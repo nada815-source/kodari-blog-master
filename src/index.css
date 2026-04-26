@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* 🐟 코다리 명품 소제목 스타일링 (미리보기용 - 적당한 크기) */
+.prose h2 {
+  font-size: 1.4rem !important; /* 약 22px */
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  margin-top: 2rem !important;
+  margin-bottom: 1rem !important;
+  border-bottom: 2px solid #f1f5f9 !important;
+  padding-bottom: 0.4rem !important;
+}
+
+.prose h3 {
+  font-size: 1.15rem !important; /* 약 18px */
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.prose p {
+  margin-bottom: 1.25rem !important;
+  line-height: 1.8 !important;
+}
