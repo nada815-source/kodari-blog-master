@@ -27,22 +27,33 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('is_authenticated') === 'true');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authCode, setAuthCode] = useState('');
+  const [toast, setToast] = useState('');
+  const [showToast, setShowToast] = useState(false);
+
+  // 🔔 자동 소멸형 명품 알림 (Toast) 로직
+  const triggerToast = (msg) => {
+    setToast(msg);
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 2500); // 2.5초 후 자동으로 사라짐
+  };
 
   const handleLogin = () => {
     if (authCode === 'kodari1') {
       setIsAuthenticated(true);
       localStorage.setItem('is_authenticated', 'true');
       setIsAuthModalOpen(false);
-      alert('반갑습니다, 대표님! KODARI BLOG AI가 활성화되었습니다. 🫡🐟');
+      triggerToast('반갑습니다, 대표님! KODARI BLOG AI가 활성화되었습니다. 🫡🐟');
     } else {
-      alert('인증 코드가 틀렸습니다. 대표님만 아시는 코드를 입력해 주세요!');
+      triggerToast('인증 코드가 틀렸습니다. 대표님만 아시는 코드를 입력해 주세요!');
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('is_authenticated');
-    alert('로그아웃 되었습니다. 충성!');
+    triggerToast('로그아웃 되었습니다. 충성!');
   };
 
   const handleSaveApiKey = (e) => {
@@ -59,7 +70,6 @@ function App() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       const now = new Date();
-      const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().replace(/T/, '_').replace(/[:.-]/g, '').slice(0, 15);
       const formattedDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
       link.href = url;
@@ -68,9 +78,9 @@ function App() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      alert('대표님! 현재 버전의 소스 코드를 대표님의 컴퓨터(다운로드 폴더)에 즉시 저장했습니다! 📂✨\n\n부장님에게도 서버용 백업을 시키시려면 채팅창에 "백업해"라고 한마디만 해주십시오! 충성!!');
+      triggerToast('대표님! 현재 버전의 소스 코드를 컴퓨터에 즉시 저장했습니다! 📂✨');
     } catch (err) {
-      alert('백업 다운로드 중 오류가 발생했습니다. 부장님에게 채팅으로 백업을 요청해 주세요! 🐟💦');
+      triggerToast('백업 다운로드 중 오류가 발생했습니다. 부장님에게 채팅으로 요청해 주세요! 🐟💦');
     }
   };
 
@@ -82,7 +92,6 @@ function App() {
         let response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${unsplashKey}`);
         let data = await response.json();
         
-        // 검색 결과가 없으면 더 넓은 범위의 키워드로 재시도
         if (!data.results || data.results.length === 0) {
           response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent('Seoul Modern Lifestyle')}&per_page=1&client_id=${unsplashKey}`);
           data = await response.json();
@@ -108,7 +117,7 @@ function App() {
 
     if (!finalKey) {
       setIsSettingsOpen(true);
-      alert('⚙️ API 키를 먼저 설정해 주세요, 대표님!');
+      triggerToast('⚙️ API 키를 먼저 설정해 주세요, 대표님!');
       return;
     }
 
@@ -123,15 +132,9 @@ function App() {
     try {
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
-      // 4. 플랫폼별 명품 프롬프트 조립 (어투 및 제약 조건 강화)
-      const platformPrompts = [];
       const platformSchema = `{"title": "매력적인 제목", "content": "상세 본문", "tags": "#태그1 #태그2 (정확히 6개)", "official_link": "보안인증(https)이 완벽한 정부/공공기관 공식 사이트 URL만 입력. 오류 사이트 절대 금지"}`;
       
-      if (platforms.naver) platformPrompts.push(`"naver": ${platformSchema.replace('상세 본문', `네이버 블로그 스타일 (어투: ${tones.naver}, 정보 해석 + 풍부한 디테일). 소제목은 반드시 ## 또는 ###를 사용해.`)}`);
-      if (platforms.tistory) platformPrompts.push(`"tistory": ${platformSchema.replace('상세 본문', `티스토리 스타일 (어투: ${tones.tistory}, 상세 정보 가이드 + 전문적 해석). 소제목은 ## 또는 ### 사용.`)}`);
-      if (platforms.wordpress) platformPrompts.push(`"wordpress": ${platformSchema.replace('상세 본문', `명쾌한 정보 전달자 스타일 (어투: ${tones.wordpress}, 실용적 정보 중심 + 읽기 편한 문체). 소제목은 ## 또는 ### 사용.`)}`);
-
-  const combinedPrompt = `주제: "${topic}"
+      const combinedPrompt = `주제: "${topic}"
 
 [필독: 생성 지침 - 미준수 시 작동 불가]
 
@@ -182,7 +185,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: combinedPrompt }] }],
-          tools: [{ google_search: {} }] // 🔍 정정: 구글 검색 실시간 연동 (최신 명칭 적용)
+          tools: [{ google_search: {} }] 
         })
       });
 
@@ -201,7 +204,6 @@ function App() {
 
       let finalImages = ['', '', ''];
       if (useImage && unsplashKey) {
-        // 전략 A: AI가 추천한 키워드로 플랫폼별 개별 이미지 가져오기
         finalImages = await fetchImages(parsedData.keywords || [topic, topic, topic]);
       }
 
@@ -221,7 +223,6 @@ function App() {
 
   const copyToClipboard = async (text) => {
     try {
-      // 1. 마크다운을 HTML로 수동 변환 (네이버 스마트에디터 최적화: p > span 구조)
       const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
       let htmlContent = text
         .replace(/^2차 해석:.*$/gim, '') 
@@ -232,21 +233,20 @@ function App() {
         .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
         .split('\n').map(line => {
           const trimmed = line.trim();
-          if (trimmed === '') return '<p>&nbsp;</p>'; // 실제 공백 삽입으로 간격 확보
+          if (trimmed === '') return '<p>&nbsp;</p>'; 
           if (trimmed.startsWith('<p') || trimmed.startsWith('<li')) return trimmed;
           return `<p style="margin-bottom: 15px;"><span style="font-size: 12pt; line-height: 1.8; color: #444; ${naverFont}">${trimmed}</span></p>`;
         }).filter(line => line !== '').join('');
 
-      // 2. HTML과 일반 텍스트를 동시에 클립보드에 저장 (Rich Text 복사)
       const blobHtml = new Blob([htmlContent], { type: 'text/html' });
       const blobText = new Blob([text], { type: 'text/plain' });
       const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
       
       await navigator.clipboard.write(data);
-      alert('서식이 포함된 상태로 복사되었습니다! 네이버 블로그에 바로 붙여넣으세요.');
+      triggerToast('서식이 포함된 상태로 복사되었습니다! 📋✨');
     } catch (err) {
       navigator.clipboard.writeText(text);
-      alert('텍스트로 복사되었습니다!');
+      triggerToast('텍스트로 복사되었습니다! ✅');
     }
   };
 
@@ -254,7 +254,6 @@ function App() {
     <div className="min-h-screen bg-slate-50 py-12 px-4 font-sans text-slate-900">
       <div className="max-w-4xl mx-auto space-y-8">
         
-        {/* Header (Sophisticated V3 Style) */}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
@@ -271,7 +270,6 @@ function App() {
           <p className="text-slate-500 font-medium text-sm">V2 명품 엔진 기반 : 보안 및 설정 시스템 이식 완료 🫡🐟</p>
         </header>
 
-        {/* Input Section */}
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
 
           <div className="space-y-2">
@@ -293,7 +291,6 @@ function App() {
             </label>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* 네이버 설정 */}
               <div className={`p-4 rounded-xl border-2 transition-all ${platforms.naver ? 'bg-white border-green-200 shadow-sm' : 'bg-slate-100/50 border-transparent opacity-60'}`}>
                 <label className="flex items-center gap-2 cursor-pointer mb-3 group">
                   <input type="checkbox" checked={platforms.naver} onChange={() => setPlatforms({...platforms, naver: !platforms.naver})} className="w-5 h-5 text-green-500 rounded border-slate-300 focus:ring-green-500" />
@@ -312,7 +309,6 @@ function App() {
                 </select>
               </div>
 
-              {/* 티스토리 설정 */}
               <div className={`p-4 rounded-xl border-2 transition-all ${platforms.tistory ? 'bg-white border-orange-200 shadow-sm' : 'bg-slate-100/50 border-transparent opacity-60'}`}>
                 <label className="flex items-center gap-2 cursor-pointer mb-3 group">
                   <input type="checkbox" checked={platforms.tistory} onChange={() => setPlatforms({...platforms, tistory: !platforms.tistory})} className="w-5 h-5 text-orange-500 rounded border-slate-300 focus:ring-orange-500" />
@@ -331,7 +327,6 @@ function App() {
                 </select>
               </div>
 
-              {/* 워드프레스 설정 */}
               <div className={`p-4 rounded-xl border-2 transition-all ${platforms.wordpress ? 'bg-white border-blue-200 shadow-sm' : 'bg-slate-100/50 border-transparent opacity-60'}`}>
                 <label className="flex items-center gap-2 cursor-pointer mb-3 group">
                   <input type="checkbox" checked={platforms.wordpress} onChange={() => setPlatforms({...platforms, wordpress: !platforms.wordpress})} className="w-5 h-5 text-blue-500 rounded border-slate-300 focus:ring-blue-500" />
@@ -355,7 +350,6 @@ function App() {
 
           {error && <p className="text-red-500 font-bold text-sm animate-pulse">{error}</p>}
 
-          {/* 이미지 토글 스위치 (전략 B) */}
           <div className="flex items-center justify-center gap-3 py-2">
             <span className={`text-xs font-bold transition-colors ${!useImage ? 'text-slate-400' : 'text-slate-300'}`}>이미지 사용 안함</span>
             <button 
@@ -381,10 +375,8 @@ function App() {
           </button>
         </div>
 
-        {/* Results Section */}
         {Object.values(results).some(val => val.content) && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            {/* Tabs */}
             <div className="flex border-b border-slate-100 bg-slate-50/50">
               {['naver', 'tistory', 'wordpress'].filter(tab => platforms[tab]).map((tab) => (
                 <button
@@ -401,10 +393,7 @@ function App() {
               ))}
             </div>
 
-            {/* Content Display */}
             <div className="p-6 space-y-6">
-              {/* 제목 영역 */}
-              {/* 이미지 표시 (전략 C) */}
               {results[activeTab].image && (
                 <div className="relative group rounded-2xl overflow-hidden shadow-lg border border-slate-100 mb-6">
                   <img 
@@ -433,7 +422,6 @@ function App() {
                 </h2>
               </div>
 
-              {/* 본문 영역 */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
@@ -459,7 +447,6 @@ function App() {
                 </div>
               </div>
 
-              {/* 팩트체크 안내 영역 */}
               <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 flex items-start gap-3 mt-4">
                 <span className="text-xl">⚠️</span>
                 <div className="flex-1">
@@ -481,7 +468,6 @@ function App() {
                 </div>
               </div>
 
-              {/* 해시태그 영역 */}
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Hashtags</label>
@@ -566,7 +552,7 @@ function App() {
             </div>
 
             <div className="pt-4 border-t border-slate-100">
-              <button onClick={() => { localStorage.setItem('gemini_api_key', apiKey); setIsSettingsOpen(false); alert('대표님, 설정이 저장되었습니다! 🫡'); }} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-lg shadow-xl transition-all">설정 저장 및 적용</button>
+              <button onClick={() => { localStorage.setItem('gemini_api_key', apiKey); setIsSettingsOpen(false); triggerToast('대표님, 설정이 저장되었습니다! 🫡'); }} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-lg shadow-xl transition-all">설정 저장 및 적용</button>
             </div>
           </div>
         </div>
@@ -584,6 +570,42 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* 🔔 명품 토스트 알림 컴포넌트 */}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          color: 'white',
+          padding: '12px 24px',
+          borderRadius: '50px',
+          zIndex: 10000,
+          fontSize: '0.95rem',
+          fontWeight: '500',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(8px)',
+          animation: 'fadeInOut 2.5s ease-in-out forwards',
+          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          {toast}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translate(-50%, 20px); }
+          15% { opacity: 1; transform: translate(-50%, 0); }
+          85% { opacity: 1; transform: translate(-50%, 0); }
+          100% { opacity: 0; transform: translate(-50%, -10px); }
+        }
+      `}</style>
     </div>
   );
 }
