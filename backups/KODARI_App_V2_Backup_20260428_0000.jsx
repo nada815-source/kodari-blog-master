@@ -130,8 +130,6 @@ function App() {
 
 [필독: 생성 지침 - 미준수 시 작동 불가]
 
-[필독: 언어 설정 - 모든 플랫폼(네이버, 티스토리, 워드프레스)의 모든 텍스트(제목, 본문, 태그, 공식 링크 이름 등)는 반드시 **한국어**로만 작성해. 영어를 섞지 마라.]
-
 0. **이미지 검색 키워드 생성 (전략 C):**
    - 주제를 분석하여 Unsplash에서 검색할 **영어 키워드 3개**를 생성해. 키워드는 "Korea, Seoul, Modern, Minimal" 느낌이 나도록 조합해.
 
@@ -286,7 +284,7 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 한국어 완벽 통일 및 3색 컬러 시스템 🫡🐟</p>
+          <p className="text-slate-500 font-medium text-sm">V2 명품 엔진 기반 : 보안 및 설정 시스템 이식 완료 🫡🐟</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">

@@ -130,8 +130,6 @@ function App() {
 
 [필독: 생성 지침 - 미준수 시 작동 불가]
 
-[필독: 언어 설정 - 모든 플랫폼(네이버, 티스토리, 워드프레스)의 모든 텍스트(제목, 본문, 태그, 공식 링크 이름 등)는 반드시 **한국어**로만 작성해. 영어를 섞지 마라.]
-
 0. **이미지 검색 키워드 생성 (전략 C):**
    - 주제를 분석하여 Unsplash에서 검색할 **영어 키워드 3개**를 생성해. 키워드는 "Korea, Seoul, Modern, Minimal" 느낌이 나도록 조합해.
 
@@ -143,10 +141,6 @@ function App() {
 
 3. **가독성 극대화 및 표(Table) 생성 전략 (필수):**
    - 모든 소제목은 반드시 마크다운의 **## (H2)** 태그로 통일해.
-   - **[형광펜 및 컬러 강조 강제]:** 독자의 시선을 끌기 위해 다음 기호를 적절히 섞어서 본문을 화려하게 구성해. 
-     1) **== 노란색 형광펜 ==**: 섹션당 1~2개 핵심 문장.
-     2) **++ 파란색 강조 ++**: 신뢰감 있는 정보, 긍정적 혜택, 숫자 정보에 사용.
-     3) **!! 빨간색 강조 !!**: 주의사항, 핵심 강조, 마감 임박 등에 사용.
    - **[표(Table) 생성 강제]:** 단순 리스트(1. 2. 3...)나 불렛 포인트로 나열할 수 있는 정보(예: 사용처 리스트, 혜택 항목, 일정 등)가 3개 이상이라면, 이를 **무조건 Markdown Table 형식**으로 시각화하여 본문 중간에 배치해. 
    - 표는 최소 2열 이상으로 구성하고(예: | 항목명 | 상세 내용 | 비고 |), 독자가 한눈에 정보를 파악할 수 있게 만들어.
 
@@ -158,7 +152,7 @@ function App() {
   "keywords": ["keyword1", "keyword2", "keyword3"],
   "naver": { 
     "title": "...", 
-    "content": "본문에 '결론', '맺음말', '관련 링크', '해시태그(tags)' 같은 섹션을 절대 포함하지 마라. 순수 정보성 문단으로만 구성해.", 
+    "content": "본문에 '결론', '맺음말', '관련 링크' 같은 제목이나 섹션을 절대 포함하지 마라. 순수 정보성 문단으로만 구성해.", 
     "tags": "...", 
     "official_links": [{"name": "경기도청 공식 홈페이지", "url": "https://www.gg.go.kr"}, {"name": "경기도문화재단", "url": "https://www.ggcf.kr"}]
   },
@@ -166,9 +160,7 @@ function App() {
   "wordpress": { ...위와 동일한 구조... }
 }
 
-[필독: '결론', '맺음말', '마지막으로' 등의 기계적 섹션 이름 사용을 절대 엄금함.]
-[필독: 모든 해시태그(tags)는 반드시 **한국어**로만 생성하고, 각 태그 앞에 반드시 **'#' 기호**를 붙여서 한 줄로 나열해. (예: #키워드1 #키워드2)]
-[말투 가이드: 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 주제와 어울리는 이모지(🌸, ✨, 📍, ✅ 등)를 적절히 섞어서 글에 생동감과 리듬감을 불어넣어줘. 정보는 날카롭게, 말투는 따뜻하게!]`;
+[필독: '결론', '맺음말', '마지막으로' 등의 기계적 섹션 이름 사용을 절대 엄금함.]`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -246,9 +238,6 @@ function App() {
         .replace(/^## (.*$)/gim, `<p style="margin-top: 40px; margin-bottom: 15px;"><span style="font-size: 20pt; font-weight: bold; color: #000; ${naverFont}">$1</span></p>`)
         .replace(/^\* (.*$)/gim, `<li style="margin-bottom: 5px;"><span style="font-size: 12pt; ${naverFont}">$1</span></li>`)
         .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-        .replace(/==\s*([\s\S]*?)\s*==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
-        .replace(/\+\+\s*([\s\S]*?)\s*\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
-        .replace(/!!\s*([\s\S]*?)\s*!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
         .split('\n').map(line => {
           const trimmed = line.trim();
           if (trimmed === '') return '<p>&nbsp;</p>'; 
@@ -286,7 +275,7 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 한국어 완벽 통일 및 3색 컬러 시스템 🫡🐟</p>
+          <p className="text-slate-500 font-medium text-sm">V2 명품 엔진 기반 : 보안 및 설정 시스템 이식 완료 🫡🐟</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -429,17 +418,7 @@ function App() {
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
                   <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2">
-                    <ReactMarkdown 
-                      components={{
-                        // ==강조== 를 미리보기에서도 노란색 배경으로 표시
-                        code: ({node, inline, className, children, ...props}) => {
-                          const match = /^\^==(.*)==\^$/.exec(children); // 임시 방편
-                          return inline ? <code className={className} {...props}>{children}</code> : <pre className={className} {...props}>{children}</pre>
-                        }
-                      }}
-                    >
-                      {results[activeTab].content}
-                    </ReactMarkdown>
+                    <ReactMarkdown>{results[activeTab].content}</ReactMarkdown>
                   </div>
                 </div>
               </div>

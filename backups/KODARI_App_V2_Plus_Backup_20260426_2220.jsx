@@ -14,9 +14,9 @@ function App() {
   const [unsplashKey, setUnsplashKey] = useState(localStorage.getItem('unsplash_key') || '');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState({
-    naver: { title: '', content: '', tags: '', official_links: [], image: '' },
-    tistory: { title: '', content: '', tags: '', official_links: [], image: '' },
-    wordpress: { title: '', content: '', tags: '', official_links: [], image: '' }
+    naver: { title: '', content: '', tags: '', official_link: '', image: '' },
+    tistory: { title: '', content: '', tags: '', official_link: '', image: '' },
+    wordpress: { title: '', content: '', tags: '', official_link: '', image: '' }
   });
   const [activeTab, setActiveTab] = useState('naver');
   const [error, setError] = useState('');
@@ -30,12 +30,13 @@ function App() {
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
 
+  // 🔔 자동 소멸형 명품 알림 (Toast) 로직
   const triggerToast = (msg) => {
     setToast(msg);
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
-    }, 2500);
+    }, 2500); // 2.5초 후 자동으로 사라짐
   };
 
   const handleLogin = () => {
@@ -90,12 +91,15 @@ function App() {
         const query = encodeURIComponent(keyword + ' Korea Seoul Modern');
         let response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${unsplashKey}`);
         let data = await response.json();
+        
         if (!data.results || data.results.length === 0) {
           response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent('Seoul Modern Lifestyle')}&per_page=1&client_id=${unsplashKey}`);
           data = await response.json();
         }
+        
         return data.results?.[0]?.urls?.regular || '';
       };
+      
       const kws = Array.isArray(keywords) ? keywords : [topic, topic, topic];
       return await Promise.all(kws.map(kw => fetchImage(kw)));
     } catch (err) {
@@ -110,11 +114,13 @@ function App() {
       return;
     }
     const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
+
     if (!finalKey) {
       setIsSettingsOpen(true);
       triggerToast('⚙️ API 키를 먼저 설정해 주세요, 대표님!');
       return;
     }
+
     if (!topic.trim()) {
       setError('포스팅 주제를 입력해주세요!');
       return;
@@ -126,49 +132,53 @@ function App() {
     try {
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
+      const platformSchema = `{"title": "매력적인 제목", "content": "상세 본문", "tags": "#태그1 #태그2 (정확히 6개)", "official_link": "보안인증(https)이 완벽한 정부/공공기관 공식 사이트 URL만 입력. 오류 사이트 절대 금지"}`;
+      
       const combinedPrompt = `주제: "${topic}"
 
 [필독: 생성 지침 - 미준수 시 작동 불가]
 
-[필독: 언어 설정 - 모든 플랫폼(네이버, 티스토리, 워드프레스)의 모든 텍스트(제목, 본문, 태그, 공식 링크 이름 등)는 반드시 **한국어**로만 작성해. 영어를 섞지 마라.]
-
 0. **이미지 검색 키워드 생성 (전략 C):**
-   - 주제를 분석하여 Unsplash에서 검색할 **영어 키워드 3개**를 생성해. 키워드는 "Korea, Seoul, Modern, Minimal" 느낌이 나도록 조합해.
+   - 주제를 분석하여 Unsplash에서 검색할 **영어 키워드 3개**를 생성해.
+   - 키워드는 "Korea, Seoul, Modern, Minimal" 느낌이 나도록 조합해. (예: "Seoul modern cafe interior")
+   - 각 키워드는 서로 다르게 생성해서 플랫폼별 이미지 차별화(전략 A)를 도모해.
 
 1. **보안 및 신뢰성 (최우선):**
-   - 반드시 보안(https)이 완벽하게 작동하는 정부('go.kr'), 공공기관 공식 사이트 링크만 선별해.
+   - **보안 경고 금지:** 현재 경기문화재단(ggcf.or.kr) 등 일부 사이트에서 보안 인증서 오류가 발생하고 있어. 이런 사이트는 공식이라도 절대 링크를 걸지 마.
+   - **검증된 주소만:** 반드시 보안(https)이 완벽하게 작동하는 정부('go.kr'), 지자체 및 공공기관 공식 사이트 링크만 선별해. 불확실하면 차라리 비워둬.
 
 2. **압도적인 정보량 (최소 1500자 이상):** 
-   - 각 플랫폼별 본문은 공백 제외 최소 1500자 이상의 풍성한 분량으로 작성해.
+   - 각 플랫폼별 본문은 공백 제외 최소 1500자 이상의 풍성한 분량으로 작성해. 요약하지 말고 디테일하게 풀어써.
+   - 주제와 관련된 구체적인 예시(장소 이름, 정책 수치, 이용 방법 등)를 최소 5개 이상 포함해.
 
-3. **가독성 극대화 및 표(Table) 생성 전략 (필수):**
-   - 모든 소제목은 반드시 마크다운의 **## (H2)** 태그로 통일해.
-   - **[형광펜 및 컬러 강조 강제]:** 독자의 시선을 끌기 위해 다음 기호를 적절히 섞어서 본문을 화려하게 구성해. 
-     1) **== 노란색 형광펜 ==**: 섹션당 1~2개 핵심 문장.
-     2) **++ 파란색 강조 ++**: 신뢰감 있는 정보, 긍정적 혜택, 숫자 정보에 사용.
-     3) **!! 빨간색 강조 !!**: 주의사항, 핵심 강조, 마감 임박 등에 사용.
-   - **[표(Table) 생성 강제]:** 단순 리스트(1. 2. 3...)나 불렛 포인트로 나열할 수 있는 정보(예: 사용처 리스트, 혜택 항목, 일정 등)가 3개 이상이라면, 이를 **무조건 Markdown Table 형식**으로 시각화하여 본문 중간에 배치해. 
-   - 표는 최소 2열 이상으로 구성하고(예: | 항목명 | 상세 내용 | 비고 |), 독자가 한눈에 정보를 파악할 수 있게 만들어.
+3. **정보(70%) + 해석(30%)의 황금 비율:**
+   - **네이버/티스토리:** 독자가 궁금해하는 '팩트(사용처, 기간, 대상)'를 아주 상세히 먼저 알려줘. 그 다음 대표님의 '2차 해석 로직(결과+감정+궁금증)'을 녹여내서 "그래서 이게 왜 대단한 건지"를 설명해.
+   - **워드프레스:** 너무 딱딱한 설명서가 되지 않게 해. 정보는 명확하게 주되, 독자와 대화하듯 부드럽고 실용적인 문체를 사용해.
 
-4. **JSON 안정성:**
-   - 응답은 반드시 유효한 JSON 형식이어야 해. 본문 텍스트 내부에 쌍따옴표(")는 작은따옴표(')로 대체해.
+4. **네이버 2차 해석 제목 전략:**
+   - 제목은 반드시 "결과 + 감정 + 궁금증"이 포함된 매력적인 2차 해석형으로 지어.
+   - **중요:** 본문 내부에는 "2차 해석:", "나름의 해석:", "대표님의 로직:" 같은 **안내성 문구를 절대 직접 노출하지 마.** 자연스럽게 이야기하듯 풀어써야 해.
 
-결과는 반드시 아래의 JSON 형식으로만 답변해:
+5. **금지 사항:**
+   - '결론', '서론', '향후 전망' 같은 기계적인 소제목 절대 금지. 대신 "이걸 놓치면 왜 안 될까요? 💡", "실제로 가본 사람들의 반응은? 🔥" 처럼 매력적인 문장으로 소제목을 지어.
+   - H2, H3 태그 명칭 노출 금지.
+
+6. **가독성 극대화 (소제목 태그 활용):**
+   - 모든 플랫폼 공통으로 모든 소제목은 반드시 마크다운의 **## (H2)** 태그로 통일해.
+   - 소제목 뒤에는 반드시 한 줄의 빈 줄을 넣어 본문과 분리해.
+   - 문단과 문단 사이에도 반드시 빈 줄을 삽입하여 가독성을 높여.
+
+7. **JSON 안정성:**
+   - 응답은 반드시 유효한 JSON 형식이어야 해.
+   - **중요:** 본문 텍스트 내부에 쌍따옴표(")를 쓰고 싶다면 반드시 작은따옴표(')로 대체해서 출력해.
+
+결과는 반드시 아래의 JSON 형식으로만 답변해 (구조 절대 준수):
 {
   "keywords": ["keyword1", "keyword2", "keyword3"],
-  "naver": { 
-    "title": "...", 
-    "content": "본문에 '결론', '맺음말', '관련 링크', '해시태그(tags)' 같은 섹션을 절대 포함하지 마라. 순수 정보성 문단으로만 구성해.", 
-    "tags": "...", 
-    "official_links": [{"name": "경기도청 공식 홈페이지", "url": "https://www.gg.go.kr"}, {"name": "경기도문화재단", "url": "https://www.ggcf.kr"}]
-  },
-  "tistory": { ...위와 동일한 구조... },
-  "wordpress": { ...위와 동일한 구조... }
-}
-
-[필독: '결론', '맺음말', '마지막으로' 등의 기계적 섹션 이름 사용을 절대 엄금함.]
-[필독: 모든 해시태그(tags)는 반드시 **한국어**로만 생성하고, 각 태그 앞에 반드시 **'#' 기호**를 붙여서 한 줄로 나열해. (예: #키워드1 #키워드2)]
-[말투 가이드: 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 주제와 어울리는 이모지(🌸, ✨, 📍, ✅ 등)를 적절히 섞어서 글에 생동감과 리듬감을 불어넣어줘. 정보는 날카롭게, 말투는 따뜻하게!]`;
+  "naver": { "title": "...", "content": "...", "tags": "...", "official_link": "..." },
+  "tistory": { "title": "...", "content": "...", "tags": "...", "official_link": "..." },
+  "wordpress": { "title": "...", "content": "...", "tags": "...", "official_link": "..." }
+}`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -186,6 +196,7 @@ function App() {
 
       const data = await response.json();
       let responseTextRaw = data.candidates[0].content.parts[0].text;
+      
       let responseText = responseTextRaw.replace(/```json/gi, '').replace(/```/gi, '').trim();
 
       const parsedData = JSON.parse(responseText);
@@ -197,9 +208,9 @@ function App() {
       }
 
       setResults({
-        naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], official_links: parsedData.naver.official_links || [] } : emptyResult,
-        tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], official_links: parsedData.tistory.official_links || [] } : emptyResult,
-        wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], official_links: parsedData.wordpress.official_links || [] } : emptyResult
+        naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0] } : emptyResult,
+        tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1] } : emptyResult,
+        wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2] } : emptyResult
       });
 
     } catch (err) {
@@ -213,46 +224,17 @@ function App() {
   const copyToClipboard = async (text) => {
     try {
       const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
-      
-      let processedText = text;
-      const tableRegex = /^\|(.+)\|\n\|([ :|-]+)\|\n((\|.+\|\n?)+)/gm;
-      
-      const markdownToHtmlTable = (match) => {
-        const lines = match.trim().split('\n');
-        const headers = lines[0].split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim());
-        const rows = lines.slice(2).map(line => line.split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim()));
-
-        let html = `<table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #ddd; ${naverFont}">`;
-        html += '<thead style="background-color: #f8f9fa;"><tr>';
-        headers.forEach(h => {
-          html += `<th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; background-color: #f2f2f2;">${h}</th>`;
-        });
-        html += '</tr></thead><tbody>';
-        rows.forEach(row => {
-          html += '<tr>';
-          row.forEach(cell => {
-            html += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${cell}</td>`;
-          });
-          html += '</tr>';
-        });
-        html += '</tbody></table>';
-        return html;
-      };
-
-      let htmlContent = processedText.replace(tableRegex, markdownToHtmlTable);
-
-      htmlContent = htmlContent
+      let htmlContent = text
+        .replace(/^2차 해석:.*$/gim, '') 
+        .replace(/^나름의 해석:.*$/gim, '') 
         .replace(/^### (.*$)/gim, `<p style="margin-top: 30px; margin-bottom: 10px;"><span style="font-size: 16pt; font-weight: bold; color: #333; ${naverFont}">$1</span></p>`)
         .replace(/^## (.*$)/gim, `<p style="margin-top: 40px; margin-bottom: 15px;"><span style="font-size: 20pt; font-weight: bold; color: #000; ${naverFont}">$1</span></p>`)
         .replace(/^\* (.*$)/gim, `<li style="margin-bottom: 5px;"><span style="font-size: 12pt; ${naverFont}">$1</span></li>`)
         .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-        .replace(/==\s*([\s\S]*?)\s*==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
-        .replace(/\+\+\s*([\s\S]*?)\s*\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
-        .replace(/!!\s*([\s\S]*?)\s*!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
         .split('\n').map(line => {
           const trimmed = line.trim();
           if (trimmed === '') return '<p>&nbsp;</p>'; 
-          if (trimmed.startsWith('<p') || trimmed.startsWith('<li') || trimmed.startsWith('<table')) return trimmed;
+          if (trimmed.startsWith('<p') || trimmed.startsWith('<li')) return trimmed;
           return `<p style="margin-bottom: 15px;"><span style="font-size: 12pt; line-height: 1.8; color: #444; ${naverFont}">${trimmed}</span></p>`;
         }).filter(line => line !== '').join('');
 
@@ -261,9 +243,8 @@ function App() {
       const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
       
       await navigator.clipboard.write(data);
-      triggerToast('서식과 표가 포함된 상태로 복사되었습니다! 📋📊✨');
+      triggerToast('서식이 포함된 상태로 복사되었습니다! 📋✨');
     } catch (err) {
-      console.error('Clipboard error:', err);
       navigator.clipboard.writeText(text);
       triggerToast('텍스트로 복사되었습니다! ✅');
     }
@@ -286,10 +267,11 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 한국어 완벽 통일 및 3색 컬러 시스템 🫡🐟</p>
+          <p className="text-slate-500 font-medium text-sm">V2 명품 엔진 기반 : 보안 및 설정 시스템 이식 완료 🫡🐟</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
+
           <div className="space-y-2">
             <label className="block text-sm font-bold text-slate-700 mb-2">✍️ 포스팅 주제</label>
             <input 
@@ -305,7 +287,9 @@ function App() {
           <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
             <label className="block text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
               ✅ 발행 플랫폼 및 개별 어투 설정
+              <span className="text-xs font-normal text-slate-400">(선택한 플랫폼에 대해 각각 다른 어투를 설정할 수 있습니다)</span>
             </label>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className={`p-4 rounded-xl border-2 transition-all ${platforms.naver ? 'bg-white border-green-200 shadow-sm' : 'bg-slate-100/50 border-transparent opacity-60'}`}>
                 <label className="flex items-center gap-2 cursor-pointer mb-3 group">
@@ -363,6 +347,7 @@ function App() {
             </div>
           </div>
 
+
           {error && <p className="text-red-500 font-bold text-sm animate-pulse">{error}</p>}
 
           <div className="flex items-center justify-center gap-3 py-2">
@@ -411,70 +396,97 @@ function App() {
             <div className="p-6 space-y-6">
               {results[activeTab].image && (
                 <div className="relative group rounded-2xl overflow-hidden shadow-lg border border-slate-100 mb-6">
-                  <img src={results[activeTab].image} alt="Blog Background" className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">📸 Photo via Unsplash (AI 추천 이미지)</div>
+                  <img 
+                    src={results[activeTab].image} 
+                    alt="Blog Background" 
+                    className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    📸 Photo via Unsplash (AI 추천 이미지)
+                  </div>
                 </div>
               )}
+
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider">Title</label>
-                  <button onClick={() => copyToClipboard(results[activeTab].title)} className="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-blue-100 flex items-center gap-1">📋 제목 복사</button>
+                  <button 
+                    onClick={() => copyToClipboard(results[activeTab].title)}
+                    className="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-blue-100 flex items-center gap-1"
+                  >
+                    📋 제목 복사
+                  </button>
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[activeTab].title || '제목 생성 중...'}</h2>
+                <h2 className="text-xl font-bold text-slate-800 leading-tight">
+                  {results[activeTab].title || '제목 생성 중...'}
+                </h2>
               </div>
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
-                  <button onClick={() => copyToClipboard(results[activeTab].content)} className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 본문 복사</button>
+                  <button 
+                    onClick={() => copyToClipboard(results[activeTab].content)}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1"
+                  >
+                    📋 본문 복사
+                  </button>
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
-                  <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2">
-                    <ReactMarkdown 
-                      components={{
-                        // ==강조== 를 미리보기에서도 노란색 배경으로 표시
-                        code: ({node, inline, className, children, ...props}) => {
-                          const match = /^\^==(.*)==\^$/.exec(children); // 임시 방편
-                          return inline ? <code className={className} {...props}>{children}</code> : <pre className={className} {...props}>{children}</pre>
-                        }
-                      }}
-                    >
-                      {results[activeTab].content}
-                    </ReactMarkdown>
+                  {activeTab === 'wordpress' && (
+                    <div className="mb-4 p-3 bg-blue-50/50 text-blue-600 rounded-lg text-xs font-bold flex items-center gap-2 border border-blue-100">
+                      💡 꿀팁: 워드프레스 편집기에 복사해서 붙여넣으면 H2, H3 제목이 자동으로 적용됩니다!
+                    </div>
+                  )}
+                  <div className="prose prose-slate max-w-none text-base leading-relaxed 
+                    prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100
+                    prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4
+                    prose-p:mb-6 prose-li:mb-2">
+                    <ReactMarkdown>{results[activeTab].content}</ReactMarkdown>
                   </div>
                 </div>
               </div>
+
               <div className="bg-amber-50 p-4 rounded-xl border border-amber-200 flex items-start gap-3 mt-4">
                 <span className="text-xl">⚠️</span>
                 <div className="flex-1">
                   <p className="text-amber-800 font-bold text-sm mb-1">코다리의 팩트체크 알림</p>
-                  <p className="text-amber-700 text-xs leading-relaxed mb-3">본 콘텐츠는 AI가 실시간 데이터를 기반으로 생성한 결과물입니다. 중요한 수치나 날짜 등은 반드시 아래 공식 관련 링크를 통해 최종 확인 후 발행해 주세요!</p>
-                  <div className="flex flex-wrap gap-2">
-                    {results[activeTab].official_links && results[activeTab].official_links.map((link, idx) => (
-                      <a 
-                        key={idx}
-                        href={link.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold rounded-lg text-xs transition-all border border-amber-300"
-                      >
-                        🔗 {link.name} 바로가기
-                      </a>
-                    ))}
-                  </div>
+                  <p className="text-amber-700 text-xs leading-relaxed mb-2">
+                    본 콘텐츠는 AI가 실시간 데이터를 기반으로 생성한 결과물입니다. 정책 변경이나 최신 정보 반영에 시차가 있을 수 있으니, 
+                    <strong> 중요한 수치나 날짜 등은 반드시 공식 홈페이지를 통해 최종 확인</strong> 후 발행해 주세요!
+                  </p>
+                  {results[activeTab].official_link && (
+                    <a 
+                      href={results[activeTab].official_link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold rounded-lg text-xs transition-all border border-amber-300"
+                    >
+                      🔗 공식 홈페이지 바로가기
+                    </a>
+                  )}
                 </div>
               </div>
+
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Hashtags</label>
-                  <button onClick={() => copyToClipboard(results[activeTab].tags)} className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 태그 복사</button>
+                  <button 
+                    onClick={() => copyToClipboard(results[activeTab].tags)}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1"
+                  >
+                    📋 태그 복사
+                  </button>
                 </div>
-                <p className="text-blue-600 font-medium">{results[activeTab].tags || '#해시태그'}</p>
+                <p className="text-blue-600 font-medium">
+                  {results[activeTab].tags || '#해시태그 #추천 #중'}
+                </p>
               </div>
             </div>
           </div>
         )}
-      </div>
 
+      </div>
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-8 max-w-md w-full space-y-6 shadow-2xl border border-slate-100 text-left">
@@ -482,24 +494,63 @@ function App() {
               <h2 className="text-2xl font-black text-slate-800">⚙️ 시스템 설정</h2>
               <button onClick={() => setIsSettingsOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
             </div>
+            
             <div className="space-y-4">
               <label className="text-sm font-bold text-slate-700 flex items-center gap-2">🔑 Gemini API Key</label>
               <div className="relative group">
-                <input type={showApiKey ? "text" : "password"} value={apiKey} onChange={handleSaveApiKey} className="w-full p-4 pr-12 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all font-mono text-sm" placeholder="Gemini API 키를 입력하세요" />
-                <button type="button" onClick={() => setShowApiKey(!showApiKey)} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">{showApiKey ? "👁️" : "👁️‍🗨️"}</button>
+                <input 
+                  type={showApiKey ? "text" : "password"} 
+                  value={apiKey} 
+                  onChange={handleSaveApiKey} 
+                  className="w-full p-4 pr-12 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all font-mono text-sm" 
+                  placeholder="Gemini API 키를 입력하세요" 
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                  title={showApiKey ? "키 숨기기" : "키 보기"}
+                >
+                  {showApiKey ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  )}
+                </button>
               </div>
             </div>
+
             <div className="space-y-4">
               <label className="text-sm font-bold text-slate-700 flex items-center gap-2">📸 Unsplash Access Key</label>
               <div className="relative group">
-                <input type={showUnsplashKey ? "text" : "password"} value={unsplashKey} onChange={(e) => { setUnsplashKey(e.target.value); localStorage.setItem('unsplash_key', e.target.value); }} className="w-full p-4 pr-12 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all font-mono text-sm" placeholder="Unsplash 키를 입력하세요" />
-                <button type="button" onClick={() => setShowUnsplashKey(!showUnsplashKey)} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">{showUnsplashKey ? "👁️" : "👁️‍🗨️"}</button>
+                <input 
+                  type={showUnsplashKey ? "text" : "password"} 
+                  value={unsplashKey} 
+                  onChange={(e) => { setUnsplashKey(e.target.value); localStorage.setItem('unsplash_key', e.target.value); }} 
+                  className="w-full p-4 pr-12 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all font-mono text-sm" 
+                  placeholder="Unsplash 키를 입력하세요" 
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowUnsplashKey(!showUnsplashKey)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                  title={showUnsplashKey ? "키 숨기기" : "키 보기"}
+                >
+                  {showUnsplashKey ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  )}
+                </button>
               </div>
             </div>
+
             <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-3 text-left">
               <h3 className="text-sm font-black text-indigo-600 uppercase tracking-wider">💾 코다리 백업 관리</h3>
-              <button onClick={handleDownloadBackup} className="w-full py-3 bg-white hover:bg-indigo-100 text-indigo-600 rounded-xl font-bold text-sm shadow-sm border border-indigo-200 transition-all">📂 현재 버전 즉시 백업(다운로드)</button>
+              <p className="text-xs text-indigo-400 leading-relaxed">작업 중에 코드가 꼬이는 것을 방지하기 위해 정기적으로 백업본을 생성하십시오.</p>
+              <button onClick={handleDownloadBackup} className="w-full py-3 bg-white hover:bg-indigo-100 text-indigo-600 rounded-xl font-bold text-sm shadow-sm border border-indigo-200 transition-all flex items-center justify-center gap-2">📂 현재 버전 즉시 백업(다운로드)</button>
             </div>
+
             <div className="pt-4 border-t border-slate-100">
               <button onClick={() => { localStorage.setItem('gemini_api_key', apiKey); setIsSettingsOpen(false); triggerToast('대표님, 설정이 저장되었습니다! 🫡'); }} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-lg shadow-xl transition-all">설정 저장 및 적용</button>
             </div>
@@ -509,16 +560,40 @@ function App() {
 
       {isAuthModalOpen && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full space-y-6 text-center shadow-2xl border border-slate-100 relative">
+          <div className="bg-white rounded-3xl p-8 max-sm w-full space-y-6 text-center shadow-2xl border border-slate-100 relative">
+            <button onClick={() => setIsAuthModalOpen(false)} className="absolute right-6 top-6 text-slate-400 hover:text-slate-600 transition-all">✕</button>
+            <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-2">🔑</div>
             <h2 className="text-2xl font-black text-slate-800">대표님 인증 필요 🫡</h2>
+            <p className="text-sm text-slate-500">이 앱은 대표님 전용입니다.<br/>비밀 코드를 입력해 주세요.</p>
             <input type="password" value={authCode} onChange={(e) => setAuthCode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} placeholder="코드를 입력하세요" className="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200 text-center text-2xl font-black focus:border-indigo-500 focus:outline-none transition-all" />
             <button onClick={handleLogin} className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-lg shadow-xl transition-all">인증하기</button>
           </div>
         </div>
       )}
 
+      {/* 🔔 명품 토스트 알림 컴포넌트 */}
       {showToast && (
-        <div style={{ position: 'fixed', bottom: '40px', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(0, 0, 0, 0.85)', color: 'white', padding: '12px 24px', borderRadius: '50px', zIndex: 10000, fontSize: '0.95rem', fontWeight: '500', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', animation: 'fadeInOut 2.5s ease-in-out forwards', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{
+          position: 'fixed',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          color: 'white',
+          padding: '12px 24px',
+          borderRadius: '50px',
+          zIndex: 10000,
+          fontSize: '0.95rem',
+          fontWeight: '500',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(8px)',
+          animation: 'fadeInOut 2.5s ease-in-out forwards',
+          whiteSpace: 'nowrap',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
           {toast}
         </div>
       )}
