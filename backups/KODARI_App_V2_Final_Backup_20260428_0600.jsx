@@ -210,84 +210,52 @@ function App() {
     }
   };
 
-  const convertMarkdownToHtml = (text) => {
-    const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
-    const tableRegex = /^\|(.+)\|\n\|([ :|-]+)\|\n((\|.+\|\n?)+)/gm;
-    
-    const markdownToHtmlTable = (match) => {
-      const lines = match.trim().split('\n');
-      const headers = lines[0].split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim());
-      const rows = lines.slice(2).map(line => line.split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim()));
-
-      let html = `<table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #ddd; ${naverFont}">`;
-      html += '<thead style="background-color: #f8f9fa;"><tr>';
-      headers.forEach(h => {
-        html += `<th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; background-color: #f2f2f2;">${h}</th>`;
-      });
-      html += '</tr></thead><tbody>';
-      rows.forEach(row => {
-        html += '<tr>';
-        row.forEach(cell => {
-          html += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${cell}</td>`;
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-      return html;
-    };
-
-    let htmlContent = text.replace(tableRegex, markdownToHtmlTable);
-
-    return htmlContent
-      .replace(/^### (.*$)/gim, `<p style="margin-top: 30px; margin-bottom: 10px;"><span style="font-size: 16pt; font-weight: bold; color: #333; ${naverFont}">$1</span></p>`)
-      .replace(/^## (.*$)/gim, `<p style="margin-top: 40px; margin-bottom: 15px;"><span style="font-size: 20pt; font-weight: bold; color: #000; ${naverFont}">$1</span></p>`)
-      .replace(/^\* (.*$)/gim, `<li style="margin-bottom: 5px;"><span style="font-size: 12pt; ${naverFont}">$1</span></li>`)
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/==\s*([\s\S]*?)\s*==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
-      .replace(/\+\+\s*([\s\S]*?)\s*\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
-      .replace(/!!\s*([\s\S]*?)\s*!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
-      .split('\n').map(line => {
-        const trimmed = line.trim();
-        if (trimmed === '') return '<p>&nbsp;</p>'; 
-        if (trimmed.startsWith('<p') || trimmed.startsWith('<li') || trimmed.startsWith('<table')) return trimmed;
-        return `<p style="margin-bottom: 15px;"><span style="font-size: 12pt; line-height: 1.8; color: #444; ${naverFont}">${trimmed}</span></p>`;
-      }).filter(line => line !== '').join('');
-  };
-
-  const openPreviewWindow = (text) => {
-    const htmlContent = convertMarkdownToHtml(text);
-    const previewWin = window.open('', '_blank');
-    if (!previewWin) {
-      triggerToast('팝업 차단을 해제해 주세요! 🐟💦');
-      return;
-    }
-    previewWin.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>모바일 복사 전용 미리보기</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body { padding: 20px; line-height: 1.6; font-family: '나눔고딕', sans-serif; background-color: #fff; }
-            .guide-box { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 30px; border: 2px dashed #dee2e6; text-align: center; }
-            .guide-text { font-weight: bold; color: #495057; font-size: 14px; }
-          </style>
-        </head>
-        <body>
-          <div class="guide-box">
-            <div class="guide-text">💡 아래 내용을 [전체 선택] 후 [복사]하여<br>네이버 블로그 앱에 붙여넣으세요!</div>
-          </div>
-          <div id="content">${htmlContent}</div>
-        </body>
-      </html>
-    `);
-    previewWin.document.close();
-    triggerToast('미리보기 창이 열렸습니다. 전체 선택 후 복사해 주세요! 📱✨');
-  };
-
   const copyToClipboard = async (text) => {
     try {
-      const htmlContent = convertMarkdownToHtml(text);
+      const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
+      
+      let processedText = text;
+      const tableRegex = /^\|(.+)\|\n\|([ :|-]+)\|\n((\|.+\|\n?)+)/gm;
+      
+      const markdownToHtmlTable = (match) => {
+        const lines = match.trim().split('\n');
+        const headers = lines[0].split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim());
+        const rows = lines.slice(2).map(line => line.split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim()));
+
+        let html = `<table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #ddd; ${naverFont}">`;
+        html += '<thead style="background-color: #f8f9fa;"><tr>';
+        headers.forEach(h => {
+          html += `<th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; background-color: #f2f2f2;">${h}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        rows.forEach(row => {
+          html += '<tr>';
+          row.forEach(cell => {
+            html += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${cell}</td>`;
+          });
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        return html;
+      };
+
+      let htmlContent = processedText.replace(tableRegex, markdownToHtmlTable);
+
+      htmlContent = htmlContent
+        .replace(/^### (.*$)/gim, `<p style="margin-top: 30px; margin-bottom: 10px;"><span style="font-size: 16pt; font-weight: bold; color: #333; ${naverFont}">$1</span></p>`)
+        .replace(/^## (.*$)/gim, `<p style="margin-top: 40px; margin-bottom: 15px;"><span style="font-size: 20pt; font-weight: bold; color: #000; ${naverFont}">$1</span></p>`)
+        .replace(/^\* (.*$)/gim, `<li style="margin-bottom: 5px;"><span style="font-size: 12pt; ${naverFont}">$1</span></li>`)
+        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+        .replace(/==\s*([\s\S]*?)\s*==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
+        .replace(/\+\+\s*([\s\S]*?)\s*\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
+        .replace(/!!\s*([\s\S]*?)\s*!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
+        .split('\n').map(line => {
+          const trimmed = line.trim();
+          if (trimmed === '') return '<p>&nbsp;</p>'; 
+          if (trimmed.startsWith('<p') || trimmed.startsWith('<li') || trimmed.startsWith('<table')) return trimmed;
+          return `<p style="margin-bottom: 15px;"><span style="font-size: 12pt; line-height: 1.8; color: #444; ${naverFont}">${trimmed}</span></p>`;
+        }).filter(line => line !== '').join('');
+
       const blobHtml = new Blob([htmlContent], { type: 'text/html' });
       const blobText = new Blob([text], { type: 'text/plain' });
       const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
@@ -318,7 +286,7 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 한국어 완벽 통일 및 모바일 복사 최적화 🫡🐟</p>
+          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 한국어 완벽 통일 및 3색 컬러 시스템 🫡🐟</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -457,10 +425,7 @@ function App() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
-                  <div className="flex gap-2">
-                    <button onClick={() => openPreviewWindow(results[activeTab].content)} className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-indigo-100 flex items-center gap-1">📱 모바일 복사 전용</button>
-                    <button onClick={() => copyToClipboard(results[activeTab].content)} className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 본문 복사</button>
-                  </div>
+                  <button onClick={() => copyToClipboard(results[activeTab].content)} className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 본문 복사</button>
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
                   <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2">
