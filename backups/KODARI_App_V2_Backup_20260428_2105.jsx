@@ -27,52 +27,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('is_authenticated') === 'true');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authCode, setAuthCode] = useState('');
-  const [isPatchNotesOpen, setIsPatchNotesOpen] = useState(false);
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
-
-  const patchNotes = [
-    {
-      version: 'v2.1.2',
-      date: '2026-04-28',
-      title: '📜 코다리의 항해일지(패치노트) 도입',
-      tags: ['기능 추가', 'UI/UX'],
-      details: [
-        '혁신 블로그 AI의 장점을 벤치마킹하여 서비스 업데이트 내역을 한눈에 볼 수 있는 타임라인 UI를 추가했습니다.',
-        '헤더의 📜 버튼을 통해 언제든지 코다리 엔진의 진화 과정을 확인하실 수 있습니다.'
-      ]
-    },
-    {
-      version: 'v2.1.1',
-      date: '2026-04-28',
-      title: '⚖️ 황금 밸런스 가독성 튜닝',
-      tags: ['성능 개선', '가독성'],
-      details: [
-        '모바일 최적화의 정점! 한 문단 길이를 2~3문장으로 조절하여 가독성과 논리적 흐름을 모두 잡았습니다.',
-        '문단 사이 시각적 여백을 강화하여 독자가 느끼는 피로도를 획기적으로 줄였습니다.'
-      ]
-    },
-    {
-      version: 'v2.1.0',
-      date: '2026-04-28',
-      title: '📱 모바일 복사 전용 시스템 도입',
-      tags: ['기능 추가'],
-      details: [
-        '네이버 블로그 앱 서식 깨짐 방지를 위한 "모바일 복사 전용 미리보기" 기능을 추가했습니다.',
-        '새 창에서 전체 선택 후 복사하여 서식을 100% 보존할 수 있습니다.'
-      ]
-    },
-    {
-      version: 'v2.0.0',
-      date: '2026-04-27',
-      title: '🇰🇷 한국어 완벽 통일 및 3색 강조',
-      tags: ['시스템'],
-      details: [
-        '워드프레스 포함 모든 플랫폼의 출력 언어를 한국어로 100% 고정했습니다.',
-        '3색(노랑 형광펜, 파랑 강조, 빨강 주의) 컬러 시스템을 완성했습니다.'
-      ]
-    }
-  ];
 
   const triggerToast = (msg) => {
     setToast(msg);
@@ -354,10 +310,6 @@ function App() {
             <div className="w-10"></div>
             <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI</h1>
             <div className="flex gap-2">
-              <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
-                <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
-                <span className="text-[10px] font-bold text-slate-400 group-hover:text-indigo-500 uppercase tracking-tighter">Log</span>
-              </button>
               <button onClick={() => setIsSettingsOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-slate-50 transition-all">⚙️</button>
               {isAuthenticated ? (
                 <button onClick={handleLogout} className="px-4 py-2 rounded-full bg-slate-800 text-white text-xs font-bold hover:bg-red-600 transition-all">인증 해제</button>
@@ -557,55 +509,6 @@ function App() {
           </div>
         )}
       </div>
-
-      {/* 패치노트 모달 */}
-      {isPatchNotesOpen && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border border-slate-100">
-            <div className="flex justify-between items-center mb-8">
-              <div className="space-y-1">
-                <h2 className="text-2xl font-black text-slate-800 flex items-center gap-2">📜 코다리의 항해일지</h2>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Service Update History</p>
-              </div>
-              <button onClick={() => setIsPatchNotesOpen(false)} className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all">✕</button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-              <div className="space-y-12 pb-4">
-                {patchNotes.map((note, idx) => (
-                  <div key={idx} className="relative pl-8 border-l-2 border-slate-100 last:border-transparent">
-                    {/* 타임라인 포인트 */}
-                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-indigo-500 shadow-sm"></div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-black text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded-md uppercase">{note.version}</span>
-                        <span className="text-xs font-bold text-slate-400">{note.date}</span>
-                        {note.tags.map((tag, tIdx) => (
-                          <span key={tIdx} className="text-[10px] font-bold text-slate-500 px-1.5 py-0.5 bg-slate-100 rounded-sm">#{tag}</span>
-                        ))}
-                      </div>
-                      <h3 className="text-lg font-black text-slate-800 tracking-tight">{note.title}</h3>
-                      <ul className="space-y-2">
-                        {note.details.map((detail, dIdx) => (
-                          <li key={dIdx} className="text-sm text-slate-600 leading-relaxed flex items-start gap-2">
-                            <span className="text-indigo-400 mt-1.5 w-1.5 h-1.5 rounded-full bg-current flex-shrink-0"></span>
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="pt-6 border-t border-slate-50 text-center">
-              <p className="text-[11px] font-bold text-slate-400 italic">더 나은 성과를 위해 오늘도 코다리는 항해 중입니다. 🫡🐟</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
