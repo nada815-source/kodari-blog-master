@@ -28,24 +28,12 @@ function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authCode, setAuthCode] = useState('');
   const [isPatchNotesOpen, setIsPatchNotesOpen] = useState(false);
-  const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
 
   const patchNotes = [
-    {
-      version: 'V2.2.0',
-      date: '2026-04-28',
-      title: '🎨 KODARI Creator Mode: AI 프롬프트 생성기',
-      tags: ['신규 기능', '이미지 생성'],
-      details: [
-        'Unsplash 검색 결과가 만족스럽지 않을 때 사용할 수 있는 "AI 이미지 생성 프롬프트" 기능을 추가했습니다.',
-        '각 플랫폼별 본문에 딱 맞는 고해상도 이미지 생성 전용 영어 프롬프트를 자동으로 제작합니다.',
-        '생성된 프롬프트를 한 번의 클릭으로 복사하여 Gemini, DALL-E 3 등에 즉시 사용할 수 있습니다.'
-      ]
-    },
     {
       version: 'V2.1.6',
       date: '2026-04-28',
@@ -277,10 +265,8 @@ function App() {
      - **인물**: 인물이 포함될 경우 반드시 **한국인(Korean/Asian)**이 주인공이 되도록 해.
      - **텍스트**: 배경에 영어 등 외국어 간판이나 지저분한 텍스트가 없는 **깨끗한 사진**을 우선해. (Keywords: No text, Minimalist background)
      - **사물**: 정책/금융 등 추상적 주제는 "결제하는 손", "신용카드", "지갑" 등 **구체적인 사물**로 치환해.
-   - **[3단계: 추출]**: 상상한 장면을 바탕으로 다음 두 가지를 생성해.
-     1) **Unsplash용 영어 쿼리**: 가장 핵심적인 사물 명사 위주로 딱 2~3단어. (예: 'Korean credit card')
-     2) **이미지 생성 전용 프롬프트(ai_gen_prompt)**: DALL-E 3나 Gemini 이미지 생성기에 그대로 사용할 수 있는 **매우 상세한 고해상도 영어 프롬프트**. (인물은 반드시 한국인, 시네마틱 조명, 8k 해상도 등을 포함하여 묘사)
-   - **[주의]**: 영어 쿼리(en)는 짧게, 한국어 설명(ko)은 자세히, ai_gen_prompt는 이미지 생성에 최적화된 상세한 문장으로 작성해.
+   - **[3단계: 추출]**: 상상한 장면에서 Unsplash 검색 엔진이 오해하지 않도록 **가장 핵심적인 사물 명사 위주로 딱 2~3단어의 영어 쿼리**를 생성해. (예: 'Korean credit card', 'Modern office desk', 'Family shopping market')
+   - **[주의]**: 영어 쿼리(en)는 절대 문장으로 쓰지 말고 짧은 키워드로 작성해. 한국어 설명(ko)은 상상한 장면을 반영하여 자세히 작성해도 좋아.
 
 1. **보안 및 신뢰성 (최우선):**
    - 반드시 보안(https)이 완벽하게 작동하는 정부('go.kr'), 공공기관 공식 사이트 링크만 선별해.
@@ -303,9 +289,9 @@ function App() {
 결과는 반드시 아래의 JSON 형식으로만 답변해:
 {
   "image_queries": [
-    {"en": "...", "ko": "...", "ai_gen_prompt": "상세한 이미지 생성용 영어 프롬프트"},
-    {"en": "...", "ko": "...", "ai_gen_prompt": "상세한 이미지 생성용 영어 프롬프트"},
-    {"en": "...", "ko": "...", "ai_gen_prompt": "상세한 이미지 생성용 영어 프롬프트"}
+    {"en": "...", "ko": "..."},
+    {"en": "...", "ko": "..."},
+    {"en": "...", "ko": "..." }
   ],
   "naver": { 
     "title": "...", 
@@ -349,12 +335,11 @@ function App() {
       }
 
       const koDescs = (parsedData.image_queries || []).map(q => q.ko);
-      const aiPrompts = (parsedData.image_queries || []).map(q => q.ai_gen_prompt);
 
       setResults({
-        naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', ai_gen_prompt: aiPrompts[0] || '', official_links: parsedData.naver.official_links || [] } : emptyResult,
-        tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', ai_gen_prompt: aiPrompts[1] || '', official_links: parsedData.tistory.official_links || [] } : emptyResult,
-        wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', ai_gen_prompt: aiPrompts[2] || '', official_links: parsedData.wordpress.official_links || [] } : emptyResult
+        naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', official_links: parsedData.naver.official_links || [] } : emptyResult,
+        tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', official_links: parsedData.tistory.official_links || [] } : emptyResult,
+        wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', official_links: parsedData.wordpress.official_links || [] } : emptyResult
       });
 
     } catch (err) {
@@ -643,15 +628,6 @@ function App() {
                         {isImageLoading ? '...' : '🔍 사진 변경'}
                       </button>
                     </div>
-                    
-                    {results[activeTab].ai_gen_prompt && (
-                      <button 
-                        onClick={() => setIsAiPromptOpen(true)}
-                        className="w-full mt-1 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-[10px] transition-all border border-indigo-100 flex items-center justify-center gap-1.5"
-                      >
-                        🎨 AI 이미지 생성 프롬프트 보기
-                      </button>
-                    )}
                   </div>
                 </div>
               )}
@@ -763,44 +739,6 @@ function App() {
             <div className="pt-6 border-t border-slate-50 text-center">
               <p className="text-[11px] font-bold text-slate-400 italic">더 나은 성과를 위해 오늘도 코다리는 항해 중입니다. 🫡🐟</p>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* AI 프롬프트 모달 */}
-      {isAiPromptOpen && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-lg w-full space-y-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-300">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🎨</span>
-                <h2 className="text-xl font-black text-slate-800">AI 이미지 생성 가이드</h2>
-              </div>
-              <button onClick={() => setIsAiPromptOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">✕</button>
-            </div>
-            
-            <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-[11px] font-black text-indigo-600 uppercase tracking-widest">Image Generation Prompt</label>
-                <button 
-                  onClick={() => {
-                    navigator.clipboard.writeText(results[activeTab].ai_gen_prompt);
-                    triggerToast('프롬프트 복사 완료! 제미나이나 GPT에 붙여넣어 보세요! 🚀');
-                  }}
-                  className="px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition-all"
-                >
-                  📋 한방에 복사하기
-                </button>
-              </div>
-              <p className="text-sm font-medium text-slate-700 leading-relaxed bg-white p-4 rounded-xl border border-indigo-100 shadow-inner max-h-[200px] overflow-y-auto italic">
-                "{results[activeTab].ai_gen_prompt}"
-              </p>
-              <div className="pt-2">
-                <p className="text-[10px] text-indigo-400 font-bold leading-tight">💡 위 프롬프트를 복사하여 **Gemini**나 **ChatGPT(DALL-E 3)**에게 그려달라고 하면, 본문에 딱 맞는 고퀄리티 한국인 이미지를 얻을 수 있습니다!</p>
-              </div>
-            </div>
-
-            <button onClick={() => setIsAiPromptOpen(false)} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold transition-all shadow-xl">확인했습니다</button>
           </div>
         </div>
       )}
