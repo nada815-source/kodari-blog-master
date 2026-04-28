@@ -353,24 +353,9 @@ function App() {
     {"title": "소제목3", "prompt": "이미지 생성 프롬프트3"},
     {"title": "소제목4", "prompt": "이미지 생성 프롬프트4"}
   ],
-  "naver": { 
-    "title": "...", 
-    "content": "...", 
-    "tags": "...", 
-    "official_links": [{"name": "링크이름", "url": "https://..."}]
-  },
-  "tistory": { 
-    "title": "...", 
-    "content": "...", 
-    "tags": "...", 
-    "official_links": [{"name": "링크이름", "url": "https://..."}]
-  },
-  "wordpress": { 
-    "title": "...", 
-    "content": "...", 
-    "tags": "...", 
-    "official_links": [{"name": "링크이름", "url": "https://..."}]
-  }
+  "naver": { ... },
+  "tistory": { ... },
+  "wordpress": { ... }
 }
 
 [필독: '결론', '맺음말', '마지막으로' 등의 기계적 섹션 이름 사용을 절대 엄금함.]
