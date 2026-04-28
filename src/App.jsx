@@ -877,11 +877,34 @@ function App() {
       )}
 
       {isAuthModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full space-y-6 text-center shadow-2xl border border-slate-100 relative">
-            <h2 className="text-2xl font-black text-slate-800">대표님 인증 필요 🫡</h2>
-            <input type="password" value={authCode} onChange={(e) => setAuthCode(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} placeholder="코드를 입력하세요" className="w-full p-4 rounded-2xl bg-slate-50 border-2 border-slate-200 text-center text-2xl font-black focus:border-indigo-500 focus:outline-none transition-all" />
-            <button onClick={handleLogin} className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-lg shadow-xl transition-all">인증하기</button>
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full space-y-6 shadow-2xl border border-slate-100 text-center relative animate-in fade-in zoom-in duration-300">
+            <button 
+              onClick={() => setIsAuthModalOpen(false)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
+            >
+              ✕
+            </button>
+            <div className="space-y-2">
+              <h2 className="text-lg font-black text-slate-800 flex items-center justify-center gap-2">
+                대표님 인증 필요 <span className="text-xl">🧐</span>
+              </h2>
+              <p className="text-[11px] text-slate-400 font-medium">코다리 보안을 위해 인증 코드를 입력해 주세요.</p>
+            </div>
+            <input 
+              type="password"
+              value={authCode}
+              onChange={(e) => setAuthCode(e.target.value)}
+              placeholder="코드를 입력하세요"
+              className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center font-bold text-lg tracking-[0.5em]"
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+            />
+            <button 
+              onClick={handleLogin}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]"
+            >
+              인증하기
+            </button>
           </div>
         </div>
       )}
