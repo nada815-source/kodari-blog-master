@@ -35,6 +35,17 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V2.1.6',
+      date: '2026-04-28',
+      title: '🎬 KODARI Visual Engine 3.0: Visual Director',
+      tags: ['기능 추가', 'AI 상상력'],
+      details: [
+        'AI가 최적의 사진 구도를 먼저 "상상"한 뒤 검색하는 "Visual Director" 로직을 도입했습니다.',
+        '한국인 모델(Korean/Asian) 우선 배정 옵션을 강화하여 국내 블로그 최적화 품질을 높였습니다.',
+        '배경 내 지저분한 영어 텍스트를 배제하고 깨끗한 이미지를 선별하는 필터링 기능을 추가했습니다.'
+      ]
+    },
+    {
       version: 'V2.1.5',
       date: '2026-04-28',
       title: '⚓ KODARI 이미지 엔진 2.0 도입',
