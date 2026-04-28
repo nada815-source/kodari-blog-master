@@ -36,6 +36,17 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V2.3.2',
+      date: '2026-04-28',
+      title: '💎 UI 최적화 및 보안 강화',
+      tags: ['UI/UX', '보안'],
+      details: [
+        '대표님 인증 팝업창의 디자인을 더 컴팩트하고 세련되게 개선했습니다.',
+        '모든 모달 창에 우측 상단 닫기(X) 버튼을 추가하여 사용 편의성을 높였습니다.',
+        '데이터 구조 변경에 따른 AI 프롬프트 버튼 노출 버그를 수정했습니다.'
+      ]
+    },
+    {
       version: 'V2.3.0',
       date: '2026-04-28',
       title: '🎬 KODARI Multi-Section Director 오픈',
