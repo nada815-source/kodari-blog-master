@@ -666,7 +666,7 @@ function App() {
                       </button>
                     </div>
                     
-                    {results[activeTab].ai_gen_prompt && (
+                    {results[activeTab].section_prompts && results[activeTab].section_prompts.length > 0 && (
                       <button 
                         onClick={() => setIsAiPromptOpen(true)}
                         className="w-full mt-1 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-[10px] transition-all border border-indigo-100 flex items-center justify-center gap-1.5"
