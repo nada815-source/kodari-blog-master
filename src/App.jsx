@@ -47,6 +47,16 @@ function App() {
       ]
     },
     {
+      version: 'V2.1.7',
+      date: '2026-04-28',
+      title: '🔍 이미지 매칭 엔진 최적화 (Keyword 3.0)',
+      tags: ['성능 개선', '이미지 매칭'],
+      details: [
+        'Unsplash 검색 정확도를 높이기 위해 문장형 검색어를 2~3단어의 핵심 키워드로 자동 압축하는 로직을 도입했습니다.',
+        '엉뚱한 사진이 나올 확률을 대폭 줄이고, 사물 중심의 정확한 매칭 성능을 확보했습니다.'
+      ]
+    },
+    {
       version: 'V2.1.6',
       date: '2026-04-28',
       title: '🎬 KODARI Visual Engine 3.0: Visual Director',
