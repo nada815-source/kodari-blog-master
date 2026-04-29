@@ -29,12 +29,24 @@ function App() {
   const [authCode, setAuthCode] = useState('');
   const [isPatchNotesOpen, setIsPatchNotesOpen] = useState(false);
   const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
+  const [visualStyle, setVisualStyle] = useState('photo'); // 'photo' or '3d'
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
 
   const patchNotes = [
+    {
+      version: 'V2.4.0',
+      date: '2026-04-29',
+      title: '🎨 KODARI Visual Style Switch 오픈',
+      tags: ['신기능', 'UI/UX'],
+      details: [
+        '이미지 스타일 선택 스위치를 통해 "실사 사진"과 "3D 일러스트" 스타일을 자유롭게 선택할 수 있습니다.',
+        '선택된 스타일에 맞춰 AI가 각 섹션별 이미지 생성 프롬프트를 맞춤형으로 제작합니다.',
+        '메인 컨트롤 패널의 디자인을 더 직관적이고 세련된 스타일로 개편했습니다.'
+      ]
+    },
     {
       version: 'V2.3.3',
       date: '2026-04-29',
@@ -316,22 +328,26 @@ function App() {
     try {
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
+      const styleGuide = visualStyle === 'photo' 
+        ? "스타일: 반드시 실제 사진 같은 'Photorealistic' 스타일로 묘사해. (Keywords: Cinematic lighting, 8k, professional photography, natural skin texture)"
+        : "스타일: 반드시 '3D Isometric Illustration' 또는 'Claymorphism' 그래픽 스타일로 묘사해. (Keywords: 3D render, soft rounded shapes, trendy digital art, vibrant colors)";
+
       const combinedPrompt = `주제: "${topic}"
+이미지 스타일: ${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'}
 
 [필독: 생성 지침 - 미준수 시 작동 불가]
 
 [필독: 언어 설정 - 모든 플랫폼(네이버, 티스토리, 워드프레스)의 모든 텍스트(제목, 본문, 태그, 공식 링크 이름 등)는 반드시 **한국어**로만 작성해. 영어를 섞지 마라.]
 
-0. **이미지 검색 전략 (KODARI Visual Engine 3.0 - Visual Director):**
-   - **[1단계: 상상]**: 각 플랫폼 성격에 맞춰 블로그 본문을 가장 잘 설명하는 **최적의 시각적 장면**을 먼저 상상해. (네이버: 감성적 일상, 티스토리: 정보 위주 깔끔함, 워드프레스: 세련된 전문성)
-   - **[2단계: 제약 조건 적용]**:
+0. **이미지 검색 및 생성 전략 (KODARI Visual Engine 3.2):**
+   - **[1단계: 상상]**: 각 플랫폼 성격에 맞춰 블로그 본문을 가장 잘 설명하는 **최적의 시각적 장면**을 먼저 상상해.
+   - **[2단계: 스타일 적용]**: ${styleGuide}
+   - **[3단계: 제약 조건]**:
      - **인물**: 인물이 포함될 경우 반드시 **한국인(Korean/Asian)**이 주인공이 되도록 해.
-     - **텍스트**: 배경에 영어 등 외국어 간판이나 지저분한 텍스트가 없는 **깨끗한 사진**을 우선해. (Keywords: No text, Minimalist background)
-     - **사물**: 정책/금융 등 추상적 주제는 "결제하는 손", "신용카드", "지갑" 등 **구체적인 사물**로 치환해.
-    - **[3단계: 추출]**: 상상한 장면을 바탕으로 다음 두 가지를 생성해.
-      1) **Unsplash용 영어 쿼리**: 가장 핵심적인 사물 명사 위주로 딱 2~3단어. (예: 'Korean credit card')
-      2) **섹션별 이미지 생성 프롬프트(section_prompts)**: 본문의 4개 주요 소제목(H2)을 분석하여, 각 섹션의 주제를 완벽히 묘사하는 서로 다른 4개의 이미지 생성용 영어 프롬프트를 생성해. (인물은 한국인, 고해상도 시네마틱 스타일 유지)
-    - **[주의]**: 영어 쿼리(en)는 짧게, section_prompts는 각 소제목의 내용을 반영하여 상세한 문장으로 작성해.
+     - **텍스트**: 배경에 외국어 간판이나 지저분한 텍스트가 없는 **깨끗한 이미지**를 우선해.
+   - **[4단계: 추출]**: 
+     1) **Unsplash용 영어 쿼리**: 가장 핵심적인 사물 명사 위주로 딱 2~3단어. (예: 'Korean credit card')
+     2) **섹션별 이미지 생성 프롬프트(section_prompts)**: 본문의 4개 주요 소제목(H2)을 분석하여, 위에서 정한 **${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'} 스타일**에 완벽히 부합하는 서로 다른 4개의 이미지 생성용 상세 영어 프롬프트를 생성해.
 
 1. **보안 및 신뢰성 (최우선):**
    - 반드시 보안(https)이 완벽하게 작동하는 정부('go.kr'), 공공기관 공식 사이트 링크만 선별해.
@@ -623,15 +639,34 @@ function App() {
 
           {error && <p className="text-red-500 font-bold text-sm animate-pulse">{error}</p>}
 
-          <div className="flex items-center justify-center gap-3 py-2">
-            <span className={`text-xs font-bold transition-colors ${!useImage ? 'text-slate-400' : 'text-slate-300'}`}>이미지 사용 안함</span>
-            <button 
-              onClick={() => setUseImage(!useImage)}
-              className={`relative w-12 h-6 rounded-full transition-all duration-300 ${useImage ? 'bg-indigo-600' : 'bg-slate-300'}`}
-            >
-              <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${useImage ? 'translate-x-6' : 'translate-x-0'}`} />
-            </button>
-            <span className={`text-xs font-bold transition-colors ${useImage ? 'text-indigo-600' : 'text-slate-400'}`}>이미지 자동 삽입 ON</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 py-6 bg-slate-50/50 rounded-2xl border border-slate-100">
+            {/* 이미지 사용 토글 */}
+            <div className="flex items-center gap-3">
+              <span className={`text-[10px] font-black transition-colors ${!useImage ? 'text-slate-400' : 'text-slate-200'}`}>NO IMAGE</span>
+              <button 
+                onClick={() => setUseImage(!useImage)}
+                className={`relative w-12 h-6 rounded-full transition-all duration-300 ${useImage ? 'bg-indigo-600' : 'bg-slate-300'}`}
+              >
+                <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${useImage ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+              <span className={`text-[10px] font-black transition-colors ${useImage ? 'text-indigo-600' : 'text-slate-400'}`}>AUTO IMAGE ON</span>
+            </div>
+
+            {/* 스타일 선택 스위치 */}
+            <div className="flex items-center p-1 bg-slate-200 rounded-xl">
+              <button 
+                onClick={() => setVisualStyle('photo')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${visualStyle === 'photo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                📸 실사 사진
+              </button>
+              <button 
+                onClick={() => setVisualStyle('3d')}
+                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${visualStyle === '3d' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                🎨 3D 일러스트
+              </button>
+            </div>
           </div>
 
           <button 
