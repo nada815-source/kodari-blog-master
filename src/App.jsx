@@ -29,6 +29,7 @@ function App() {
   const [authCode, setAuthCode] = useState('');
   const [isPatchNotesOpen, setIsPatchNotesOpen] = useState(false);
   const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
+  const [isStyleGuideOpen, setIsStyleGuideOpen] = useState(false);
   const [visualStyle, setVisualStyle] = useState('photo'); // 'photo' or '3d'
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
@@ -36,6 +37,17 @@ function App() {
   const [isImageLoading, setIsImageLoading] = useState(false);
 
   const patchNotes = [
+    {
+      version: 'V2.4.1',
+      date: '2026-04-29',
+      title: '💡 KODARI Visual Style Guide 탑재',
+      tags: ['편의성', '가이드'],
+      details: [
+        '스타일 스위치 옆에 "스타일 선택 가이드(💡)" 버튼을 추가했습니다.',
+        '주제별로 실사 사진과 3D 일러스트 중 어떤 것이 더 적합한지 한눈에 알 수 있는 전문 팝업 가이드를 제공합니다.',
+        '대표님의 생산성 향상을 위한 비주얼 의사결정 지원 시스템을 구축했습니다.'
+      ]
+    },
     {
       version: 'V2.4.0',
       date: '2026-04-29',
@@ -653,18 +665,27 @@ function App() {
             </div>
 
             {/* 스타일 선택 스위치 */}
-            <div className="flex items-center p-1 bg-slate-200 rounded-xl">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center p-1 bg-slate-200 rounded-xl">
+                <button 
+                  onClick={() => setVisualStyle('photo')}
+                  className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${visualStyle === 'photo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  📸 실사 사진
+                </button>
+                <button 
+                  onClick={() => setVisualStyle('3d')}
+                  className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${visualStyle === '3d' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                  🎨 3D 일러스트
+                </button>
+              </div>
               <button 
-                onClick={() => setVisualStyle('photo')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${visualStyle === 'photo' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                onClick={() => setIsStyleGuideOpen(true)}
+                className="p-2 rounded-lg bg-white border border-slate-200 shadow-sm hover:bg-amber-50 hover:border-amber-200 transition-all group"
+                title="이미지 스타일 선택 가이드"
               >
-                📸 실사 사진
-              </button>
-              <button 
-                onClick={() => setVisualStyle('3d')}
-                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${visualStyle === '3d' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                🎨 3D 일러스트
+                <span className="text-sm group-hover:scale-110 transition-transform block">💡</span>
               </button>
             </div>
           </div>
@@ -869,6 +890,65 @@ function App() {
         </div>
       )}
 
+      {/* 이미지 스타일 가이드 모달 */}
+      {isStyleGuideOpen && (
+        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center z-[70] p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-xl w-full space-y-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto relative">
+            <button 
+              onClick={() => setIsStyleGuideOpen(false)} 
+              className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all z-10"
+            >✕</button>
+            
+            <div className="text-center space-y-2">
+              <span className="text-3xl">💡</span>
+              <h2 className="text-xl font-black text-slate-800">이미지 스타일 선택 가이드</h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">How to choose the best visual style</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              {/* 실사 사진 카드 */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">📸</span>
+                  <h3 className="font-black text-slate-800 text-sm">실사 사진</h3>
+                </div>
+                <p className="text-[11px] text-indigo-600 font-bold italic">"현장감, 신뢰, 생생한 감성"</p>
+                <ul className="space-y-1.5">
+                  {['맛집 / 여행 / 숙박', '금융 / 부동산 / 정책', '건강 / 운동 / 라이프', '리뷰 / 언박싱'].map((item, i) => (
+                    <li key={i} className="text-[11px] text-slate-600 flex items-center gap-2">
+                      <span className="w-1 h-1 bg-slate-400 rounded-full" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* 3D 일러스트 카드 */}
+              <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🎨</span>
+                  <h3 className="font-black text-indigo-600 text-sm">3D 일러스트</h3>
+                </div>
+                <p className="text-[11px] text-indigo-600 font-bold italic">"트렌디, IT 서비스, 추상적 개념"</p>
+                <ul className="space-y-1.5">
+                  {['IT / 앱 서비스 / SW', '보험 / 법률 / 연금', 'MZ세대 타겟 콘텐츠', '교육 / 자기계발'].map((item, i) => (
+                    <li key={i} className="text-[11px] text-slate-600 flex items-center gap-2">
+                      <span className="w-1 h-1 bg-indigo-300 rounded-full" /> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
+              <p className="text-[10px] text-amber-700 font-bold leading-tight">
+                💡 **부장의 팁**: 독자가 "나도 저기에 있고 싶다"고 느끼게 하려면 **실사 사진**을, "이 서비스 참 스마트하네"라고 느끼게 하려면 **3D 일러스트**를 추천합니다!
+              </p>
+            </div>
+
+            <button onClick={() => setIsStyleGuideOpen(false)} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold transition-all shadow-xl">알겠습니다</button>
+          </div>
+        </div>
+      )}
       {/* AI 프롬프트 모달 */}
       {isAiPromptOpen && (
         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center z-[60] p-4">
