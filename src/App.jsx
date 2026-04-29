@@ -521,12 +521,18 @@ function App() {
       // 단어 업데이트
       updatedPrompts[idx].impact_word = newWord;
       
-      // 프롬프트 내의 이전 단어를 새 단어로 교체 (영어 프롬프트 내의 따옴표 안의 한글을 찾음)
+      // 프롬프트 내의 이전 단어를 새 단어로 교체
       if (oldWord && updatedPrompts[idx].prompt.includes(oldWord)) {
-        updatedPrompts[idx].prompt = updatedPrompts[idx].prompt.replace(new RegExp(oldWord, 'g'), newWord);
-      } else {
-        // 만약 프롬프트에 단어가 없었다면 새로 추가 지침 삽입 (방어적 코드)
-        updatedPrompts[idx].prompt += `, with Korean text "${newWord}" in a stylish font`;
+        updatedPrompts[idx].prompt = updatedPrompts[idx].prompt.replace(new RegExp(`'${oldWord}'|"${oldWord}"|${oldWord}`, 'g'), newWord ? `"${newWord}"` : '');
+      } else if (newWord) {
+        // 만약 프롬프트에 단어가 없었다면 새로 추가 지침 삽입
+        updatedPrompts[idx].prompt += `, featuring the Korean text "${newWord}" in a stylish font`;
+      }
+
+      // 단어를 지웠을 때 남는 불필요한 구문 정제 (예: with text "", showing "")
+      if (!newWord) {
+        const cleanupRegex = /with the word\s*""|featuring (the )?Korean text\s*""|showing (a )?""|containing\s*""|with\s*""/gi;
+        updatedPrompts[idx].prompt = updatedPrompts[idx].prompt.replace(cleanupRegex, '').replace(/,\s*,/g, ',').replace(/\s\s+/g, ' ').trim();
       }
 
       return {
