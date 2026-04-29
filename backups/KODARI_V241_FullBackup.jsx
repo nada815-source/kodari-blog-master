@@ -38,17 +38,6 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V2.4.5',
-      date: '2026-04-29',
-      title: '🔄 스타일 반전 복사 기능 도입',
-      tags: ['생산성', '하이브리드'],
-      details: [
-        'AI 이미지 가이드 모달에서 현재 생성된 프롬프트를 즉석에서 다른 스타일(실사 ↔ 3D)로 변환하여 복사할 수 있는 기능을 추가했습니다.',
-        '복사 시 3D 관련 키워드와 실사 관련 키워드를 지능적으로 교체하여 별도의 생성 과정 없이도 스타일 전환이 가능합니다.',
-        '하나의 포스팅 안에서 다양한 스타일의 이미지를 섞어 사용하고자 하는 대표님의 니즈를 반영했습니다.'
-      ]
-    },
-    {
       version: 'V2.4.1',
       date: '2026-04-29',
       title: '💡 KODARI Visual Style Guide 탑재',
@@ -469,31 +458,6 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleStyleSwapCopy = (originalPrompt, currentStyle, idx) => {
-    let transformed = originalPrompt;
-    
-    // 3D/그래픽 관련 키워드 셋
-    const graphicsKeywords = ['3D isometric illustration', 'claymorphism', '3D render', 'soft rounded shapes', 'trendy digital art', 'vibrant colors', 'stylized', '3D illustration'];
-    // 실사/사진 관련 키워드 셋
-    const photoKeywords = ['Photorealistic', 'Cinematic lighting', '8k', 'professional photography', 'natural skin texture', 'real life photo', 'high-quality photography', 'realistic style'];
-
-    if (currentStyle === 'photo') {
-      // 사진 -> 3D 변환
-      photoKeywords.forEach(k => { transformed = transformed.replace(new RegExp(k, 'gi'), ''); });
-      transformed = `A vibrant 3D isometric illustration showing ${transformed.trim()}, claymorphism style, soft rounded shapes, trendy digital art, high-quality 3D render`;
-    } else {
-      // 3D -> 사진 변환
-      graphicsKeywords.forEach(k => { transformed = transformed.replace(new RegExp(k, 'gi'), ''); });
-      transformed = `A photorealistic image showing ${transformed.trim()}, cinematic lighting, 8k, professional photography, natural skin texture, realistic style`;
-    }
-
-    // 연속된 쉼표나 공백 정리
-    transformed = transformed.replace(/,\s*,/g, ',').replace(/\s\s+/g, ' ').replace(/,\s*\./g, '.').trim();
-    
-    navigator.clipboard.writeText(transformed);
-    triggerToast(`[섹션 ${idx + 1}] ${currentStyle === 'photo' ? '🎨 3D' : '📸 사진'} 스타일로 변환 복사 완료! ✨`);
   };
 
   const convertMarkdownToHtml = (text) => {
@@ -1011,23 +975,15 @@ function App() {
                         <span className="w-5 h-5 bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center rounded-full">{idx + 1}</span>
                         <span className="text-xs font-black text-slate-700 truncate max-w-[200px]">{item.title}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => {
-                            navigator.clipboard.writeText(item.prompt);
-                            triggerToast(`[섹션 ${idx + 1}] 현재 스타일로 복사 완료! 🚀`);
-                          }}
-                          className="px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg shadow-md hover:bg-indigo-700 transition-all flex items-center gap-1"
-                        >
-                          📋 기본 복사
-                        </button>
-                        <button 
-                          onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)}
-                          className="px-2.5 py-1.5 bg-white text-indigo-600 border border-indigo-200 text-[10px] font-bold rounded-lg shadow-sm hover:bg-indigo-50 transition-all flex items-center gap-1"
-                        >
-                          {visualStyle === 'photo' ? '🎨 3D로 변환 복사' : '📸 사진으로 변환 복사'}
-                        </button>
-                      </div>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.prompt);
+                          triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사 완료! 🚀`);
+                        }}
+                        className="px-3 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition-all flex items-center gap-1"
+                      >
+                        📋 복사하기
+                      </button>
                     </div>
                     <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-inner">
                       <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-3 group-hover:line-clamp-none transition-all cursor-default">
