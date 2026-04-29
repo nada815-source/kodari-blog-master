@@ -38,6 +38,18 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V2.5.0',
+      date: '2026-04-29',
+      title: '🔠 KODARI Impact Typo 엔진 탑재',
+      tags: ['신기능', '타이포그래피'],
+      details: [
+        '3D 일러스트 내에 블로그 주제를 관통하는 "핵심 한글 단어"를 삽입할 수 있는 기능이 추가되었습니다.',
+        'AI가 섹션별로 최적의 단어(1~4글자)를 자동 추천하며, 대표님이 직접 수정하여 개성을 더할 수 있습니다.',
+        '수정된 단어는 프롬프트에 실시간으로 반영되어, 생성 시 이미지 속에 자연스럽게 녹아듭니다.',
+        '썸네일의 가시성을 극대화하고 독자의 클릭을 유도하는 강력한 시각 도구입니다.'
+      ]
+    },
+    {
       version: 'V2.4.5',
       date: '2026-04-29',
       title: '🔄 스타일 반전 복사 기능 도입',
@@ -368,9 +380,11 @@ function App() {
    - **[3단계: 제약 조건]**:
      - **인물**: 인물이 포함될 경우 반드시 **한국인(Korean/Asian)**이 주인공이 되도록 해.
      - **텍스트**: 배경에 외국어 간판이나 지저분한 텍스트가 없는 **깨끗한 이미지**를 우선해.
-   - **[4단계: 추출]**: 
      1) **Unsplash용 영어 쿼리**: 가장 핵심적인 사물 명사 위주로 딱 2~3단어. (예: 'Korean credit card')
-     2) **섹션별 이미지 생성 프롬프트(section_prompts)**: 본문의 4개 주요 소제목(H2)을 분석하여, 위에서 정한 **${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'} 스타일**에 완벽히 부합하는 서로 다른 4개의 이미지 생성용 상세 영어 프롬프트를 생성해.
+     2) **섹션별 이미지 생성 전략(section_prompts)**: 본문의 4개 주요 소제목(H2)을 분석하여 다음을 포함한 JSON 배열을 생성해.
+        - `title`: 소제목 내용.
+        - `impact_word`: 해당 섹션의 핵심 가치를 담은 **1~4글자의 강렬한 한글 단어** 추천. (예: '혜택', '신청', '주의', '꿀팁')
+        - `prompt`: 위에서 정한 **${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'} 스타일**에 부합하며, **추천한 impact_word가 디자인 요소로 포함된** 상세 영어 프롬프트.
 
 1. **보안 및 신뢰성 (최우선):**
    - 반드시 보안(https)이 완벽하게 작동하는 정부('go.kr'), 공공기관 공식 사이트 링크만 선별해.
@@ -494,6 +508,35 @@ function App() {
     
     navigator.clipboard.writeText(transformed);
     triggerToast(`[섹션 ${idx + 1}] ${currentStyle === 'photo' ? '🎨 3D' : '📸 사진'} 스타일로 변환 복사 완료! ✨`);
+  };
+
+  const handleImpactWordChange = (idx, newWord) => {
+    setResults(prev => {
+      const currentSectionPrompts = prev[activeTab].section_prompts;
+      if (!currentSectionPrompts) return prev;
+
+      const updatedPrompts = [...currentSectionPrompts];
+      const oldWord = updatedPrompts[idx].impact_word || '';
+      
+      // 단어 업데이트
+      updatedPrompts[idx].impact_word = newWord;
+      
+      // 프롬프트 내의 이전 단어를 새 단어로 교체 (영어 프롬프트 내의 따옴표 안의 한글을 찾음)
+      if (oldWord && updatedPrompts[idx].prompt.includes(oldWord)) {
+        updatedPrompts[idx].prompt = updatedPrompts[idx].prompt.replace(new RegExp(oldWord, 'g'), newWord);
+      } else {
+        // 만약 프롬프트에 단어가 없었다면 새로 추가 지침 삽입 (방어적 코드)
+        updatedPrompts[idx].prompt += `, with Korean text "${newWord}" in a stylish font`;
+      }
+
+      return {
+        ...prev,
+        [activeTab]: {
+          ...prev[activeTab],
+          section_prompts: updatedPrompts
+        }
+      };
+    });
   };
 
   const convertMarkdownToHtml = (text) => {
@@ -1006,27 +1049,42 @@ function App() {
               <div className="grid grid-cols-1 gap-4">
                 {results[activeTab].section_prompts && results[activeTab].section_prompts.map((item, idx) => (
                   <div key={idx} className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 space-y-3 group hover:border-indigo-300 transition-all">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center rounded-full">{idx + 1}</span>
-                        <span className="text-xs font-black text-slate-700 truncate max-w-[200px]">{item.title}</span>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="w-5 h-5 bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center rounded-full flex-shrink-0">{idx + 1}</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Section Title</span>
+                          <span className="text-[11px] font-bold text-slate-700 truncate">{item.title}</span>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => {
-                            navigator.clipboard.writeText(item.prompt);
-                            triggerToast(`[섹션 ${idx + 1}] 현재 스타일로 복사 완료! 🚀`);
-                          }}
-                          className="px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg shadow-md hover:bg-indigo-700 transition-all flex items-center gap-1"
-                        >
-                          📋 기본 복사
-                        </button>
-                        <button 
-                          onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)}
-                          className="px-2.5 py-1.5 bg-white text-indigo-600 border border-indigo-200 text-[10px] font-bold rounded-lg shadow-sm hover:bg-indigo-50 transition-all flex items-center gap-1"
-                        >
-                          {visualStyle === 'photo' ? '🎨 3D로 변환 복사' : '📸 사진으로 변환 복사'}
-                        </button>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[9px] font-black text-indigo-500 uppercase tracking-tighter mb-0.5">Impact Word</span>
+                          <input 
+                            type="text" 
+                            value={item.impact_word || ''} 
+                            onChange={(e) => handleImpactWordChange(idx, e.target.value)}
+                            className="w-20 p-1.5 bg-white border border-indigo-200 rounded-lg text-[11px] font-black text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all shadow-sm"
+                            placeholder="단어 입력"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <button 
+                            onClick={() => {
+                              navigator.clipboard.writeText(item.prompt);
+                              triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사 완료! 🚀`);
+                            }}
+                            className="px-2.5 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg shadow-md hover:bg-indigo-700 transition-all flex items-center gap-1"
+                          >
+                            📋 복사
+                          </button>
+                          <button 
+                            onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)}
+                            className="px-2.5 py-1.5 bg-white text-indigo-600 border border-indigo-200 text-[10px] font-bold rounded-lg shadow-sm hover:bg-indigo-50 transition-all flex items-center gap-1"
+                          >
+                            🔄 변환 복사
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div className="bg-white p-3 rounded-xl border border-indigo-100 shadow-inner">
