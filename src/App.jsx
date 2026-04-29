@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { GoogleGenAI } from '@google/genai';
 import ReactMarkdown from 'react-markdown';
 
 function App() {
@@ -412,10 +411,10 @@ function App() {
     {"en": "...", "ko": "..." }
   ],
   "section_prompts": [
-    {"title": "소제목1", "prompt": "이미지 생성 프롬프트1"},
-    {"title": "소제목2", "prompt": "이미지 생성 프롬프트2"},
-    {"title": "소제목3", "prompt": "이미지 생성 프롬프트3"},
-    {"title": "소제목4", "prompt": "이미지 생성 프롬프트4"}
+    {"title": "소제목1", "impact_word": "단어1", "prompt": "이미지 생성 프롬프트1"},
+    {"title": "소제목2", "impact_word": "단어2", "prompt": "이미지 생성 프롬프트2"},
+    {"title": "소제목3", "impact_word": "단어3", "prompt": "이미지 생성 프롬프트3"},
+    {"title": "소제목4", "impact_word": "단어4", "prompt": "이미지 생성 프롬프트4"}
   ],
   "naver": { 
     "title": "...", 
