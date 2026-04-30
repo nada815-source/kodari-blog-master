@@ -710,6 +710,12 @@ function App() {
     }));
   };
 
+  const handleSelectTopic = (selectedTopic) => {
+    setTopic(selectedTopic);
+    setIsTopicLabOpen(false);
+    triggerToast(`💡 '${selectedTopic}' 주제가 선택되었습니다! ✨`);
+  };
+
   const handleSubCopyChange = (idx, newCopy) => {
     setResults(prev => {
       const currentSectionPrompts = prev[activeTab].section_prompts;
