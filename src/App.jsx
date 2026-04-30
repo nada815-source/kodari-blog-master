@@ -563,19 +563,19 @@ function App() {
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       const prompt = `주제: "${topic}"에 대해 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
       
-      기존에 작성된 내용이 마음에 들지 않아 새로 작성하는 것이니, 더 풍성하고 전문적인 느낌으로 작성해.
+      기존에 작성된 내용이 마음에 들지 않아 새로 작성하는 것이니, 아래 지침을 0순위로 준수해:
       
-      반드시 아래의 지침을 엄수해:
-      1. ${platformName} 특유의 다정하고 친근한 말투 사용.
-      2. 최소 1500자 이상의 풍성한 분량.
-      3. **[형광펜 및 컬러 강조]** (==형광펜==, ++파란색++, !!빨간색!!)를 문장 단위로 적극적으로 사용.
-      4. 정보를 시각화할 수 있는 **Markdown Table**을 반드시 포함.
+      1. **[구조적 가독성]**: 반드시 **## 소제목**을 사용하여 섹션을 명확히 구분해.
+      2. **[표(Table) 생성]**: 정보를 시각화할 수 있는 **Markdown Table**을 본문 중간에 반드시 포함해.
+      3. **[강조 스타일]**: ==형광펜==, ++파란색++, !!빨간색!! 기호를 **문장 단위로** 적극적으로 사용해.
+      4. **[분량]**: 공백 제외 최소 1500자 이상의 풍성한 분량으로 작성해.
+      5. **[어투]**: ${platformName} 특유의 다정하고 친근한 말투 사용.
       
-      결과는 반드시 아래 JSON 형식으로만 응답해:
+      결과는 반드시 아래 JSON 형식으로만 응답하고, JSON 외에 다른 설명은 절대 하지마:
       {
         "${platform}": {
           "title": "새로운 제목",
-          "content": "새로운 본문 내용...",
+          "content": "새로운 본문 내용 (마크다운 형식)",
           "tags": "#태그1 #태그2",
           "official_links": [{"name": "공식링크명", "url": "https://..."}]
         }
@@ -590,11 +590,15 @@ function App() {
         })
       });
 
-      if (!response.ok) throw new Error('재생성 실패');
+      if (!response.ok) throw new Error('네트워크 응답 오류');
       
       const data = await response.json();
-      let responseText = data.candidates[0].content.parts[0].text.replace(/```json/gi, '').replace(/```/gi, '').trim();
-      const parsedData = JSON.parse(responseText);
+      const responseTextRaw = data.candidates[0].content.parts[0].text;
+      const jsonMatch = responseTextRaw.match(/\{[\s\S]*\}/);
+      
+      if (!jsonMatch) throw new Error('유효한 JSON 데이터를 찾을 수 없습니다.');
+      
+      const parsedData = JSON.parse(jsonMatch[0]);
       
       if (parsedData[platform]) {
         setResults(prev => ({
@@ -604,11 +608,11 @@ function App() {
             ...parsedData[platform]
           }
         }));
-        triggerToast(`${platformName} 글이 성공적으로 재생성되었습니다! ✨`);
+        triggerToast(`${platformName} 글이 새롭게 태어났습니다! ✨`);
       }
     } catch (err) {
-      console.error(err);
-      triggerToast('재생성 중 오류가 발생했습니다. 💦');
+      console.error('재생성 상세 오류:', err);
+      triggerToast('AI 응답 지연 또는 형식 오류입니다. 다시 시도해주세요! 💦');
     } finally {
       setLoading(false);
     }
