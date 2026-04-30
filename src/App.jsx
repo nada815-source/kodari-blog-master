@@ -49,6 +49,31 @@ function App() {
   const [showToast, setShowToast] = useState(false);
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
+  const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
+
+  // 소재 연구소 데이터베이스 (V2.8.0)
+  const topicDatabase = {
+    monthly: [
+      { month: 1, topics: ['새해 목표 세우기', '연말정산 꿀팁', '겨울 방학 여행지', '다이어트 시작', '가계부 작성법'] },
+      { month: 2, topics: ['발렌타인데이 선물', '졸업 시즌 축하 문구', '봄맞이 인테리어', '설날 명절 음식', '취업 준비 전략'] },
+      { month: 3, topics: ['새학기 준비물', '화이트데이 이벤트', '봄꽃 개화 시기', '환절기 건강 관리', '이사 체크리스트'] },
+      { month: 4, topics: ['벚꽃 명소 추천', '벚꽃 축제 일정', '중간고사 공부법', '봄 패션 트렌드', '식목일 나무 심기'] },
+      { month: 5, topics: ['어버이날 선물 추천', '어린이날 나들이', '스승의 날 감사 인사', '종합소득세 신고', '가족 여행 코스'] },
+      { month: 6, topics: ['여름 휴가 계획', '장마 대비 아이템', '현충일 의미', '여름 다이어트 식단', '자취방 에어컨 관리'] },
+      { month: 7, topics: ['여름 방학 알바', '초복 보양식 추천', '워터파크 순위', '여름 방학 공부 계획', '캠핑 장비 리스트'] },
+      { month: 8, topics: ['광복절의 역사', '말복 보양식', '늦여름 휴가 정보', '가을 옷 미리보기', '태풍 대비 요령'] },
+      { month: 9, topics: ['추석 명절 선물', '추석 귀성길 정체', '가을 캠핑 명소', '추석 연휴 해외여행', '환절기 피부 관리'] },
+      { month: 10, topics: ['단풍 구경 명소', '할로윈 파티 소품', '가을 독서 추천', '공무원 시험 준비', '건강 검진 체크'] },
+      { month: 11, topics: ['수능 응원 문구', '빼빼로데이 이벤트', '겨울 옷 코디', '김장 시기 및 레시피', '블랙프라이데이 직구'] },
+      { month: 12, topics: ['크리스마스 홈파티', '연말 결산 및 회고', '일출 명소 추천', '스키장 개장 일정', '겨울 방학 계획'] }
+    ],
+    categories: [
+      { name: '💰 경제/재테크', topics: ['주식 투자 입문', '부동산 전망', '앱테크 추천', '적금 금리 비교', '은퇴 설계'] },
+      { name: '💪 건강/운동', topics: ['홈트레이닝 루틴', '영양제 고르는 법', '스트레스 해소법', '필라테스 효과', '수면의 질 높이기'] },
+      { name: '💻 IT/테크', topics: ['최신 스마트폰 비교', '유용한 어플 추천', 'AI 툴 활용법', 'PC 조립 가이드', '코딩 독학 방법'] },
+      { name: '✈️ 여행/생활', topics: ['제주도 숨은 맛집', '해외여행 준비물', '캠핑 요리 레시피', '혼자 가기 좋은 여행지', '미니멀 라이프'] }
+    ]
+  };
 
   const patchNotes = [
     {
@@ -676,13 +701,13 @@ function App() {
   };
 
   const handleMainTitleChange = (idx, newTitle) => {
-    setResults(prev => {
-      const currentSectionPrompts = prev[activeTab].section_prompts;
-      if (!currentSectionPrompts) return prev;
-      const updatedPrompts = [...currentSectionPrompts];
-      updatedPrompts[idx].main_title = newTitle;
-      return { ...prev, [activeTab]: { ...prev[activeTab], section_prompts: updatedPrompts } };
-    });
+    setResults(prev => ({
+      ...prev,
+      [activeTab]: {
+        ...prev[activeTab],
+        title: newTitle
+      }
+    }));
   };
 
   const handleSubCopyChange = (idx, newCopy) => {
@@ -1357,6 +1382,75 @@ function App() {
             >
               인증하기
             </button>
+          </div>
+        </div>
+      )}
+
+      {isTopicLabOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 overflow-y-auto">
+          <div className="bg-white rounded-[40px] p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300">
+            <div className="flex justify-between items-center mb-8">
+              <div className="space-y-1">
+                <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                  💡 소재 연구소 <span className="text-sm font-bold bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest">Lab</span>
+                </h2>
+                <p className="text-sm text-slate-400 font-medium">조회수가 터지는 황금 키워드를 발굴하세요.</p>
+              </div>
+              <button onClick={() => setIsTopicLabOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
+            </div>
+
+            <div className="space-y-10">
+              {/* 월간 황금 키워드 섹션 */}
+              <section className="space-y-4">
+                <h3 className="text-lg font-black text-slate-700 flex items-center gap-2">
+                  🌸 {new Date().getMonth() + 1}월의 황금 라인업
+                  <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-md">SEASONAL</span>
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {topicDatabase.monthly[new Date().getMonth()].topics.map((t, i) => (
+                    <button 
+                      key={i} 
+                      onClick={() => handleSelectTopic(t)}
+                      className="p-4 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-2xl text-left transition-all group border border-slate-100 hover:border-indigo-600 hover:shadow-lg hover:shadow-indigo-200"
+                    >
+                      <p className="text-xs font-bold text-slate-400 group-hover:text-white/70 mb-1">KEYWORD 0{i+1}</p>
+                      <p className="font-black truncate">{t}</p>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              {/* 카테고리별 테마 섹션 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {topicDatabase.categories.map((cat, i) => (
+                  <section key={i} className="space-y-4">
+                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">{cat.name}</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {cat.topics.map((t, j) => (
+                        <button 
+                          key={j} 
+                          onClick={() => handleSelectTopic(t)}
+                          className="px-4 py-2.5 bg-white border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 rounded-xl text-xs font-bold transition-all hover:shadow-sm"
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-12 p-6 bg-slate-900 rounded-[30px] text-center space-y-2">
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Live Trend Analysis</p>
+              <h4 className="text-white font-black text-lg">새로운 주제가 필요하신가요?</h4>
+              <button 
+                onClick={() => { setIsTopicLabOpen(false); triggerToast('AI가 실시간 트렌드를 분석 중입니다... 🔄'); }}
+                className="inline-block px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-xl active:scale-95"
+              >
+                실시간 트렌드 확인하기 🚀
+              </button>
+            </div>
           </div>
         </div>
       )}
