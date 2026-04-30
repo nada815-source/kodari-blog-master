@@ -854,20 +854,32 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 황금 밸런스 가독성 및 모바일 복사 최적화 🫡🐟</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V2.8.0 [💡 소재 연구소] 탑재 - 콘텐츠 발굴부터 생성까지 원스톱 최적화 🫡💎</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
           <div className="space-y-2">
             <label className="block text-sm font-bold text-slate-700 mb-2">✍️ 포스팅 주제</label>
-            <input 
-              type="text" 
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && generateContent()}
-              placeholder="예: 2026 경기 컬처패스 사용처 및 유효기간"
-              className="w-full p-4 rounded-xl border-2 border-blue-100 focus:outline-none focus:border-blue-500 text-lg transition-all"
-            />
+            <div className="flex gap-3">
+              <div className="relative flex-1 group">
+                <input 
+                  type="text" 
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && generateContent()}
+                  placeholder="예: 2026 경기 컬처패스 사용처 및 유효기간"
+                  className="w-full p-5 pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-lg font-bold transition-all shadow-sm"
+                />
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl group-focus-within:scale-110 transition-transform">✨</span>
+              </div>
+              <button 
+                onClick={() => setIsTopicLabOpen(true)}
+                className="px-8 py-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-2xl font-black text-sm transition-all flex flex-col items-center justify-center gap-1 border-2 border-indigo-100 shadow-sm whitespace-nowrap active:scale-95"
+              >
+                <span className="text-2xl">💡</span>
+                소재 연구소
+              </button>
+            </div>
           </div>
 
           <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
