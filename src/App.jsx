@@ -789,6 +789,35 @@ function App() {
     }
   };
 
+  const refreshStaticSection = (categoryName, sectionName) => {
+    const category = topicDatabase.categories.find(c => c.name === categoryName);
+    if (!category) return;
+    
+    const pool = category[sectionName];
+    if (!pool || pool.length === 0) return;
+    
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 4);
+    
+    setDisplayedStaticTopics(prev => ({
+      ...prev,
+      [`${categoryName}_${sectionName}`]: selected
+    }));
+  };
+
+  // 초기 로딩 및 카테고리 변경 시 키워드 셔플
+  useEffect(() => {
+    if (topicDatabase && topicDatabase.categories) {
+      topicDatabase.categories.forEach(cat => {
+        ['monthly', 'annual', 'gold'].forEach(sec => {
+          if (!displayedStaticTopics[`${cat.name}_${sec}`]) {
+            refreshStaticSection(cat.name, sec);
+          }
+        });
+      });
+    }
+  }, [selectedCategory, isTopicLabOpen]);
+
   const convertMarkdownToHtml = (text) => {
     const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
     const tableRegex = /^\|(.+)\|\n\|([ :|-]+)\|\n((\|.+\|\n?)+)/gm;
