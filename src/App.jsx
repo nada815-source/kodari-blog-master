@@ -563,21 +563,20 @@ function App() {
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       const prompt = `주제: "${topic}"에 대해 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
       
-      기존에 작성된 내용이 마음에 들지 않아 새로 작성하는 것이니, 아래 지침을 0순위로 준수해:
+      반드시 아래 지침을 0순위로 준수해서 유효한 JSON으로 응답해:
       
-      1. **[구조적 가독성]**: 반드시 **## 소제목**을 사용하여 섹션을 명확히 구분해.
-      2. **[표(Table) 생성]**: 정보를 시각화할 수 있는 **Markdown Table**을 본문 중간에 반드시 포함해.
-      3. **[강조 스타일]**: ==형광펜==, ++파란색++, !!빨간색!! 기호를 **문장 단위로** 적극적으로 사용해.
-      4. **[분량]**: 공백 제외 최소 1500자 이상의 풍성한 분량으로 작성해.
-      5. **[어투]**: ${platformName} 특유의 다정하고 친근한 말투 사용.
+      1. **[구조]**: 반드시 ## 소제목으로 섹션을 구분할 것.
+      2. **[표(Table) 주의사항]**: 본문 중간에 Markdown Table을 포함하되, **표의 각 셀 내부에는 절대 강조 기호(==, ++, !!)를 사용하지 마.** 표는 반드시 표준 마크다운 형식을 지켜서 한 줄씩 작성해.
+      3. **[본문 강조]**: 표 밖의 일반 문장에는 ==형광펜==, ++파란색++, !!빨간색!! 기호를 적극적으로 사용해.
+      4. **[분량]**: 공백 제외 1500자 이상의 풍성한 분량.
       
-      결과는 반드시 아래 JSON 형식으로만 응답하고, JSON 외에 다른 설명은 절대 하지마:
+      결과는 오직 이 JSON 구조로만 응답해:
       {
         "${platform}": {
-          "title": "새로운 제목",
-          "content": "새로운 본문 내용 (마크다운 형식)",
-          "tags": "#태그1 #태그2",
-          "official_links": [{"name": "공식링크명", "url": "https://..."}]
+          "title": "제목",
+          "content": "본문내용",
+          "tags": "#태그",
+          "official_links": [{"name": "이름", "url": "url"}]
         }
       }`;
 
@@ -585,8 +584,7 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          tools: [{ google_search: {} }] 
+          contents: [{ parts: [{ text: prompt }] }]
         })
       });
 
@@ -594,11 +592,15 @@ function App() {
       
       const data = await response.json();
       const responseTextRaw = data.candidates[0].content.parts[0].text;
-      const jsonMatch = responseTextRaw.match(/\{[\s\S]*\}/);
       
-      if (!jsonMatch) throw new Error('유효한 JSON 데이터를 찾을 수 없습니다.');
+      // JSON 블록 추출 로직 강화 (가장 앞의 { 와 가장 뒤의 } 찾기)
+      const startIdx = responseTextRaw.indexOf('{');
+      const endIdx = responseTextRaw.lastIndexOf('}');
       
-      const parsedData = JSON.parse(jsonMatch[0]);
+      if (startIdx === -1 || endIdx === -1) throw new Error('JSON 구조를 찾을 수 없습니다.');
+      
+      const jsonStr = responseTextRaw.substring(startIdx, endIdx + 1);
+      const parsedData = JSON.parse(jsonStr);
       
       if (parsedData[platform]) {
         setResults(prev => ({
@@ -608,11 +610,11 @@ function App() {
             ...parsedData[platform]
           }
         }));
-        triggerToast(`${platformName} 글이 새롭게 태어났습니다! ✨`);
+        triggerToast(`${platformName} 글이 성공적으로 리필되었습니다! ✨`);
       }
     } catch (err) {
       console.error('재생성 상세 오류:', err);
-      triggerToast('AI 응답 지연 또는 형식 오류입니다. 다시 시도해주세요! 💦');
+      triggerToast('AI 응답 형식이 불안정합니다. 잠시 후 다시 시도해주세요! 💦');
     } finally {
       setLoading(false);
     }
