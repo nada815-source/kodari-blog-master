@@ -566,9 +566,9 @@ function App() {
       반드시 아래 지침을 0순위로 준수해서 유효한 JSON으로 응답해:
       
       1. **[구조]**: 반드시 ## 소제목으로 섹션을 구분할 것.
-      2. **[표(Table) 주의사항]**: 본문 중간에 Markdown Table을 포함하되, **표의 각 셀 내부에는 절대 강조 기호(==, ++, !!)를 사용하지 마.** 표는 반드시 표준 마크다운 형식을 지켜서 한 줄씩 작성해.
-      3. **[본문 강조]**: 표 밖의 일반 문장에는 ==형광펜==, ++파란색++, !!빨간색!! 기호를 적극적으로 사용해.
-      4. **[분량]**: 공백 제외 1500자 이상의 풍성한 분량.
+      2. **[표(Table)]**: Markdown Table을 포함하되, 셀 내부에는 강조 기호 사용 금지.
+      3. **[강조]**: 표 밖의 문장에는 ==형광펜==, ++파란색++, !!빨간색!! 사용.
+      4. **[JSON 안정성]**: 응답은 반드시 유효한 JSON이어야 해. 본문 텍스트 내부에 쌍따옴표(")는 작은따옴표(')로 대체하고, **실제 줄바꿈 문자는 반드시 \\n 기호로 변환하여 한 줄의 문자열로 표현해.** 
       
       결과는 오직 이 JSON 구조로만 응답해:
       {
@@ -584,7 +584,8 @@ function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search: {} }] 
         })
       });
 
@@ -593,10 +594,8 @@ function App() {
       const data = await response.json();
       const responseTextRaw = data.candidates[0].content.parts[0].text;
       
-      // JSON 블록 추출 로직 강화 (가장 앞의 { 와 가장 뒤의 } 찾기)
       const startIdx = responseTextRaw.indexOf('{');
       const endIdx = responseTextRaw.lastIndexOf('}');
-      
       if (startIdx === -1 || endIdx === -1) throw new Error('JSON 구조를 찾을 수 없습니다.');
       
       const jsonStr = responseTextRaw.substring(startIdx, endIdx + 1);
@@ -614,7 +613,7 @@ function App() {
       }
     } catch (err) {
       console.error('재생성 상세 오류:', err);
-      triggerToast('AI 응답 형식이 불안정합니다. 잠시 후 다시 시도해주세요! 💦');
+      triggerToast('AI 응답 형식이 불안정합니다. 한 번 더 눌러주세요! 💦');
     } finally {
       setLoading(false);
     }
