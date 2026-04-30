@@ -50,6 +50,8 @@ function App() {
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
+  const [isLiveLoading, setIsLiveLoading] = useState(false);
+  const [dynamicTopics, setDynamicTopics] = useState(null);
 
   // 소재 연구소 데이터베이스 (V2.8.0)
   const topicDatabase = {
@@ -724,6 +726,61 @@ function App() {
       updatedPrompts[idx].sub_copy = newCopy;
       return { ...prev, [activeTab]: { ...prev[activeTab], section_prompts: updatedPrompts } };
     });
+  };
+
+  const refreshLiveTrends = async () => {
+    const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
+    if (!finalKey) {
+      triggerToast('⚙️ API 키를 설정해야 실시간 분석이 가능합니다!');
+      return;
+    }
+
+    setIsLiveLoading(true);
+    triggerToast('🔄 AI가 현재 대한민국 트렌드를 분석 중입니다...');
+
+    try {
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
+      const prompt = `당신은 대한민국 최고의 트렌드 분석가입니다. 현재 날짜(${new Date().toLocaleDateString()})를 기준으로 블로그 조회수가 폭발할 만한 최신 트렌드 주제를 추천하세요.
+반드시 아래 4개 카테고리별로 5개씩 추천해야 합니다.
+카테고리: 💰 경제/재테크, 💪 건강/운동, 💻 IT/테크, ✈️ 여행/생활
+
+응답 형식은 반드시 아래 형식을 엄수하세요:
+[CATEGORY]카테고리명
+소재1
+소재2
+소재3
+소재4
+소재5
+... (다음 카테고리 반복)`;
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+      
+      const data = await response.json();
+      const text = data.candidates[0].content.parts[0].text;
+      
+      const categories = text.split('[CATEGORY]').filter(c => c.trim() !== '');
+      const newTopics = categories.map(c => {
+        const lines = c.trim().split('\n').filter(l => l.trim() !== '');
+        return {
+          name: lines[0].trim(),
+          topics: lines.slice(1, 6).map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim())
+        };
+      });
+
+      if (newTopics.length > 0) {
+        setDynamicTopics(newTopics);
+        triggerToast('✨ 실시간 트렌드 분석 완료! 새로운 주제들이 도착했습니다.');
+      }
+    } catch (err) {
+      console.error(err);
+      triggerToast('❌ 트렌드 분석 중 오류가 발생했습니다.');
+    } finally {
+      setIsLiveLoading(false);
+    }
   };
 
   const convertMarkdownToHtml = (text) => {
@@ -1440,7 +1497,7 @@ function App() {
 
               {/* 카테고리별 테마 섹션 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {topicDatabase.categories.map((cat, i) => (
+                {(dynamicTopics || topicDatabase.categories).map((cat, i) => (
                   <section key={i} className="space-y-4">
                     <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">{cat.name}</h3>
                     <div className="flex flex-wrap gap-2">
@@ -1463,10 +1520,16 @@ function App() {
               <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Live Trend Analysis</p>
               <h4 className="text-white font-black text-lg">새로운 주제가 필요하신가요?</h4>
               <button 
-                onClick={() => { setIsTopicLabOpen(false); triggerToast('AI가 실시간 트렌드를 분석 중입니다... 🔄'); }}
-                className="inline-block px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-xl active:scale-95"
+                onClick={refreshLiveTrends}
+                disabled={isLiveLoading}
+                className="inline-block px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                실시간 트렌드 확인하기 🚀
+                {isLiveLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    트렌드 분석 중...
+                  </span>
+                ) : '실시간 트렌드 확인하기 🚀'}
               </button>
             </div>
           </div>
