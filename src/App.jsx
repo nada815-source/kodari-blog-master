@@ -52,28 +52,41 @@ function App() {
   const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
   const [isLiveLoading, setIsLiveLoading] = useState(false);
   const [dynamicTopics, setDynamicTopics] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('💰 경제/재테크');
 
-  // 소재 연구소 데이터베이스 (V2.8.0)
+  // 소재 연구소 V3.0 데이터베이스 (전략적 세분화)
   const topicDatabase = {
-    monthly: [
-      { month: 1, topics: ['새해 목표 세우기', '연말정산 꿀팁', '겨울 방학 여행지', '다이어트 시작', '가계부 작성법'] },
-      { month: 2, topics: ['발렌타인데이 선물', '졸업 시즌 축하 문구', '봄맞이 인테리어', '설날 명절 음식', '취업 준비 전략'] },
-      { month: 3, topics: ['새학기 준비물', '화이트데이 이벤트', '봄꽃 개화 시기', '환절기 건강 관리', '이사 체크리스트'] },
-      { month: 4, topics: ['벚꽃 명소 추천', '벚꽃 축제 일정', '중간고사 공부법', '봄 패션 트렌드', '식목일 나무 심기'] },
-      { month: 5, topics: ['어버이날 선물 추천', '어린이날 나들이', '스승의 날 감사 인사', '종합소득세 신고', '가족 여행 코스'] },
-      { month: 6, topics: ['여름 휴가 계획', '장마 대비 아이템', '현충일 의미', '여름 다이어트 식단', '자취방 에어컨 관리'] },
-      { month: 7, topics: ['여름 방학 알바', '초복 보양식 추천', '워터파크 순위', '여름 방학 공부 계획', '캠핑 장비 리스트'] },
-      { month: 8, topics: ['광복절의 역사', '말복 보양식', '늦여름 휴가 정보', '가을 옷 미리보기', '태풍 대비 요령'] },
-      { month: 9, topics: ['추석 명절 선물', '추석 귀성길 정체', '가을 캠핑 명소', '추석 연휴 해외여행', '환절기 피부 관리'] },
-      { month: 10, topics: ['단풍 구경 명소', '할로윈 파티 소품', '가을 독서 추천', '공무원 시험 준비', '건강 검진 체크'] },
-      { month: 11, topics: ['수능 응원 문구', '빼빼로데이 이벤트', '겨울 옷 코디', '김장 시기 및 레시피', '블랙프라이데이 직구'] },
-      { month: 12, topics: ['크리스마스 홈파티', '연말 결산 및 회고', '일출 명소 추천', '스키장 개장 일정', '겨울 방학 계획'] }
-    ],
     categories: [
-      { name: '💰 경제/재테크', topics: ['주식 투자 입문', '부동산 전망', '앱테크 추천', '적금 금리 비교', '은퇴 설계'] },
-      { name: '💪 건강/운동', topics: ['홈트레이닝 루틴', '영양제 고르는 법', '스트레스 해소법', '필라테스 효과', '수면의 질 높이기'] },
-      { name: '💻 IT/테크', topics: ['최신 스마트폰 비교', '유용한 어플 추천', 'AI 툴 활용법', 'PC 조립 가이드', '코딩 독학 방법'] },
-      { name: '✈️ 여행/생활', topics: ['제주도 숨은 맛집', '해외여행 준비물', '캠핑 요리 레시피', '혼자 가기 좋은 여행지', '미니멀 라이프'] }
+      { 
+        name: '💰 경제/재테크', 
+        monthly: ['5월 종합소득세 신고', '공모주 청약 일정', '반기별 예적금 특판', '근로장려금 신청'],
+        annual: ['매년 연말정산 대비', '연초 재테크 계획', '금리 변동 전망', '국세청 환급금 찾기'],
+        gold: ['주식 투자 입문 가이드', '부동산 청약 제도 해설', '앱테크 베스트 10', '가계부 다이어트 비법']
+      },
+      { 
+        name: '🏛️ 정부정책', 
+        monthly: ['청년도약계좌 신청', '지자체별 지원금 소식', '부모급여 및 아동수당', '에너지 바우처 혜택'],
+        annual: ['정부 예산안 발표', '최저임금 결정', '세법 개정안 핵심 정리', '대선/총선 관련 공약'],
+        gold: ['실업급여 수급 자격', '국민내일배움카드 활용', '주거급여 신청 방법', '소상공인 지원 정책']
+      },
+      { 
+        name: '💪 건강/운동', 
+        monthly: ['환절기 면역력 강화', '여름 다이어트 식단', '황사/미세먼지 대처', '봄철 야외 운동 가이드'],
+        annual: ['무료 건강검진 대상', '계절별 보양식 총정리', '독감 예방접종 시기', '새해 금연 결심 지원'],
+        gold: ['홈트레이닝 필수 장비', '영양제 과잉 섭취 주의', '스트레스 해소법 7가지', '수면의 질 높이는 법']
+      },
+      { 
+        name: '💻 IT/테크', 
+        monthly: ['갤럭시/아이폰 최신 루머', '유튜브 알고리즘 변화', '신규 게임 출시 일정', '윈도우 보안 업데이트'],
+        annual: ['CES/MWC 주요 기술', '애플 WWDC 발표', '구글 I/O 신기술', '연말 가전 세일 정보'],
+        gold: ['최강의 업무용 툴 추천', '스마트폰 사진 잘 찍는 법', 'PC 속도 빨라지는 법', 'AI 챗봇 활용 꿀팁']
+      },
+      { 
+        name: '✈️ 여행/생활', 
+        monthly: ['5월 가정의 달 나들이', '여름 휴가 항공권 예약', '벚꽃/단풍 지도', '캠핑 명소 추천'],
+        annual: ['해외여행 국가별 성수기', '전국 축제 총정리', '연간 연휴 황금 일정', '여권 재발급 팁'],
+        gold: ['여행 짐 싸기 체크리스트', '가성비 숙소 예약법', '제주도 한 달 살기 가이드', '현지인 맛집 찾는 법']
+      }
     ]
   };
 
@@ -740,18 +753,16 @@ function App() {
 
     try {
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
-      const prompt = `당신은 대한민국 최고의 트렌드 분석가입니다. 현재 날짜(${new Date().toLocaleDateString()})를 기준으로 블로그 조회수가 폭발할 만한 최신 트렌드 주제를 추천하세요.
-반드시 아래 4개 카테고리별로 5개씩 추천해야 합니다.
-카테고리: 💰 경제/재테크, 💪 건강/운동, 💻 IT/테크, ✈️ 여행/생활
+      const prompt = `당신은 대한민국의 최신 트렌드를 분석하는 일타 강사입니다. 
+현재 선택된 카테고리 [${selectedCategory}]에 대하여, 오늘 날짜(${new Date().toLocaleDateString()}) 기준 블로그 조회수가 폭발할 만한 '실시간 핫이슈 주제' 5개를 추천하세요.
 
-응답 형식은 반드시 아래 형식을 엄수하세요:
-[CATEGORY]카테고리명
-소재1
-소재2
-소재3
-소재4
-소재5
-... (다음 카테고리 반복)`;
+반드시 아래 형식을 엄수하여 소재만 나열하세요:
+[LIVE]
+주제1
+주제2
+주제3
+주제4
+주제5`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -762,18 +773,12 @@ function App() {
       const data = await response.json();
       const text = data.candidates[0].content.parts[0].text;
       
-      const categories = text.split('[CATEGORY]').filter(c => c.trim() !== '');
-      const newTopics = categories.map(c => {
-        const lines = c.trim().split('\n').filter(l => l.trim() !== '');
-        return {
-          name: lines[0].trim(),
-          topics: lines.slice(1, 6).map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim())
-        };
-      });
-
-      if (newTopics.length > 0) {
-        setDynamicTopics(newTopics);
-        triggerToast('✨ 실시간 트렌드 분석 완료! 새로운 주제들이 도착했습니다.');
+      const liveSection = text.split('[LIVE]')[1];
+      if (liveSection) {
+        const lines = liveSection.trim().split('\n').filter(l => l.trim() !== '').slice(0, 5);
+        const processedTopics = lines.map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim());
+        setDynamicTopics(processedTopics);
+        triggerToast(`✨ [${selectedCategory}] 실시간 트렌드 분석 완료!`);
       }
     } catch (err) {
       console.error(err);
@@ -1474,63 +1479,102 @@ function App() {
               <button onClick={() => setIsTopicLabOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
             </div>
 
-            <div className="space-y-10">
-              {/* 월간 황금 키워드 섹션 */}
-              <section className="space-y-4">
-                <h3 className="text-lg font-black text-slate-700 flex items-center gap-2">
-                  🌸 {new Date().getMonth() + 1}월의 황금 라인업
-                  <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-md">SEASONAL</span>
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {topicDatabase.monthly[new Date().getMonth()].topics.map((t, i) => (
-                    <button 
-                      key={i} 
-                      onClick={() => handleSelectTopic(t)}
-                      className="p-4 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-2xl text-left transition-all group border border-slate-100 hover:border-indigo-600 hover:shadow-lg hover:shadow-indigo-200"
-                    >
-                      <p className="text-xs font-bold text-slate-400 group-hover:text-white/70 mb-1">KEYWORD 0{i+1}</p>
-                      <p className="font-black truncate">{t}</p>
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              {/* 카테고리별 테마 섹션 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {(dynamicTopics || topicDatabase.categories).map((cat, i) => (
-                  <section key={i} className="space-y-4">
-                    <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">{cat.name}</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {cat.topics.map((t, j) => (
-                        <button 
-                          key={j} 
-                          onClick={() => handleSelectTopic(t)}
-                          className="px-4 py-2.5 bg-white border-2 border-slate-100 hover:border-indigo-500 hover:text-indigo-600 rounded-xl text-xs font-bold transition-all hover:shadow-sm"
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
+            <div className="space-y-8">
+              {/* 카테고리 탭 네비게이션 */}
+              <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-3xl">
+                {topicDatabase.categories.map((cat, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setSelectedCategory(cat.name); setDynamicTopics(null); }}
+                    className={`px-5 py-3 rounded-2xl font-black text-xs transition-all ${
+                      selectedCategory === cat.name 
+                      ? 'bg-white text-indigo-600 shadow-md scale-105' 
+                      : 'text-slate-500 hover:text-indigo-600 hover:bg-white/50'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
                 ))}
               </div>
-            </div>
 
-            <div className="mt-12 p-6 bg-slate-900 rounded-[30px] text-center space-y-2">
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Live Trend Analysis</p>
-              <h4 className="text-white font-black text-lg">새로운 주제가 필요하신가요?</h4>
-              <button 
-                onClick={refreshLiveTrends}
-                disabled={isLiveLoading}
-                className="inline-block px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLiveLoading ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    트렌드 분석 중...
-                  </span>
-                ) : '실시간 트렌드 확인하기 🚀'}
-              </button>
+              {/* 4대 전략 대시보드 그리드 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 1. 실시간 트렌드 카드 */}
+                <div className="bg-slate-900 rounded-[30px] p-6 shadow-xl border border-white/10 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-white font-black text-sm flex items-center gap-2">
+                      ⚡ 실시간 주제
+                      <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                    </h3>
+                    <button 
+                      onClick={refreshLiveTrends}
+                      disabled={isLiveLoading}
+                      className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                    >
+                      {isLiveLoading ? '분석 중...' : '새로고침 🔄'}
+                    </button>
+                  </div>
+                  <div className="space-y-2 min-h-[150px] flex flex-col justify-center">
+                    {dynamicTopics ? (
+                      dynamicTopics.map((t, i) => (
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 truncate">
+                          {i+1}. {t}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="text-center space-y-3">
+                        <p className="text-slate-500 text-xs font-bold">지금 가장 핫한 주제는?</p>
+                        <button onClick={refreshLiveTrends} className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black shadow-lg shadow-indigo-900/40 active:scale-95">실시간 분석 시작 🚀</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. 이번 달 주제 카드 */}
+                <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm">
+                  <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                    🗓️ 이번 달 주제
+                    <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Monthly</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {topicDatabase.categories.find(c => c.name === selectedCategory)?.monthly.map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. 연간 주제 카드 */}
+                <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm">
+                  <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                    📅 연간 주제
+                    <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase">Annual</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {topicDatabase.categories.find(c => c.name === selectedCategory)?.annual.map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. 황금 키워드 카드 */}
+                <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm">
+                  <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                    💎 황금 키워드
+                    <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Evergreen</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {topicDatabase.categories.find(c => c.name === selectedCategory)?.gold.map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
