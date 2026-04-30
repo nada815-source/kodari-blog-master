@@ -592,14 +592,18 @@ function App() {
       if (!response.ok) throw new Error('네트워크 응답 오류');
       
       const data = await response.json();
-      const responseTextRaw = data.candidates[0].content.parts[0].text;
+      let rawText = data.candidates[0].content.parts[0].text;
       
-      const startIdx = responseTextRaw.indexOf('{');
-      const endIdx = responseTextRaw.lastIndexOf('}');
-      if (startIdx === -1 || endIdx === -1) throw new Error('JSON 구조를 찾을 수 없습니다.');
+      const startIdx = rawText.indexOf('{');
+      const endIdx = rawText.lastIndexOf('}');
+      if (startIdx === -1 || endIdx === -1) throw new Error('JSON 구조 없음');
       
-      const jsonStr = responseTextRaw.substring(startIdx, endIdx + 1);
-      const parsedData = JSON.parse(jsonStr);
+      let jsonStr = rawText.substring(startIdx, endIdx + 1);
+      
+      // JSON 내의 실제 줄바꿈을 \n으로 치환하여 파싱 에러 방지 (정밀 세척)
+      const sanitizedJson = jsonStr.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+      
+      const parsedData = JSON.parse(sanitizedJson);
       
       if (parsedData[platform]) {
         setResults(prev => ({
@@ -613,7 +617,7 @@ function App() {
       }
     } catch (err) {
       console.error('재생성 상세 오류:', err);
-      triggerToast('AI 응답 형식이 불안정합니다. 한 번 더 눌러주세요! 💦');
+      triggerToast('AI 응답이 불안정합니다. 한 번 더 눌러보시면 바로 해결됩니다! 💦');
     } finally {
       setLoading(false);
     }
