@@ -52,22 +52,9 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V2.7.3',
-      date: '2026-04-29',
-      title: '🎨 KODARI Storytelling Branding 엔진 공식 오픈',
-      tags: ['대규모 업데이트', '브랜딩', 'AI 상상력'],
-      details: [
-        '단일 단어(Impact Word)를 넘어선 [메인 제목 + 보조 문구] 이중 카피라이팅 시스템을 도입했습니다.',
-        '본문 맥락을 분석하여 금화, 악수, 성장 차트 등 "시각적 비유(Metaphor)"를 자동으로 설계하는 지능형 프롬프트를 탑재했습니다.',
-        '어떤 주제에서도 [썸네일1 + 본문3]의 완벽한 4종 세트 이미지를 보장하는 Perfect 4-Set 로직을 강제했습니다.',
-        '외부 라이브러리 의존성을 제거한 "Zero-Error 인라인 아이콘 시스템"으로 엔진 안정성을 극대화했습니다.',
-        '명품 정보 카드 레이아웃을 적용하여 블로그의 시각적 신뢰도와 브랜딩 가치를 한 차원 높였습니다.'
-      ]
-    },
-    {
       version: 'V2.6.0',
       date: '2026-04-29',
-      title: '💎 KODARI 명품 비주얼 엔진 V2.6 업그레이드',
+      title: '💎 KODARI 명품 비주얼 엔진 V3.3 업그레이드',
       tags: ['신기능', '디자인'],
       details: [
         '보케(Bokeh) 효과와 시네마틱 조명 지침을 도입하여 텍스트 가독성과 이미지 깊이감을 극대화했습니다.',
@@ -428,15 +415,12 @@ function App() {
    - **[1단계: 상상]**: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 **최적의 시각적 장면**을 먼저 상상해.
    - **[2단계: 스타일 적용]**: ${styleGuide}
    - **[3단계: 제약 조건]**: 인물은 반드시 **한국인(Korean/Asian)**으로, 배경은 외국어 없이 **깨끗하게** 구성해.
-   - **[4단계: 이미지 생성 지침(section_prompts)]**: 본문 소제목(H2) 개수와 상관없이, 아래의 **Storytelling Branding Rule**을 적용한 **총 4개**의 상세 영어 프롬프트를 반드시 생성해.
-      1) **Section 1 (Thumbnail)**: Create a grand masterpiece thumbnail representing the overall topic.
-      2) **Section 2 & 3 (Main Content)**: Visualize the most important informative parts of the content.
-      3) **Section 4 (Summary/Conclusion)**: Show a celebratory or concluding scene with a sense of achievement.
-      4) **Text Hierarchy**: Generate a **main_title** and a **sub_copy** for EACH of the 4 images.
-      5) **Visual Metaphor**: Use 'Storytelling Visual Metaphors' that symbolize the content.
-      6) **Layout Strategy**: Create a 'Premium Information Card' layout where the **main_title** and **sub_copy** can be placed naturally as part of the design.
-      7) **Visual Style**: Keep the 'Premium 3D Claymorphism' style.
-      8) **Safety**: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.**
+   - **[4단계: 이미지 생성 지침(section_prompts)]**: 소제목(H2)을 분석하여 아래의 **Storytelling Branding Rule**을 적용한 상세 영어 프롬프트를 생성해.
+      1) **Text Hierarchy**: Generate a **main_title** (Impactful title) and a **sub_copy** (Supporting detail or action message) for each image.
+      2) **Visual Metaphor**: Use 'Storytelling Visual Metaphors' that symbolize the content.
+      3) **Layout Strategy**: Create a 'Premium Information Card' layout where the **main_title** and **sub_copy** can be placed naturally as part of the design.
+      4) **Visual Style**: Keep the 'Premium 3D Claymorphism' style.
+      5) **Safety**: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.**
 
    - **[출력 포맷]**: 반드시 아래와 같은 순수한 JSON 배열 형식으로만 답변해. 다른 설명은 생략해.
      [
