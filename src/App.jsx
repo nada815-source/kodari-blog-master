@@ -457,10 +457,10 @@ function App() {
 
 3. **가독성 극대화 및 표(Table) 생성 전략 (필수):**
    - 모든 소제목은 반드시 마크다운의 **## (H2)** 태그로 통일해.
-   - **[형광펜 및 컬러 강조 강제]:** 독자의 시선을 끌기 위해 다음 기호를 적절히 섞어서 본문을 화려하게 구성해. 
-     1) **== 노란색 형광펜 ==**: 섹션당 1~2개 핵심 문장.
-     2) **++ 파란색 강조 ++**: 신뢰감 있는 정보, 긍정적 혜택, 숫자 정보에 사용.
-     3) **!! 빨간색 강조 !!**: 주의사항, 핵심 강조, 마감 임박 등에 사용.
+   - **[형광펜 및 컬러 강조 강제]:** 독자의 가독성을 위해 반드시 아래 기호를 **본문 문장 곳곳에 적극적으로** 섞어서 화려하게 구성해. (매 섹션마다 최소 2~3회 이상 사용 필수)
+      1) **== 강조할 내용 ==**: 노란색 형광펜 효과 (핵심 키워드)
+      2) **++ 강조할 내용 ++**: 파란색 글자 강조 (신뢰 정보)
+      3) **!! 강조할 내용 !!**: 빨간색 글자 강조 (핵심 경고)
    - **[표(Table) 생성 강제]:** 단순 리스트(1. 2. 3...)나 불렛 포인트로 나열할 수 있는 정보(예: 사용처 리스트, 혜택 항목, 일정 등)가 3개 이상이라면, 이를 **무조건 Markdown Table 형식**으로 시각화하여 본문 중간에 배치해. 
    - 표는 최소 2열 이상으로 구성하고(예: | 항목명 | 상세 내용 | 비고 |), 독자가 한눈에 정보를 파악할 수 있게 만들어.
 
@@ -643,24 +643,46 @@ function App() {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>모바일 복사 전용 미리보기</title>
+          <title>KODARI 모바일 복사 전용</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { padding: 20px; line-height: 1.6; font-family: '나눔고딕', sans-serif; background-color: #fff; }
-            .guide-box { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 30px; border: 2px dashed #dee2e6; text-align: center; }
-            .guide-text { font-weight: bold; color: #495057; font-size: 14px; }
+            body { padding: 20px; line-height: 1.8; font-family: '나눔고딕', sans-serif; background-color: #fff; color: #333; }
+            .action-bar { position: sticky; top: 0; background: #fff; padding: 10px 0; border-bottom: 2px solid #6366f1; margin-bottom: 20px; display: flex; gap: 10px; z-index: 100; }
+            button { background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; flex: 1; cursor: pointer; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+            button:active { transform: scale(0.98); }
+            #content { padding-top: 10px; }
+            table { width: 100% !important; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+            th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+            th { background-color: #f2f2f2; font-weight: bold; }
           </style>
+          <script>
+            function selectAllAndCopy() {
+              const content = document.getElementById('content');
+              const range = document.createRange();
+              range.selectNodeContents(content);
+              const selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+              try {
+                document.execCommand('copy');
+                alert('전체 선택 및 복사가 완료되었습니다! 네이버 블로그 앱에 붙여넣으세요! ✨');
+              } catch (err) {
+                alert('브라우저 보안 설정으로 인해 직접 복사가 실패했습니다. 선택된 영역을 길게 눌러 복사해 주세요! 💦');
+              }
+            }
+          </script>
         </head>
         <body>
-          <div class="guide-box">
-            <div class="guide-text">💡 아래 내용을 [전체 선택] 후 [복사]하여<br>네이버 블로그 앱에 붙여넣으세요!</div>
+          <div class="action-bar">
+            <button onclick="selectAllAndCopy()">📋 전체 선택 및 복사</button>
+            <button onclick="window.close()" style="background: #64748b;">닫기</button>
           </div>
           <div id="content">${htmlContent}</div>
         </body>
       </html>
     `);
     previewWin.document.close();
-    triggerToast('미리보기 창이 열렸습니다. 전체 선택 후 복사해 주세요! 📱✨');
+    triggerToast('미리보기 창이 열렸습니다. 버튼을 눌러 한 번에 복사하세요! 📱✨');
   };
 
   const copyToClipboard = async (text) => {
