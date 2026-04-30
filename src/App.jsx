@@ -543,6 +543,64 @@ function App() {
     }
   };
 
+  const regeneratePlatform = async (platform) => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
+      const prompt = `주제: "${topic}"에 대해 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
+      
+      기존에 작성된 내용이 마음에 들지 않아 새로 작성하는 것이니, 더 풍성하고 전문적인 느낌으로 작성해.
+      
+      반드시 아래의 지침을 엄수해:
+      1. ${platformName} 특유의 다정하고 친근한 말투 사용.
+      2. 최소 1500자 이상의 풍성한 분량.
+      3. **[형광펜 및 컬러 강조]** (==형광펜==, ++파란색++, !!빨간색!!)를 문장 단위로 적극적으로 사용.
+      4. 정보를 시각화할 수 있는 **Markdown Table**을 반드시 포함.
+      
+      결과는 반드시 아래 JSON 형식으로만 응답해:
+      {
+        "${platform}": {
+          "title": "새로운 제목",
+          "content": "새로운 본문 내용...",
+          "tags": "#태그1 #태그2",
+          "official_links": [{"name": "공식링크명", "url": "https://..."}]
+        }
+      }`;
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ google_search: {} }] 
+        })
+      });
+
+      if (!response.ok) throw new Error('재생성 실패');
+      
+      const data = await response.json();
+      let responseText = data.candidates[0].content.parts[0].text.replace(/```json/gi, '').replace(/```/gi, '').trim();
+      const parsedData = JSON.parse(responseText);
+      
+      if (parsedData[platform]) {
+        setResults(prev => ({
+          ...prev,
+          [platform]: {
+            ...prev[platform],
+            ...parsedData[platform]
+          }
+        }));
+        triggerToast(`${platformName} 글이 성공적으로 재생성되었습니다! ✨`);
+      }
+    } catch (err) {
+      console.error(err);
+      triggerToast('재생성 중 오류가 발생했습니다. 💦');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleStyleSwapCopy = (originalPrompt, currentStyle, idx) => {
     let transformed = originalPrompt;
     
@@ -939,6 +997,13 @@ function App() {
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
                   <div className="flex gap-2">
+                    <button 
+                      onClick={() => regeneratePlatform(activeTab)} 
+                      disabled={loading}
+                      className={`px-3 py-1.5 font-bold rounded-lg text-xs transition-all shadow-sm border flex items-center gap-1 ${loading ? 'bg-slate-100 text-slate-400' : 'bg-rose-50 hover:bg-rose-100 text-rose-600 border-rose-100 animate-pulse'}`}
+                    >
+                      {loading ? '⏳ 생성 중...' : '🔄 이 글만 다시 쓰기'}
+                    </button>
                     <button onClick={() => openPreviewWindow(results[activeTab].content)} className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-indigo-100 flex items-center gap-1">📱 모바일 복사 전용</button>
                     <button onClick={() => copyToClipboard(results[activeTab].content)} className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 본문 복사</button>
                   </div>
