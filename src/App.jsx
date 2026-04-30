@@ -434,7 +434,6 @@ function App() {
 이미지 스타일: ${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'}
 
 [필독: 생성 지침 - 미준수 시 작동 불가]
-
 [필독: 언어 설정 - 모든 플랫폼(네이버, 티스토리, 워드프레스)의 모든 텍스트(제목, 본문, 태그, 공식 링크 이름 등)는 반드시 **한국어**로만 작성해. 영어를 섞지 마라.]
 
 0. **이미지 검색 및 생성 전략 (KODARI Visual Engine 3.3):**
@@ -475,7 +474,7 @@ function App() {
       2) **++ 강조할 내용 ++**: 파란색 글자 강조 (신뢰 정보, 숫자)
       3) **!! 강조할 내용 !!**: 빨간색 글자 강조 (주의사항, 마감 임박)
    - **[표(Table) 생성 강제]:** 단순 리스트(1. 2. 3...)나 불렛 포인트로 나열할 수 있는 정보(예: 사용처 리스트, 혜택 항목, 일정 등)가 3개 이상이라면, 이를 **무조건 Markdown Table 형식**으로 시각화하여 본문 중간에 배치해. 
-   - 표는 최소 2열 이상으로 구성하고(예: | 항목명 | 상세 내용 | 비고 |), 독자가 한눈에 정보를 파악할 수 있게 만들어.
+   - 표는 최소 2열 이상으로 구성하고(예: | 항목명 | 상세 내용 | 비고 |), **표의 모든 셀 내부에는 절대로 강조 기호(**, ==, ++, !!)를 사용하지 마.** 독자가 깔끔하게 정보를 파악할 수 있게 만들어.
 
 4. **JSON 안정성:**
    - 응답은 반드시 유효한 JSON 형식이어야 해. 본문 텍스트 내부에 쌍따옴표(")는 작은따옴표(')로 대체해.
@@ -563,22 +562,23 @@ function App() {
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       const prompt = `주제: "${topic}"에 대해 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
       
-      반드시 아래 지침을 0순위로 준수해서 유효한 JSON으로 응답해:
+      아래 형식을 엄격히 지켜서 답변해 (다른 설명 금지):
       
-      1. **[구조]**: 반드시 ## 소제목으로 섹션을 구분할 것.
-      2. **[표(Table)]**: Markdown Table을 포함하되, 셀 내부에는 강조 기호 사용 금지.
-      3. **[강조]**: 표 밖의 문장에는 ==형광펜==, ++파란색++, !!빨간색!! 사용.
-      4. **[JSON 안정성]**: 응답은 반드시 유효한 JSON이어야 해. 본문 텍스트 내부에 쌍따옴표(")는 작은따옴표(')로 대체하고, **실제 줄바꿈 문자는 반드시 \\n 기호로 변환하여 한 줄의 문자열로 표현해.** 
+      [TITLE]
+      여기에 새로운 제목 작성
       
-      결과는 오직 이 JSON 구조로만 응답해:
-      {
-        "${platform}": {
-          "title": "제목",
-          "content": "본문내용",
-          "tags": "#태그",
-          "official_links": [{"name": "이름", "url": "url"}]
-        }
-      }`;
+      [CONTENT]
+      여기에 새로운 본문 작성
+      - 반드시 ## 소제목으로 섹션 구분
+      - 표(Table)를 포함하되, 표 셀 내부에는 절대 강조 기호(**, ==, ++, !!) 사용 금지
+      - 표 밖의 본문에는 ==형광펜==, ++파란색++, !!빨간색!! 적극 사용
+      
+      [TAGS]
+      #태그1 #태그2 #태그3 (한글로만 나열)
+      
+      [LINKS]
+      공식사이트명 | https://url
+      공식블로그 | https://url2`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -592,32 +592,39 @@ function App() {
       if (!response.ok) throw new Error('네트워크 응답 오류');
       
       const data = await response.json();
-      let rawText = data.candidates[0].content.parts[0].text;
+      const rawText = data.candidates[0].content.parts[0].text;
       
-      const startIdx = rawText.indexOf('{');
-      const endIdx = rawText.lastIndexOf('}');
-      if (startIdx === -1 || endIdx === -1) throw new Error('JSON 구조 없음');
+      // 구분자 기반 파싱 로직 (JSON보다 훨씬 견고함)
+      const parts = rawText.split(/\[TITLE\]|\[CONTENT\]|\[TAGS\]|\[LINKS\]/i);
+      if (parts.length < 4) throw new Error('응답 형식이 올바르지 않습니다.');
       
-      let jsonStr = rawText.substring(startIdx, endIdx + 1);
+      const title = parts[1].trim();
+      const content = parts[2].trim();
+      const tags = parts[3].trim();
+      const linksStr = parts[4]?.trim() || '';
       
-      // JSON 내의 실제 줄바꿈을 \n으로 치환하여 파싱 에러 방지 (정밀 세척)
-      const sanitizedJson = jsonStr.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+      const official_links = linksStr.split('\n')
+        .filter(line => line.includes('|'))
+        .map(line => {
+          const [name, url] = line.split('|').map(s => s.trim());
+          return { name, url };
+        });
       
-      const parsedData = JSON.parse(sanitizedJson);
+      setResults(prev => ({
+        ...prev,
+        [platform]: {
+          ...prev[platform],
+          title,
+          content,
+          tags,
+          official_links
+        }
+      }));
+      triggerToast(`${platformName} 글이 성공적으로 리필되었습니다! ✨`);
       
-      if (parsedData[platform]) {
-        setResults(prev => ({
-          ...prev,
-          [platform]: {
-            ...prev[platform],
-            ...parsedData[platform]
-          }
-        }));
-        triggerToast(`${platformName} 글이 성공적으로 리필되었습니다! ✨`);
-      }
     } catch (err) {
       console.error('재생성 상세 오류:', err);
-      triggerToast('AI 응답이 불안정합니다. 한 번 더 눌러보시면 바로 해결됩니다! 💦');
+      triggerToast('AI 응답이 일시적으로 불안정합니다. 한 번 더 눌러주세요! 💦');
     } finally {
       setLoading(false);
     }
