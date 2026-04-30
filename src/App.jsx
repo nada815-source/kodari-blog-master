@@ -611,24 +611,46 @@ function App() {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>모바일 복사 전용 미리보기</title>
+          <title>KODARI 모바일 복사 전용</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { padding: 20px; line-height: 1.6; font-family: '나눔고딕', sans-serif; background-color: #fff; }
-            .guide-box { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 30px; border: 2px dashed #dee2e6; text-align: center; }
-            .guide-text { font-weight: bold; color: #495057; font-size: 14px; }
+            body { padding: 20px; line-height: 1.8; font-family: '나눔고딕', sans-serif; background-color: #fff; color: #333; }
+            .action-bar { position: sticky; top: 0; background: #fff; padding: 10px 0; border-bottom: 2px solid #6366f1; margin-bottom: 20px; display: flex; gap: 10px; z-index: 100; }
+            button { background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; flex: 1; cursor: pointer; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+            button:active { transform: scale(0.98); }
+            #content { padding-top: 10px; }
+            table { width: 100% !important; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+            th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+            th { background-color: #f2f2f2; font-weight: bold; }
           </style>
+          <script>
+            function selectAllAndCopy() {
+              const content = document.getElementById('content');
+              const range = document.createRange();
+              range.selectNodeContents(content);
+              const selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+              try {
+                document.execCommand('copy');
+                alert('전체 선택 및 복사가 완료되었습니다! 네이버 블로그 앱에 붙여넣으세요! ✨');
+              } catch (err) {
+                alert('브라우저 보안 설정으로 인해 직접 복사가 실패했습니다. 선택된 영역을 길게 눌러 복사해 주세요! 💦');
+              }
+            }
+          </script>
         </head>
         <body>
-          <div class="guide-box">
-            <div class="guide-text">💡 아래 내용을 [전체 선택] 후 [복사]하여<br>네이버 블로그 앱에 붙여넣으세요!</div>
+          <div class="action-bar">
+            <button onclick="selectAllAndCopy()">📋 전체 선택 및 복사</button>
+            <button onclick="window.close()" style="background: #64748b;">닫기</button>
           </div>
           <div id="content">${htmlContent}</div>
         </body>
       </html>
     `);
     previewWin.document.close();
-    triggerToast('미리보기 창이 열렸습니다. 전체 선택 후 복사해 주세요! 📱✨');
+    triggerToast('미리보기 창이 열렸습니다. 버튼을 눌러 한 번에 복사하세요! 📱✨');
   };
 
   const copyToClipboard = async (text) => {
@@ -668,7 +690,15 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-medium text-sm">V2.1 명품 엔진 기반 : 황금 밸런스 가독성 및 모바일 복사 최적화 🫡🐟</p>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-500"></span>
+            </span>
+            <p className="text-xs font-bold text-slate-700 tracking-tight">
+              V2.5.1 Classic - 모바일 최적화 리마스터 🫡🐟
+            </p>
+          </div>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
