@@ -559,6 +559,9 @@ function App() {
     if (loading) return;
     setLoading(true);
     try {
+      const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
+      
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       const prompt = `주제: "${topic}"에 대해 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
       
@@ -594,15 +597,19 @@ function App() {
       const data = await response.json();
       const rawText = data.candidates[0].content.parts[0].text;
       
-      // 구분자 기반 파싱 로직 (JSON보다 훨씬 견고함)
-      const parts = rawText.split(/\[TITLE\]|\[CONTENT\]|\[TAGS\]|\[LINKS\]/i);
-      if (parts.length < 4) throw new Error('응답 형식이 올바르지 않습니다.');
+      // 정규표현식 기반 정밀 추출 (split보다 훨씬 강력함)
+      const titleMatch = rawText.match(/\[TITLE\]\s*([\s\S]*?)\s*\[CONTENT\]/i);
+      const contentMatch = rawText.match(/\[CONTENT\]\s*([\s\S]*?)\s*\[TAGS\]/i);
+      const tagsMatch = rawText.match(/\[TAGS\]\s*([\s\S]*?)\s*\[LINKS\]/i) || rawText.match(/\[TAGS\]\s*([\s\S]*)/i);
+      const linksMatch = rawText.match(/\[LINKS\]\s*([\s\S]*)/i);
       
-      const title = parts[1].trim();
-      const content = parts[2].trim();
-      const tags = parts[3].trim();
-      const linksStr = parts[4]?.trim() || '';
+      const title = titleMatch ? titleMatch[1].trim() : (rawText.split('[TITLE]')[1]?.split('[CONTENT]')[0]?.trim() || '');
+      const content = contentMatch ? contentMatch[1].trim() : (rawText.split('[CONTENT]')[1]?.split('[TAGS]')[0]?.trim() || '');
+      const tags = tagsMatch ? tagsMatch[1].trim() : '';
+      const linksStr = linksMatch ? linksMatch[1].trim() : '';
       
+      if (!title || !content) throw new Error('데이터 추출 실패');
+
       const official_links = linksStr.split('\n')
         .filter(line => line.includes('|'))
         .map(line => {
