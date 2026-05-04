@@ -935,7 +935,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900 flex flex-col items-center overflow-x-hidden">
+    <div className="min-h-screen w-full w-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900 flex flex-col items-center overflow-x-hidden">
       <div className="w-full max-w-4xl space-y-6 md:space-y-8">
         
         <header className="text-center space-y-4">
