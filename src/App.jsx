@@ -960,7 +960,15 @@ function App() {
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-slate-700 mb-2">✍️ 포스팅 주제</label>
+            <div className="flex justify-between items-end mb-1">
+              <label className="block text-sm font-bold text-slate-700">✍️ 포스팅 주제</label>
+              <button 
+                onClick={() => setIsTopicLabOpen(true)}
+                className="md:hidden px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-[11px] border-2 border-indigo-100 shadow-sm flex items-center gap-1 active:scale-95"
+              >
+                <span>💡 소재 연구소</span>
+              </button>
+            </div>
             <div className="flex gap-3">
               <div className="relative flex-1 group">
                 <input 
@@ -969,13 +977,13 @@ function App() {
                   onChange={(e) => setTopic(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && generateContent()}
                   placeholder="예: 2026 경기 컬처패스 사용처 및 유효기간"
-                  className="w-full p-5 pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-lg font-bold transition-all shadow-sm"
+                  className="w-full p-4 md:p-5 pl-12 md:pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-base md:text-lg font-bold transition-all shadow-sm"
                 />
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-2xl group-focus-within:scale-110 transition-transform">✨</span>
+                <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-xl md:text-2xl group-focus-within:scale-110 transition-transform">✨</span>
               </div>
               <button 
                 onClick={() => setIsTopicLabOpen(true)}
-                className="px-8 py-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-2xl font-black text-sm transition-all flex flex-col items-center justify-center gap-1 border-2 border-indigo-100 shadow-sm whitespace-nowrap active:scale-95"
+                className="hidden md:flex px-8 py-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-2xl font-black text-sm transition-all flex-col items-center justify-center gap-1 border-2 border-indigo-100 shadow-sm whitespace-nowrap active:scale-95"
               >
                 <span className="text-2xl">💡</span>
                 소재 연구소
