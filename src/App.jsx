@@ -935,8 +935,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 font-sans text-slate-900">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900 flex flex-col items-center overflow-x-hidden">
+      <div className="w-full max-w-4xl space-y-6 md:space-y-8">
         
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
