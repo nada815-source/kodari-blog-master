@@ -940,7 +940,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
