@@ -93,6 +93,18 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.5.4',
+      date: '2026-05-05',
+      title: '⚓ 가로 모드 뷰포트 최종 봉인 완료',
+      tags: ['Viewport Fix', 'Safari Ultimate', 'UX'],
+      details: [
+        '아이폰 사파리 가로 모드에서 레이아웃이 50%로 고정되는 현상을 shrink-to-fit=no 설정으로 해결했습니다.',
+        'html, body에 min-width: 100vw를 강제 주입하여 배경색 잘림을 원천 차단했습니다.',
+        '#root 래퍼 기반의 세이프 에리어 인셋(Safe Area Insets) 패딩을 적용했습니다.',
+        '버전명을 V3.5.4로 업데이트하여 최신 패치 적용 여부를 즉시 확인할 수 있게 했습니다.'
+      ]
+    },
+    {
       version: 'V3.5.2',
       date: '2026-05-05',
       title: '💎 가로 모드 완전 대응 및 레이아웃 안정화',
@@ -940,7 +952,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.3</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.4</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
