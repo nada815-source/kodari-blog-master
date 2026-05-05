@@ -4,12 +4,14 @@
 html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  min-width: 100vw !important;
+  width: 100vw !important;
+  width: -webkit-fill-available !important;
   min-height: 100vh !important;
+  min-height: -webkit-fill-available !important;
   background-color: #f8fafc !important;
   color: #334155;
-  display: block !important;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* 📱 아이폰 가로 모드 및 세이프 에리어 대응 */
