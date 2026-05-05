@@ -20,16 +20,16 @@ const Image = ({ size = 16, className = "" }) => (
 const topicDatabase = {
   categories: [
     { 
-      name: '💰 경제/재테크', 
-      monthly: ['5월 종합소득세 신고', '공모주 청약 일정', '반기별 예적금 특판', '근로장려금 신청', '가정의 달 절약법', '여름 휴가 적금 추천', '장마 대비 보험 점검', '하반기 증시 전망', '추석 상여금 활용법', '블랙프라이데이 소비전략'],
-      annual: ['매년 연말정산 대비', '연초 재테크 계획', '금리 변동 전망', '국세청 환급금 찾기', 'ISA 계좌 활용법', 'IRP 절세 전략', '배당주 투자 시기', '연간 가계부 결산', '부동산 공시지가 확인', '지방세 납부 기간'],
-      gold: ['주식 투자 입문 가이드', '부동산 청약 제도 해설', '앱테크 베스트 10', '가계부 다이어트 비법', '미국 주식 시작하기', '금 투자 방법', '비트코인 초보 가이드', '사회초년생 돈 모으기', '통장 쪼개기 기술', '노후 자금 준비법']
-    },
-    { 
       name: '🏛️ 정부정책', 
       monthly: ['청년도약계좌 신청', '지자체별 지원금 소식', '부모급여 및 아동수당', '에너지 바우처 혜택', '임대주택 입주 공고', '문화누리카드 신청', '청년 월세 지원', '이사 비용 지원 사업', '내 집 마련 디딤돌 대출', '버팀목 전세 자금'],
       annual: ['정부 예산안 발표', '최저임금 결정', '세법 개정안 핵심 정리', '대선/총선 관련 공약', '병사 월급 인상 소식', '건강보험료 개편안', '노령연금 수급 자격', '기초수급자 혜택 정리', '근로장려금 지급 시기', '자녀장려금 자격 확인'],
       gold: ['실업급여 수급 자격', '국민내일배움카드 활용', '주거급여 신청 방법', '소상공인 지원 정책', '국가 장학금 신청법', '경기 컬처패스 활용', 'K-패스 환급 제도', '육아휴직 급여 계산', '출산 장려금 지역별 정리', '긴급 복지 지원 제도']
+    },
+    { 
+      name: '💰 경제/재테크', 
+      monthly: ['5월 종합소득세 신고', '공모주 청약 일정', '반기별 예적금 특판', '근로장려금 신청', '가정의 달 절약법', '여름 휴가 적금 추천', '장마 대비 보험 점검', '하반기 증시 전망', '추석 상여금 활용법', '블랙프라이데이 소비전략'],
+      annual: ['매년 연말정산 대비', '연초 재테크 계획', '금리 변동 전망', '국세청 환급금 찾기', 'ISA 계좌 활용법', 'IRP 절세 전략', '배당주 투자 시기', '연간 가계부 결산', '부동산 공시지가 확인', '지방세 납부 기간'],
+      gold: ['주식 투자 입문 가이드', '부동산 청약 제도 해설', '앱테크 베스트 10', '가계부 다이어트 비법', '미국 주식 시작하기', '금 투자 방법', '비트코인 초보 가이드', '사회초년생 돈 모으기', '통장 쪼개기 기술', '노후 자금 준비법']
     },
     { 
       name: '💪 건강/운동', 
@@ -88,10 +88,21 @@ function App() {
   const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
   const [isLiveLoading, setIsLiveLoading] = useState(false);
   const [dynamicTopics, setDynamicTopics] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('💰 경제/재테크');
+  const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
   const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
 
   const patchNotes = [
+    {
+      version: 'V3.5.8',
+      date: '2026-05-05',
+      title: '🏛️ 정부정책 우선순위 전략 배치',
+      tags: ['전략 변경', '데이터 최적화', 'UX'],
+      details: [
+        '소재 연구소의 최우선 카테고리를 "정부정책"으로 변경하여 진입 시 즉시 노출되도록 했습니다.',
+        '경제/재테크 카테고리와 정부정책 카테고리의 위치를 스왑하여 전략적 중요도를 높였습니다.',
+        '기본 선택값을 변경하여 대표님의 분석 흐름을 최적화했습니다.'
+      ]
+    },
     {
       version: 'V3.5.7',
       date: '2026-05-05',
@@ -975,7 +986,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.7</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.8</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
