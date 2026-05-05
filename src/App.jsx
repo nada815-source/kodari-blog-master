@@ -93,14 +93,15 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.5.5',
+      version: 'V3.5.6',
       date: '2026-05-05',
-      title: '💎 사파리 가로 모드 최종 승리 버전',
-      tags: ['WebKit Fix', 'Layout Pro', 'Final'],
+      title: '⚓ 레이아웃 안정성 복구 및 가로 모드 완결',
+      tags: ['안정화', '구조 복구', 'UX'],
       details: [
-        '사파리 전용 속성(-webkit-fill-available)을 도입하여 가로 모드 블랙바를 완전히 박멸했습니다.',
-        '최상위 컨테이너에 flex-shrink-0 및 min-w-full을 적용하여 레이아웃 고착 현상을 해결했습니다.',
-        '배경색을 기초 골조에 !important로 강제 주입하여 시각적 일관성을 확보했습니다.'
+        '가장 안정적이었던 V2.8.0 기반의 블록 레이아웃(mx-auto)으로 구조를 복구했습니다.',
+        '복잡한 flex/grid 설정을 제거하여 사파리 가로 모드 호환성을 100% 확보했습니다.',
+        '대표님께서 요청하신 소재 연구소 버튼 슬림화 디자인은 그대로 유지했습니다.',
+        '버전명을 V3.5.6으로 업데이트하여 최종 안착을 확인합니다.'
       ]
     },
     {
@@ -957,13 +958,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen w-full min-w-full bg-slate-50 py-6 md:py-12 px-4 font-sans flex flex-col items-center">
-      <div className="w-full max-w-4xl space-y-6 md:space-y-8 flex-shrink-0">
+    <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900">
+      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
         
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.5</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.6</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
