@@ -93,6 +93,17 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.5.7',
+      date: '2026-05-05',
+      title: '💡 소재 연구소 모바일 화면 최적화',
+      tags: ['모달 수정', 'UX 개선', '모바일'],
+      details: [
+        '소재 연구소 진입 시 모바일에서 화면이 잘리던 현상을 완벽하게 해결했습니다.',
+        '모바일 모달 정렬을 상단 위주로 재조정하여 스크롤 가독성을 극대화했습니다.',
+        '테두리 여백과 곡률을 슬림화하여 정보 노출 영역을 대폭 확대했습니다.'
+      ]
+    },
+    {
       version: 'V3.5.6',
       date: '2026-05-05',
       title: '⚓ 레이아웃 안정성 복구 및 가로 모드 완결',
@@ -964,7 +975,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.6</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.7</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1531,8 +1542,8 @@ function App() {
       )}
 
       {isTopicLabOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-[100] p-4 overflow-y-auto">
-          <div className="bg-white rounded-[40px] p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-start md:items-center justify-center z-[100] p-2 md:p-4 overflow-y-auto pt-4 md:pt-0">
+          <div className="bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto">
             <div className="flex justify-between items-center mb-8">
               <div className="space-y-1">
                 <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
