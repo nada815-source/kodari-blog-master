@@ -93,15 +93,15 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V2.8.4',
+      version: 'V3.5.2',
       date: '2026-05-05',
-      title: '📱 모바일 가로 모드 및 레이아웃 최적화',
-      tags: ['UX 개선', '버그 수정', '모바일'],
+      title: '💎 가로 모드 완전 대응 및 레이아웃 안정화',
+      tags: ['UX 완결', '최종 수정', '명품 UI'],
       details: [
-        '아이폰 가로 모드에서 화면이 한쪽으로 쏠리던 현상을 완벽하게 해결했습니다.',
-        'Safe Area(노치 영역) 대응을 위한 viewport-fit=cover 설정을 적용했습니다.',
-        '배경색이 화면 전체를 빈틈없이 채우도록 기초 설계를 보강했습니다.',
-        '소재 연구소 버튼을 슬림화하여 모바일 가독성을 200% 향상시켰습니다.'
+        '아이폰 가로 모드에서 화면이 반쪽만 나오던 현상을 100vw 강제 주입으로 해결했습니다.',
+        '배경색 유실을 방지하기 위해 CSS 기초 골조(!important)를 대대적으로 보강했습니다.',
+        'grid 정렬 시스템을 도입하여 어떤 회전 상황에서도 중앙 정렬을 유지합니다.',
+        '모바일 사용성을 위한 버튼 슬림화 패치가 최종 안착되었습니다.'
       ]
     },
     {
@@ -934,13 +934,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen py-6 md:py-12 px-4 font-sans">
-      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+    <div className="min-h-screen w-full min-w-full bg-slate-50 py-6 md:py-12 px-4 font-sans grid place-items-start md:place-items-center">
+      <div className="w-full max-w-4xl mx-auto space-y-6 md:space-y-8">
         
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.1</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
