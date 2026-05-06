@@ -903,23 +903,28 @@ function App() {
 
   const convertMarkdownToHtml = (text) => {
     const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
-    const tableRegex = /^\|(.+)\|\n\|([ :|-]+)\|\n((\|.+\|\n?)+)/gm;
+    // 더욱 유연한 표 탐지 정규식 (줄바꿈 및 공백 대응 강화)
+    const tableRegex = /((?:^|\n)\|.+(?:\n\|[ :|-]+)+\n(?:\|.+\|(?:\n|$))+)/g;
     
     const markdownToHtmlTable = (match) => {
-      const lines = match.trim().split('\n');
+      const lines = match.trim().split(/\r?\n/);
+      if (lines.length < 2) return match;
+
       const headers = lines[0].split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim());
       const rows = lines.slice(2).map(line => line.split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim()));
 
       let html = `<table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #ddd; ${naverFont}">`;
       html += '<thead style="background-color: #f8f9fa;"><tr>';
       headers.forEach(h => {
-        html += `<th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; background-color: #f2f2f2;">${h}</th>`;
+        html += `<th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; background-color: #f2f2f2; color: #333;">${h}</th>`;
       });
       html += '</tr></thead><tbody>';
       rows.forEach(row => {
+        if (row.length === 0) return;
         html += '<tr>';
-        row.forEach(cell => {
-          html += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center;">${cell}</td>`;
+        headers.forEach((_, idx) => {
+          const cell = row[idx] || '';
+          html += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center; color: #444;">${cell}</td>`;
         });
         html += '</tr>';
       });
@@ -937,7 +942,7 @@ function App() {
       .replace(/==\s*([\s\S]*?)\s*==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
       .replace(/\+\+\s*([\s\S]*?)\s*\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
       .replace(/!!\s*([\s\S]*?)\s*!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
-      .split('\n').map(line => {
+      .split(/\r?\n/).map(line => {
         const trimmed = line.trim();
         if (trimmed === '') return '<p>&nbsp;</p>'; 
         if (trimmed.startsWith('<p') || trimmed.startsWith('<li') || trimmed.startsWith('<table')) return trimmed;
