@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-
-// 🛡️ KODARI 내장 아이콘 컴포넌트 (외부 의존성 제거)
+// 인라인 SVG 아이콘 컴포넌트 (설치 없이 작동)
 const Copy = ({ size = 16, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
