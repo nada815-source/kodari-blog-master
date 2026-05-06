@@ -571,7 +571,7 @@ function App() {
       1) **Section 1 (Thumbnail)**: Create a grand masterpiece thumbnail representing the overall topic.
       2) **Section 2 & 3 (Main Content)**: Visualize the most important informative parts of the content.
       3) **Section 4 (Summary/Conclusion)**: Show a celebratory or concluding scene with a sense of achievement.
-      4) **Text Hierarchy**: Generate a **main_title** and a **sub_copy** for EACH of the 4 images.
+      4) **Text Hierarchy**: Generate a **main_title** (e.g. 프리미엄 정보 가이드) and a **sub_copy** (e.g. 2026년 최신 혜택 총정리) for EACH of the 4 images.
       5) **Visual Metaphor**: Use 'Storytelling Visual Metaphors' that symbolize the content.
       6) **Layout Strategy**: Create a 'Premium Information Card' layout where the **main_title** and **sub_copy** can be placed naturally as part of the design.
       7) **Visual Style**: Keep the 'Premium 3D Claymorphism' style.
@@ -591,22 +591,20 @@ function App() {
 1. **보안 및 신뢰성 (최우선):**
    - 반드시 보안(https)이 완벽하게 작동하는 정부('go.kr'), 공공기관 공식 사이트 링크만 선별해.
 
-2. **[초비상] 압도적인 정보량 및 디테일 (절대 준수):** 
-   - 각 플랫폼별 본문은 공백 제외 **최소 2000자에서 3000자 이상의 초고밀도 분량**으로 작성해. (700~800자는 절대 금지!!)
-   - 단순히 정보를 나열하지 말고, 독자가 궁금해할 만한 아주 미세한 디테일(신청 시 주의사항, 꿀팁, 실제 사례 등)까지 정찰된 정보를 바탕으로 풍성하게 풀어내.
-   - 문단 사이에는 반드시 빈 줄을 두어 시원하면서도 안정적인 리듬감을 만들어.
+2. **압도적인 정보량 및 호흡 조절 (필수):** 
+   - 각 플랫폼별 본문은 공백 제외 **최소 2000자 이상의 풍성한 분량**으로 작성하되, **모바일 가독성과 글의 흐름을 위해 한 문단은 최대 2~3문장** 정도로 구성해. 문단 사이에는 반드시 빈 줄을 두어 시원하면서도 안정적인 리듬감을 만들어.
 
-3. **가독성 극대화 및 [형광펜 폭격] 전략 (필수):**
+3. **가독성 극대화 및 [표(Table) 생성 전략] (필수):**
    - 모든 소제목은 반드시 마크다운의 **## (H2)** 태그로 통일해.
-   - **[형광펜 및 컬러 강조 대폭 확대]:** 독자가 글을 훑어만 봐도 모든 핵심을 알 수 있도록, **거의 매 문단마다** 아래 기호를 적극적으로 사용해. 
-      1) **== 강조할 핵심 문장 전체 (최소 15자 이상) ==**: 노란색 형광펜 효과 (섹션당 **최소 3~5개 이상의 핵심 문장을 통째로** 강조해. **[절대 금지] 단어나 짧은 단락만 찔끔 색칠하지 마라. 반드시 읽었을 때 의미가 완결되는 긴 문장 전체를 색칠해.**)
-      2) **++ 핵심 키워드 ++**: 파란색 글자 강조 (중요 수치, 날짜, 기관명)
-      3) **!! 주의사항 !!**: 빨간색 글자 강조 (결정적 단점, 마감 임박, 필수 서류)
-   - **[표(Table) 생성 강제 및 기호 전면 금지]:** 복잡한 정보는 **무조건 Markdown Table 형식**으로 시각화해. **[경고] 표의 모든 셀 내부에는 ** (굵게), == (형광펜), ++ (파란색) 등 그 어떤 강조 기호도 절대 사용하지 마라.** 강조를 넣으면 표 구조가 깨지니 순수한 텍스트와 숫자만 입력해.
+   - **[형광펜 및 컬러 강조 강제]:** 독자의 가독성을 위해 반드시 아래 기호를 **본문 문맥에 맞게 적극적으로** 사용하여 본문을 화려하게 구성해. 
+      1) **== 강조할 문장 전체 ==**: 노란색 형광펜 효과 (섹션당 2~3개의 **핵심 문장 전체**를 강조)
+      2) **++ 강조할 내용 ++**: 파란색 글자 강조 (신뢰 정보, 숫자)
+      3) **!! 강조할 내용 !!**: 빨간색 글자 강조 (주의사항, 마감 임박)
+   - **[표(Table) 생성 강제]:** 단순 리스트(1. 2. 3...)나 불렛 포인트로 나열할 수 있는 정보(표 내용, 선택 조건 등, 나정 조건이 3개 이상이라면)는 **무조건 Markdown Table 형식**으로 시각화하여 본문 중간에 배치해. 
+   - 표는 최소 2열 이상으로 구성하고(예: | 항목 | 상세 내용 |), **표의 모든 셀 내부에는 그 어떤 강조 기호(**, ==, ++, !!)도 사용하지 말 것.** 그래야 독자가 깔끔하게 정보를 파악할 수 있게 만들어.
 
-4. **JSON 안정성 및 이모지 가이드:**
+4. **JSON 안정성:**
    - 응답은 반드시 유효한 JSON 형식이어야 해. 본문 텍스트 내부에 쌍따옴표(")는 작은따옴표(')로 대체해.
-   - [이모지 제약]: 이모지는 다정하게 사용하되, \`🇰🇷\`, \`✨\` 처럼 너무 튀는 조합을 남발하지 말고 세련되고 깔끔한 이모지(📍, ✅, 💡 등) 위주로 글에 생동감을 줘.
 
 결과는 반드시 아래의 JSON 형식으로만 답변해:
 {
@@ -616,14 +614,14 @@ function App() {
     {"en": "...", "ko": "..." }
   ],
   "section_prompts": [ ... ],
-  "naver": { "title": "...", "content": "...", "tags": "...", "official_links": [...] },
-  "tistory": { "title": "...", "content": "...", "tags": "...", "official_links": [...] },
-  "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [...] }
+  "naver": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
+  "tistory": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
+  "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
 }
 
-[필독: '결론', '맺음말', '마지막으로' 등의 기계적 섹션 이름 사용을 절대 엄금함.]
+[필독: '결론', '맺음말', '마지막으로' 등의 기계적 섹션 이름 사용을 절대 금함.]
 [필독: 모든 해시태그(tags)는 반드시 **한국어**로만 생성하고, 각 태그 앞에 반드시 **'#' 기호**를 붙여서 한 줄로 나열해.]
-[말투 가이드: 독자와 직접 대화하듯 다정하고 친근한 말투를 사용해. 정보는 날카롭게, 말투는 따뜻하게!]`;
+[말투 가이드: 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 주제와 어울리는 이모지를 적절히 섞어서 글에 생동감과 리듬감을 불어넣어줘. 정보는 날카롭게, 말투는 따뜻하게!]`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
