@@ -107,6 +107,18 @@ function App() {
       ]
     },
     {
+      version: 'V3.6.0',
+      date: '2026-05-06',
+      title: '✨ KODARI Soft-Power: 황금 밸런스 에디션',
+      tags: ['주요 업데이트', '하이브리드'],
+      details: [
+        'V3.5.8의 자연스러운 문장 구조와 이모지 리듬감을 완벽하게 복원했습니다.',
+        'V3.5.9의 강력한 팩트체크 시스템을 Soft하게 튜닝하여 정확성과 유연성을 동시에 잡았습니다.',
+        '2,000자 이상의 최적화된 화력 지침으로 안정적인 명품 리포트 생성을 보장합니다.',
+        '3중 하이브리드 강조(볼드, 파랑, 노랑) 시스템의 최적 배합비를 적용했습니다.'
+      ]
+    },
+    {
       version: 'V3.5.9',
       date: '2026-05-06',
       title: '🛡️ 무결점 팩트 체크 시스템(Grounding) 탑재',
@@ -981,7 +993,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.5.9</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.0</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
