@@ -55,7 +55,7 @@ const topicDatabase = {
 
 function App() {
   const [inputMode, setInputMode] = useState('topic'); // 'topic' or 'youtube'
-  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeTranscript, setYoutubeTranscript] = useState('');
   const [topic, setTopic] = useState('');
   const [tones, setTones] = useState({
     naver: '기본 블로거',
@@ -97,6 +97,17 @@ function App() {
   const [groundingMetadata, setGroundingMetadata] = useState(null);
 
   const patchNotes = [
+    {
+      version: 'V3.7.1',
+      date: '2026-05-08',
+      title: '📺 Tube-Master: 수동 주입 모드 탑재 (서버 우회)',
+      tags: ['기능개선', '유튜브', '안정성'],
+      details: [
+        '유튜브의 클라우드 서버 차단 문제를 완벽하게 우회하기 위해 자막 "수동 주입 모드"로 전환했습니다.',
+        '크롬 확장 프로그램(YouTube Summary)의 복사 기능을 활용하여 빈칸에 자막을 붙여넣기만 하면 자동으로 분석합니다.',
+        '이제 모바일/PC 상관없이 언제 어디서든 가장 안정적으로 유튜브 영상을 연성할 수 있습니다.'
+      ]
+    },
     {
       version: 'V3.7.0',
       date: '2026-05-08',
@@ -637,8 +648,8 @@ function App() {
       setError('포스팅 주제를 입력해주세요!');
       return;
     }
-    if (inputMode === 'youtube' && !youtubeUrl.trim()) {
-      setError('유튜브 URL을 입력해주세요!');
+    if (inputMode === 'youtube' && !youtubeTranscript.trim()) {
+      setError('유튜브 자막 텍스트를 붙여넣어 주세요!');
       return;
     }
 
@@ -649,19 +660,16 @@ function App() {
       let finalTopicContext = `주제: "${topic}"`;
       
       if (inputMode === 'youtube') {
-        triggerToast('유튜브 자막을 추출 중입니다... ⏳');
-        const transcriptRes = await fetch(`/api/transcript?url=${encodeURIComponent(youtubeUrl)}`);
-        if (!transcriptRes.ok) {
-          throw new Error('유튜브 자막을 추출할 수 없습니다. 올바른 유튜브 URL인지 확인해주세요.');
-        }
-        const transcriptData = await transcriptRes.json();
-        
+        const truncatedTranscript = youtubeTranscript.length > 15000 
+          ? youtubeTranscript.substring(0, 15000) + '... (이하 생략)' 
+          : youtubeTranscript;
+          
         finalTopicContext = `[특별 임무: 유튜브 영상 요약 및 큐레이션]
 아래 제공된 유튜브 영상 자막을 완벽하게 분석하고, 단순 요약이 아닌 전문가의 시선이 담긴 깊이 있는 블로그 글로 연성해. 원본 영상의 핵심을 짚어주고 독자가 궁금해할 만한 인사이트를 반드시 추가해. 영상의 제목이나 분위기도 유추해서 글에 녹여내.
 
 [영상 자막 원본]:
 """
-${transcriptData.text}
+${truncatedTranscript}
 """`;
       }
 
@@ -1102,7 +1110,7 @@ ${transcriptData.text}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.0</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1116,7 +1124,7 @@ ${transcriptData.text}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.0 [📺 Tube-Master] 탑재 - 유튜브 영상을 전문가의 블로그 글로 자동 연성 ✨📹</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.1 [📺 Tube-Master] 탑재 - 자막 수동 주입 모드로 완벽한 우회 연성 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1126,7 +1134,7 @@ ${transcriptData.text}
                 <label className="block text-sm font-bold text-slate-700">✍️ 포스팅 소스</label>
                 <div className="flex bg-slate-100 rounded-lg p-1">
                   <button onClick={() => setInputMode('topic')} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${inputMode === 'topic' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}>일반 주제</button>
-                  <button onClick={() => setInputMode('youtube')} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${inputMode === 'youtube' ? 'bg-white shadow-sm text-red-600' : 'text-slate-500 hover:text-slate-700'}`}>유튜브 URL</button>
+                  <button onClick={() => setInputMode('youtube')} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${inputMode === 'youtube' ? 'bg-white shadow-sm text-red-600' : 'text-slate-500 hover:text-slate-700'}`}>유튜브 자막</button>
                 </div>
               </div>
               <button 
@@ -1137,29 +1145,32 @@ ${transcriptData.text}
               </button>
             </div>
             <div className="flex gap-3">
-              <div className="relative flex-1 group">
+              <div className={`relative flex-1 group ${inputMode === 'youtube' ? 'flex flex-col' : ''}`}>
                 {inputMode === 'topic' ? (
-                  <input 
-                    type="text" 
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && generateContent()}
-                    placeholder="예: 2026 경기 컬처패스 사용처 및 유효기간"
-                    className="w-full p-4 md:p-5 pl-12 md:pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-base md:text-lg font-bold transition-all shadow-sm"
-                  />
+                  <>
+                    <input 
+                      type="text" 
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && generateContent()}
+                      placeholder="예: 2026 경기 컬처패스 사용처 및 유효기간"
+                      className="w-full p-4 md:p-5 pl-12 md:pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-base md:text-lg font-bold transition-all shadow-sm"
+                    />
+                    <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-xl md:text-2xl group-focus-within:scale-110 transition-transform">✨</span>
+                  </>
                 ) : (
-                  <input 
-                    type="text" 
-                    value={youtubeUrl}
-                    onChange={(e) => setYoutubeUrl(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && generateContent()}
-                    placeholder="예: https://www.youtube.com/watch?v=..."
-                    className="w-full p-4 md:p-5 pl-12 md:pl-14 rounded-2xl border-2 border-red-100 focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-base md:text-lg font-bold transition-all shadow-sm"
-                  />
+                  <>
+                    <textarea 
+                      value={youtubeTranscript}
+                      onChange={(e) => setYoutubeTranscript(e.target.value)}
+                      placeholder="YouTube Summary 확장 프로그램에서 복사한 자막 텍스트를 여기에 붙여넣어 주세요..."
+                      className="w-full h-32 p-4 md:p-5 rounded-2xl border-2 border-red-100 focus:outline-none focus:border-red-500 focus:ring-4 focus:ring-red-500/10 text-sm md:text-base font-normal transition-all shadow-sm resize-y"
+                    />
+                    <div className="absolute top-2 right-4 text-xs font-bold text-red-400">
+                      📺 복사된 자막 텍스트
+                    </div>
+                  </>
                 )}
-                <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-xl md:text-2xl group-focus-within:scale-110 transition-transform">
-                  {inputMode === 'topic' ? '✨' : '📺'}
-                </span>
               </div>
               <button 
                 onClick={() => setIsTopicLabOpen(true)}
