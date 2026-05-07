@@ -96,17 +96,6 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.6.7',
-      date: '2026-05-07',
-      title: '🛡️ Fresh-Radar: 최신성 강화 정찰 시스템',
-      tags: ['정찰', '신뢰도', '업데이트'],
-      details: [
-        '정찰 쿼리 생성 시 현재 연도(2026)와 "최신" 키워드를 자동 삽입하여 과거 데이터 노출을 원천 차단했습니다.',
-        '개인 블로그의 오래된 정보를 배제하고 .go.kr, .or.kr 등 공식 공공기관 출처를 최우선하도록 지침을 강화했습니다.',
-        '정보의 신선도를 기준으로 정찰 보고서의 신뢰도를 한 차원 더 격상시켰습니다.'
-      ]
-    },
-    {
       version: 'V3.6.6',
       date: '2026-05-07',
       title: '🎨 True-Visual: 강조 무결성 및 렌더링 혁신',
@@ -1065,7 +1054,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.7</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.6</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1079,7 +1068,7 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.6.7 [🛡️ Fresh-Radar] 탑재 - 과거의 정보는 거르고 오직 최신 팩트만 정찰 ✨🛡️</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.6.6 [🎨 True-Visual] 탑재 - 단 1mm의 오차도 없는 완벽한 강조 시스템 ✨🛡️</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
