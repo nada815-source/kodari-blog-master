@@ -96,6 +96,17 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.6.3',
+      date: '2026-05-07',
+      title: '🛡️ 정찰 보고서 무결성 복구 (Grounding Fix)',
+      tags: ['버그 수정', '신뢰도', '레이더'],
+      details: [
+        '정찰 보고서 모달에서 검색 쿼리가 표시되지 않던 데이터 경로 오류를 완벽하게 수정했습니다.',
+        '구글 공식 renderedContent 통로를 복구하여 어떤 정찰 결과도 누락 없이 표시되도록 안정성을 강화했습니다.',
+        '정찰 레이더 시스템의 UI 응답 속도와 가시성을 최적화했습니다.'
+      ]
+    },
+    {
       version: 'V3.6.2',
       date: '2026-05-07',
       title: '🎨 비주얼 엔진 3.3 복구 및 하이브리드 최적화',
@@ -1039,7 +1050,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.2</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.3</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1053,7 +1064,7 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.6.2 [🎨 비주얼 가이드] 복구 - 고밀도 정보와 화려한 비주얼의 황금 밸런스 ✨💎</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.6.3 [🛡️ 정찰 보고서] 복구 - 무결점 팩트 데이터의 완벽한 시각화 ✨🛡️</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1775,24 +1786,33 @@ function App() {
                   정찰 쿼리 (Search Queries)
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {groundingMetadata?.searchEntryPoint?.sdkBlob?.googleSearchEntryPoint?.searchQueries?.map((query, idx) => (
-                    <a 
-                      key={idx} 
-                      href={`https://www.google.com/search?q=${encodeURIComponent(query)}`}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 bg-slate-800 text-white px-3 py-2 rounded-xl text-xs hover:bg-slate-700 transition-all cursor-pointer border border-slate-700 shadow-sm group"
-                    >
-                      <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center shrink-0">
-                        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-3 h-3" />
-                      </div>
-                      <span className="font-bold">{query}</span>
-                      <svg className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  )) || (
-                    <p className="text-xs text-slate-400 italic">정찰된 정보의 근거를 분석 중입니다...</p>
+                  {groundingMetadata?.searchEntryPoint?.renderedContent ? (
+                    <div 
+                      className="w-full"
+                      dangerouslySetInnerHTML={{ __html: groundingMetadata.searchEntryPoint.renderedContent }} 
+                    />
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {groundingMetadata?.searchEntryPoint?.sdkBlob?.googleSearchEntryPoint?.searchQueries?.map((query, idx) => (
+                        <a 
+                          key={idx} 
+                          href={`https://www.google.com/search?q=${encodeURIComponent(query)}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 bg-slate-800 text-white px-3 py-2 rounded-xl text-xs hover:bg-slate-700 transition-all cursor-pointer border border-slate-700 shadow-sm group"
+                        >
+                          <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center shrink-0">
+                            <img src="https://www.google.com/favicon.ico" alt="Google" className="w-3 h-3" />
+                          </div>
+                          <span className="font-bold">{query}</span>
+                          <svg className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      )) || (
+                        <p className="text-xs text-slate-400 italic">정찰된 정보의 근거를 분석 중입니다...</p>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
