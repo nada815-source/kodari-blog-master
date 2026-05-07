@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 // 🛡️ KODARI 내장 아이콘 컴포넌트 (외부 의존성 제거)
 const Copy = ({ size = 16, className = "" }) => (
@@ -97,6 +98,16 @@ function App() {
   const [groundingMetadata, setGroundingMetadata] = useState(null);
 
   const patchNotes = [
+    {
+      version: 'V3.7.2',
+      date: '2026-05-08',
+      title: '🐛 렌더링 버그 픽스 (True-Visual 복원)',
+      tags: ['버그수정', '렌더링', '가독성'],
+      details: [
+        'ReactMarkdown의 렌더러가 강조 태그(<strong>, <mark> 등)를 문자열로 출력하던 심각한 시각적 버그를 수정했습니다.',
+        'rehype-raw 플러그인을 도입하여 HTML 기반의 3중 하이브리드 강조 시스템이 화면에 정상적으로 출력되도록 복구했습니다.'
+      ]
+    },
     {
       version: 'V3.7.1',
       date: '2026-05-08',
@@ -1110,7 +1121,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.1</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1124,7 +1135,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.1 [📺 Tube-Master] 탑재 - 자막 수동 주입 모드로 완벽한 우회 연성 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.2 [🐛 버그 픽스] 탑재 - 가독성 100% 보장 True-Visual 렌더링 복구 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1398,8 +1409,8 @@ ${truncatedTranscript}
                   </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
-                  <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2">
-                    <ReactMarkdown>
+                  <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2 prose-table:w-full prose-table:border-collapse prose-th:bg-slate-50 prose-th:border prose-th:border-slate-200 prose-th:p-3 prose-td:border prose-td:border-slate-200 prose-td:p-3">
+                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
                       {results[activeTab].content
                         .replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-slate-900 px-1 rounded">$1</mark>')
                         .replace(/\+\+([^+]+)\+\+/g, '<span class="text-blue-600 font-black">$1</span>')
