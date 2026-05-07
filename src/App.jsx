@@ -96,7 +96,18 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.6.4',
+      version: 'V3.6.6',
+      date: '2026-05-07',
+      title: '🎨 True-Visual: 강조 무결성 및 렌더링 혁신',
+      tags: ['디자인', '가독성', '수정'],
+      details: [
+        '별표(**), 형광펜(==), 파란색(++) 기호가 서로 섞여도 완벽하게 렌더링되도록 처리 엔진을 전면 개편했습니다.',
+        '강조 기호가 문장 중간에 끊기거나 노출되는 현상을 원천 차단했습니다.',
+        'AI 지침에 "밀착 강조 규칙"을 도입하여 시각적 리듬감을 극대화했습니다.'
+      ]
+    },
+    {
+      version: 'V3.6.5',
       date: '2026-05-07',
       title: '🛡️ 철벽 파싱(Iron-Parser) 및 안정성 강화',
       tags: ['버그 수정', '안정성', '시스템'],
@@ -640,12 +651,12 @@ function App() {
    - 불필요한 미사여구는 빼고, **'핵심 정보'와 '실전 팁'** 중심으로 밀도 높게 구성해.
    - **[구조]**: 소제목에 번호를 붙이지 말고, ## 기호를 사용하여 깔끔한 제목 스타일로 구성해. 
 
-2. **가독성 극대화 및 [3중 하이브리드 강조]:**
-   - 아래 3가지 기호를 본문 문맥에 맞게 전략적으로 배치해 가독성을 폭발시켜.
-      1) **== 문장 전체를 노란색 색칠 ==**: (섹션당 2개 이상의 핵심 문장 전체를 강조)
-      2) **++ 파란색 키워드 강조 ++**: (핵심 단어, 수치를 파란색으로 강조)
-      3) ** 굵은 글씨 문장 강조 **: (중요한 메시지를 굵게 표시)
-      4) **!! 빨간색 주의사항 !!**: (필독 정보 강조)
+2. **가독성 극대화 및 [3중 하이브리드 강조 - 밀착 강조 규칙]:**
+   - 모든 기호는 **반드시 강조할 대상에 공백 없이 1:1로 밀착**시켜라. (예: ==문장 전체==, ++파란색키워드++, **강조단어**, !!주의사항!!)
+   - 기호를 문장 중간에 끊기거나 어설프게 남기지 말고, 반드시 감싸는 구조로 정밀하게 작성해.
+   - **[형광펜]**: ==문장 전체를 감싸서 노란색 색칠== (중간에 끊지 마)
+   - **[파랑강조]**: ++핵심단어/수치++
+   - **[빨강주의]**: !!필독정보!!
 
 3. **[경고] 표(Table) 내부 기호 절대 금지 (Zero-Symbol Policy):**
    - 모든 정보성 데이터는 **무조건 Markdown Table 형식**으로 시각화해. 
@@ -946,51 +957,40 @@ function App() {
 
   const convertMarkdownToHtml = (text) => {
     const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
-    // 더욱 유연한 표 탐지 정규식 (줄바꿈 및 공백 대응 강화)
-    const tableRegex = /((?:^|\n)\|.+(?:\n\|[ :|-]+)+\n(?:\|.+\|(?:\n|$))+)/g;
     
-    const markdownToHtmlTable = (match) => {
+    // 1. 표 변환 (가장 먼저 처리)
+    const tableRegex = /((?:^|\n)\|.+(?:\n\|[ :|-]+)+\n(?:\|.+\|(?:\n|$))+)/g;
+    let processed = text.replace(tableRegex, (match) => {
       const lines = match.trim().split(/\r?\n/);
       if (lines.length < 2) return match;
-
-      const headers = lines[0].split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim());
-      const rows = lines.slice(2).map(line => line.split('|').filter(cell => cell.trim() !== '').map(cell => cell.trim()));
-
-      let html = `<table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #ddd; ${naverFont}">`;
-      html += '<thead style="background-color: #f8f9fa;"><tr>';
-      headers.forEach(h => {
-        html += `<th style="border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: bold; background-color: #f2f2f2; color: #333;">${h}</th>`;
-      });
+      const headers = lines[0].split('|').filter(c => c.trim() !== '').map(c => c.trim());
+      const rows = lines.slice(2).map(line => line.split('|').filter(c => c.trim() !== '').map(c => c.trim()));
+      let html = `<table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #ddd; ${naverFont}"><thead><tr>`;
+      headers.forEach(h => html += `<th style="border: 1px solid #ddd; padding: 12px; background: #f2f2f2;">${h}</th>`);
       html += '</tr></thead><tbody>';
       rows.forEach(row => {
-        if (row.length === 0) return;
         html += '<tr>';
-        headers.forEach((_, idx) => {
-          const cell = row[idx] || '';
-          html += `<td style="border: 1px solid #ddd; padding: 10px; text-align: center; color: #444;">${cell}</td>`;
-        });
+        headers.forEach((_, i) => html += `<td style="border: 1px solid #ddd; padding: 10px;">${row[i] || ''}</td>`);
         html += '</tr>';
       });
-      html += '</tbody></table>';
-      return html;
-    };
+      return html + '</tbody></table>';
+    });
 
-    let htmlContent = text.replace(tableRegex, markdownToHtmlTable);
+    // 2. 강조 기호 (밀착 기호 우선 처리)
+    processed = processed
+      .replace(/==([\s\S]*?)==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
+      .replace(/\+\+([\s\S]*?)\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
+      .replace(/!!([\s\S]*?)!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-    return htmlContent
-      .replace(/^### (.*$)/gim, `<p style="margin-top: 30px; margin-bottom: 10px;"><span style="font-size: 16pt; font-weight: bold; color: #333; ${naverFont}">$1</span></p>`)
-      .replace(/^## (.*$)/gim, `<p style="margin-top: 40px; margin-bottom: 15px;"><span style="font-size: 20pt; font-weight: bold; color: #000; ${naverFont}">$1</span></p>`)
-      .replace(/^\* (.*$)/gim, `<li style="margin-bottom: 5px;"><span style="font-size: 12pt; ${naverFont}">$1</span></li>`)
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/==\s*([\s\S]*?)\s*==/g, '<span style="background-color: #fff5b1; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>')
-      .replace(/\+\+\s*([\s\S]*?)\s*\+\+/g, '<span style="color: #0047b3; font-weight: bold;">$1</span>')
-      .replace(/!!\s*([\s\S]*?)\s*!!/g, '<span style="color: #e60000; font-weight: bold;">$1</span>')
-      .split(/\r?\n/).map(line => {
-        const trimmed = line.trim();
-        if (trimmed === '') return '<p>&nbsp;</p>'; 
-        if (trimmed.startsWith('<p') || trimmed.startsWith('<li') || trimmed.startsWith('<table')) return trimmed;
-        return `<p style="margin-bottom: 15px;"><span style="font-size: 12pt; line-height: 1.8; color: #444; ${naverFont}">${trimmed}</span></p>`;
-      }).filter(line => line !== '').join('');
+    // 3. 헤더 및 일반 텍스트 변환
+    return processed.split(/\r?\n/).map(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return '<p>&nbsp;</p>';
+      if (trimmed.startsWith('## ')) return `<p style="margin: 30px 0 10px;"><span style="font-size: 20pt; font-weight: bold; ${naverFont}">${trimmed.slice(3)}</span></p>`;
+      if (trimmed.startsWith('<table') || trimmed.startsWith('<li')) return trimmed;
+      return `<p style="margin: 10px 0;"><span style="font-size: 12pt; line-height: 1.8; ${naverFont}">${trimmed}</span></p>`;
+    }).join('');
   };
 
   const openPreviewWindow = (text) => {
@@ -1010,11 +1010,6 @@ function App() {
             body { padding: 20px; line-height: 1.8; font-family: '나눔고딕', sans-serif; background-color: #fff; color: #333; }
             .action-bar { position: sticky; top: 0; background: #fff; padding: 10px 0; border-bottom: 2px solid #6366f1; margin-bottom: 20px; display: flex; gap: 10px; z-index: 100; }
             button { background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; flex: 1; cursor: pointer; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-            button:active { transform: scale(0.98); }
-            #content { padding-top: 10px; }
-            table { width: 100% !important; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-            th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-            th { background-color: #f2f2f2; font-weight: bold; }
           </style>
           <script>
             function selectAllAndCopy() {
@@ -1024,26 +1019,18 @@ function App() {
               const selection = window.getSelection();
               selection.removeAllRanges();
               selection.addRange(range);
-              try {
-                document.execCommand('copy');
-                alert('전체 선택 및 복사가 완료되었습니다! 네이버 블로그 앱에 붙여넣으세요! ✨');
-              } catch (err) {
-                alert('브라우저 보안 설정으로 인해 직접 복사가 실패했습니다. 선택된 영역을 길게 눌러 복사해 주세요! 💦');
-              }
+              document.execCommand('copy');
+              alert('복사 완료! 네이버 블로그 앱에 붙여넣으세요! ✨');
             }
           </script>
         </head>
         <body>
-          <div class="action-bar">
-            <button onclick="selectAllAndCopy()">📋 전체 선택 및 복사</button>
-            <button onclick="window.close()" style="background: #64748b;">닫기</button>
-          </div>
+          <div class="action-bar"><button onclick="selectAllAndCopy()">📋 전체 선택 및 복사</button></div>
           <div id="content">${htmlContent}</div>
         </body>
       </html>
     `);
     previewWin.document.close();
-    triggerToast('미리보기 창이 열렸습니다. 버튼을 눌러 한 번에 복사하세요! 📱✨');
   };
 
   const copyToClipboard = async (text) => {
@@ -1052,11 +1039,9 @@ function App() {
       const blobHtml = new Blob([htmlContent], { type: 'text/html' });
       const blobText = new Blob([text], { type: 'text/plain' });
       const data = [new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })];
-      
       await navigator.clipboard.write(data);
       triggerToast('서식과 표가 포함된 상태로 복사되었습니다! 📋📊✨');
     } catch (err) {
-      console.error('Clipboard error:', err);
       navigator.clipboard.writeText(text);
       triggerToast('텍스트로 복사되었습니다! ✅');
     }
@@ -1069,7 +1054,7 @@ function App() {
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.4</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.6.6</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1083,7 +1068,7 @@ function App() {
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.6.4 [🛡️ 철벽 파싱] 탑재 - 어떤 상황에서도 흔들리지 않는 무결점 안정성 ✨🛡️</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.6.6 [🎨 True-Visual] 탑재 - 단 1mm의 오차도 없는 완벽한 강조 시스템 ✨🛡️</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1336,15 +1321,13 @@ function App() {
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
                   <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2">
-                    <ReactMarkdown 
-                      components={{
-                        code: ({node, inline, className, children, ...props}) => {
-                          const match = /^\^==(.*)==\^$/.exec(children);
-                          return inline ? <code className={className} {...props}>{children}</code> : <pre className={className} {...props}>{children}</pre>
-                        }
-                      }}
-                    >
-                      {results[activeTab].content}
+                    <ReactMarkdown>
+                      {results[activeTab].content
+                        .replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-slate-900 px-1 rounded">$1</mark>')
+                        .replace(/\+\+([^+]+)\+\+/g, '<span class="text-blue-600 font-black">$1</span>')
+                        .replace(/!!([^!]+)!!/g, '<span class="text-red-600 font-black">$1</span>')
+                        .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-black text-slate-900">$1</strong>')
+                      }
                     </ReactMarkdown>
                   </div>
                 </div>
