@@ -96,18 +96,7 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.6.2',
-      date: '2026-05-07',
-      title: '🎨 비주얼 엔진 3.3 복구 및 하이브리드 최적화',
-      tags: ['버그 수정', '비주얼', '성능'],
-      details: [
-        'V3.6.1에서 소실되었던 [AI 이미지 생성 가이드] 전용 섹션 프롬프트 생성 로직을 완벽 복구했습니다.',
-        'V3.5.9의 강력한 이미지 전략과 V3.6.1의 고밀도 본문 지능을 결합한 하이브리드 엔진을 구축했습니다.',
-        '메인 제목, 보조 문구, 상세 영어 프롬프트가 모달 창에 정상적으로 노출되도록 지침을 강화했습니다.'
-      ]
-    },
-    {
-      version: 'V3.6.1',
+      version: 'V3.5.9+',
       date: '2026-05-06',
       title: '🛡️ 실시간 팩트체크 리포트(Shield) UI 오픈',
       tags: ['UI/UX', '신뢰도', '신기능'],
@@ -599,20 +588,6 @@ function App() {
 [필독: 팩트 체크 - 반드시 '구글 검색' 결과를 바탕으로 정확한 정보만 기록해. 확실하지 않은 수치는 절대 지어내지 마.]
 [필독: 언어 설정 - 모든 텍스트는 반드시 **한국어**로만 작성해.]
 
-0. **이미지 검색 및 생성 전략 (KODARI Visual Engine 3.3):**
-   - **[1단계: 상상]**: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 **최적의 시각적 장면**을 먼저 상상해.
-   - **[2단계: 스타일 적용]**: ${styleGuide}
-   - **[3단계: 제약 조건]**: 인물은 반드시 **한국인(Korean/Asian)**으로, 배경은 외국어 없이 **깨끗하게** 구성해.
-   - **[4단계: 이미지 생성 지침(section_prompts)]**: 본문 소제목(H2) 개수와 상관없이, 아래의 **Storytelling Branding Rule**을 적용한 **총 4개**의 상세 영어 프롬프트를 반드시 생성해.
-      1) **Section 1 (Thumbnail)**: Create a grand masterpiece thumbnail representing the overall topic.
-      2) **Section 2 & 3 (Main Content)**: Visualize the most important informative parts of the content.
-      3) **Section 4 (Summary/Conclusion)**: Show a celebratory or concluding scene with a sense of achievement.
-      4) **Text Hierarchy**: Generate a **main_title** and a **sub_copy** for EACH of the 4 images.
-      5) **Visual Metaphor**: Use 'Storytelling Visual Metaphors' that symbolize the content.
-      6) **Layout Strategy**: Create a 'Premium Information Card' layout where the **main_title** and **sub_copy** can be placed naturally as part of the design.
-      7) **Visual Style**: Keep the 'Premium 3D Claymorphism' style.
-      8) **Safety**: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.**
-
 1. **[정밀 화력] 콤팩트한 정보 밀도 (V3.5.9 스타일 계승):** 
    - 본문은 공백 제외 **최소 1500자 이상의 풍성한 분량**으로 작성해. 
    - 불필요한 미사여구는 빼고, **'핵심 정보'와 '실전 팁'** 중심으로 밀도 높게 구성해.
@@ -634,16 +609,8 @@ function App() {
 
 결과는 반드시 아래의 JSON 형식으로만 답변해:
 {
-  "image_queries": [ {"en": "...", "ko": "..." }, ... ],
-  "section_prompts": [
-    {
-      "title": "소제목",
-      "main_title": "메인 제목 (한글)",
-      "sub_copy": "보조 문구 (한글)",
-      "prompt": "상세 영어 프롬프트"
-    },
-    ... (총 4개 생성)
-  ],
+  "image_queries": [ ... ],
+  "section_prompts": [ ... ],
   "naver": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
   "tistory": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
   "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
