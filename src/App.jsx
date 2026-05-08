@@ -100,6 +100,16 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.7.5',
+      date: '2026-05-09',
+      title: '🧠 컨텍스트 치매 완치 및 영문 태그 픽스',
+      tags: ['버그수정', '품질향상'],
+      details: [
+        '유튜브 자막 모드에서 [이 글만 다시 쓰기] 버튼을 누르면 원본 자막을 잊어버리고 엉뚱한 글을 쓰던 치명적인 버그를 수정했습니다.',
+        '워드프레스 등 글로벌 플랫폼 생성 시 AI가 임의로 영어 해시태그를 다는 현상을 원천 차단했습니다.'
+      ]
+    },
+    {
       version: 'V3.7.4',
       date: '2026-05-09',
       title: '📊 마크다운 표(Table) 렌더링 엔진 장착',
@@ -778,7 +788,7 @@ ${truncatedTranscript}
   "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
 }
 
-[필독: 해시태그는 '#'을 붙여 한 줄로 나열해.]`;
+[필독: 해시태그는 '#'을 붙여 한 줄로 나열하고, 워드프레스를 포함한 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -850,7 +860,19 @@ ${truncatedTranscript}
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
-      const prompt = `주제: "${topic}"에 대해 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
+      
+      // [V3.7.5] 재생성 시 컨텍스트 유지 (치매 방지)
+      let regenerateContext = `주제: "${topic}"`;
+      if (inputMode === 'youtube') {
+        const truncatedTranscript = youtubeTranscript.length > 15000 
+          ? youtubeTranscript.substring(0, 15000) + '... (이하 생략)' 
+          : youtubeTranscript;
+        regenerateContext = `[특별 임무: 유튜브 영상 요약 및 큐레이션]\n[영상 자막 원본]:\n"""\n${truncatedTranscript}\n"""`;
+      }
+
+      const prompt = `다음 내용을 바탕으로 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
+      
+      ${regenerateContext}
       
       아래 형식을 엄격히 지켜서 답변해 (다른 설명 금지):
       
@@ -864,7 +886,7 @@ ${truncatedTranscript}
       - 표 밖의 본문에는 ==형광펜==, ++파란색++, !!빨간색!! 적극 사용
       
       [TAGS]
-      #태그1 #태그2 #태그3 (한글로만 나열)
+      #태그1 #태그2 #태그3 (무조건 한국어로만 나열)
       
       [LINKS]
       공식사이트명 | https://url
@@ -1151,7 +1173,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.4</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.5</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1165,7 +1187,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.4 [📊 마크다운 표 지원] 완벽한 표 렌더링 엔진 장착 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.5 [🧠 컨텍스트 복구] 치매 버그 완치 및 영문 태그 차단 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
