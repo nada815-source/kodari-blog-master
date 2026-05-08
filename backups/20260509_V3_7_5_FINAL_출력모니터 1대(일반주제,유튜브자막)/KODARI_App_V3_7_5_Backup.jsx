@@ -68,10 +68,10 @@ function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   const [unsplashKey, setUnsplashKey] = useState(localStorage.getItem('unsplash_key') || '');
   const [loading, setLoading] = useState(false);
-  const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
-    topic: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
-    youtube: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult }
+    naver: { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '' },
+    tistory: { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '' },
+    wordpress: { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '' }
   });
   const [activeTab, setActiveTab] = useState('naver');
   const [error, setError] = useState('');
@@ -96,19 +96,9 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
   const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
   const [isFactCheckOpen, setIsFactCheckOpen] = useState(false);
-  const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
+  const [groundingMetadata, setGroundingMetadata] = useState(null);
 
   const patchNotes = [
-    {
-      version: 'V3.7.6',
-      date: '2026-05-09',
-      title: '🏠 듀얼 워크스페이스 (작업실 완전 분리)',
-      tags: ['기능개선', 'UI/UX'],
-      details: [
-        '일반 주제와 유튜브 자막 입력 모드 간의 결과창이 완전히 분리되었습니다.',
-        '이제 탭을 전환해도 기존에 생성해 둔 글이 날아가지 않고 안전하게 보존됩니다.'
-      ]
-    },
     {
       version: 'V3.7.5',
       date: '2026-05-09',
@@ -818,10 +808,10 @@ ${truncatedTranscript}
       
       // 구글 검색 근거(Grounding) 메타데이터 추출 및 저장
       if (data.candidates?.[0]?.groundingMetadata) {
-        setGroundingMetadata(prev => ({ ...prev, [inputMode]: data.candidates[0].groundingMetadata }));
+        setGroundingMetadata(data.candidates[0].groundingMetadata);
         console.log('[팩트체크 성공] 구글 검색 근거를 확보했습니다.');
       } else {
-        setGroundingMetadata(prev => ({ ...prev, [inputMode]: null }));
+        setGroundingMetadata(null);
       }
 
       let responseTextRaw = data.candidates[0].content.parts[0].text;
@@ -848,14 +838,11 @@ ${truncatedTranscript}
       const koDescs = (parsedData.image_queries || []).map(q => q.ko);
       const sectionPrompts = parsedData.section_prompts || [];
 
-      setResults(prev => ({
-        ...prev,
-        [inputMode]: {
-          naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
-          tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
-          wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
-        }
-      }));
+      setResults({
+        naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
+        tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
+        wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
+      });
 
     } catch (err) {
       console.error(err);
@@ -941,15 +928,12 @@ ${truncatedTranscript}
       
       setResults(prev => ({
         ...prev,
-        [inputMode]: {
-          ...prev[inputMode],
-          [platform]: {
-            ...prev[inputMode][platform],
-            title,
-            content,
-            tags,
-            official_links
-          }
+        [platform]: {
+          ...prev[platform],
+          title,
+          content,
+          tags,
+          official_links
         }
       }));
       triggerToast(`${platformName} 글이 성공적으로 리필되었습니다! ✨`);
@@ -1189,7 +1173,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.6</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.5</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1203,7 +1187,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.6 [🏠 듀얼 워크스페이스] 일반/유튜브 작업실 완벽 분리 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.5 [🧠 컨텍스트 복구] 치매 버그 완치 및 영문 태그 차단 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1377,7 +1361,7 @@ ${truncatedTranscript}
           </button>
         </div>
 
-        {Object.values(results[inputMode]).some(val => val.content) && (
+        {Object.values(results).some(val => val.content) && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="flex border-b border-slate-100 bg-slate-50/50">
               {['naver', 'tistory', 'wordpress'].filter(tab => platforms[tab]).map((tab) => (
@@ -1396,10 +1380,10 @@ ${truncatedTranscript}
             </div>
 
             <div className="p-6 space-y-6">
-              {results[inputMode][activeTab].image && (
+              {results[activeTab].image && (
                 <div className="space-y-3 mb-6">
                   <div className="relative group rounded-2xl overflow-hidden shadow-lg border border-slate-100">
-                    <img src={results[inputMode][activeTab].image} alt="Blog Background" className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={results[activeTab].image} alt="Blog Background" className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-105" />
                     {isImageLoading && (
                       <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
                         <div className="flex flex-col items-center gap-2">
@@ -1410,8 +1394,8 @@ ${truncatedTranscript}
                     )}
                     <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
                       <span>📸 Photo via Unsplash (AI 추천 이미지)</span>
-                      {results[inputMode][activeTab].image_desc && (
-                        <span className="bg-indigo-500/80 px-2 py-0.5 rounded-md backdrop-blur-sm">컨셉: {results[inputMode][activeTab].image_desc}</span>
+                      {results[activeTab].image_desc && (
+                        <span className="bg-indigo-500/80 px-2 py-0.5 rounded-md backdrop-blur-sm">컨셉: {results[activeTab].image_desc}</span>
                       )}
                     </div>
                   </div>
@@ -1420,7 +1404,7 @@ ${truncatedTranscript}
                   <div className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">Current Concept</span>
-                      <span className="text-xs font-bold text-slate-600">{results[inputMode][activeTab].image_desc || '지정된 키워드 없음'}</span>
+                      <span className="text-xs font-bold text-slate-600">{results[activeTab].image_desc || '지정된 키워드 없음'}</span>
                     </div>
                     <div className="flex gap-2">
                       <input 
@@ -1440,7 +1424,7 @@ ${truncatedTranscript}
                       </button>
                     </div>
                     
-                    {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.length > 0 && (
+                    {results[activeTab].section_prompts && results[activeTab].section_prompts.length > 0 && (
                       <button 
                         onClick={() => setIsAiPromptOpen(true)}
                         className="w-full mt-1 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-[10px] transition-all border border-indigo-100 flex items-center justify-center gap-1.5"
@@ -1454,9 +1438,9 @@ ${truncatedTranscript}
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider">Title</label>
-                  <button onClick={() => copyToClipboard(results[inputMode][activeTab].title)} className="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-blue-100 flex items-center gap-1">📋 제목 복사</button>
+                  <button onClick={() => copyToClipboard(results[activeTab].title)} className="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-blue-100 flex items-center gap-1">📋 제목 복사</button>
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[inputMode][activeTab].title || '제목 생성 중...'}</h2>
+                <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[activeTab].title || '제목 생성 중...'}</h2>
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
@@ -1469,17 +1453,17 @@ ${truncatedTranscript}
                     >
                       {loading ? '⏳ 생성 중...' : '🔄 이 글만 다시 쓰기'}
                     </button>
-                    <button onClick={() => openPreviewWindow(results[inputMode][activeTab].content)} className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-indigo-100 flex items-center gap-1">📱 모바일 복사 전용</button>
-                    <button onClick={() => copyToClipboard(results[inputMode][activeTab].content)} className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 본문 복사</button>
-                    <button onClick={() => setIsFactCheckOpen(true)} className={`px-3 py-1.5 font-bold rounded-lg text-xs transition-all shadow-sm flex items-center gap-1 ${groundingMetadata[inputMode] ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                      🛡️ 팩트체크 리포트 {groundingMetadata[inputMode] ? '✅' : '(데이터 확인 중)'}
+                    <button onClick={() => openPreviewWindow(results[activeTab].content)} className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-indigo-100 flex items-center gap-1">📱 모바일 복사 전용</button>
+                    <button onClick={() => copyToClipboard(results[activeTab].content)} className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 본문 복사</button>
+                    <button onClick={() => setIsFactCheckOpen(true)} className={`px-3 py-1.5 font-bold rounded-lg text-xs transition-all shadow-sm flex items-center gap-1 ${groundingMetadata ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                      🛡️ 팩트체크 리포트 {groundingMetadata ? '✅' : '(데이터 확인 중)'}
                     </button>
                   </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
                   <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2 prose-table:w-full prose-table:border-collapse prose-table:my-8 prose-th:bg-indigo-50 prose-th:text-indigo-900 prose-th:border prose-th:border-indigo-100 prose-th:p-3 prose-td:border prose-td:border-slate-200 prose-td:p-3 prose-td:text-slate-700 hover:prose-tr:bg-slate-50">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                      {results[inputMode][activeTab].content
+                      {results[activeTab].content
                         .replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-slate-900 px-1 rounded">$1</mark>')
                         .replace(/\+\+([^+]+)\+\+/g, '<span class="text-blue-600 font-black">$1</span>')
                         .replace(/!!([^!]+)!!/g, '<span class="text-red-600 font-black">$1</span>')
@@ -1495,7 +1479,7 @@ ${truncatedTranscript}
                   <p className="text-amber-800 font-bold text-sm mb-1">코다리의 팩트체크 알림</p>
                   <p className="text-amber-700 text-xs leading-relaxed mb-3">본 콘텐츠는 AI가 실시간 데이터를 기반으로 생성한 결과물입니다. 중요한 수치나 날짜 등은 반드시 아래 공식 관련 링크를 통해 최종 확인 후 발행해 주세요!</p>
                   <div className="flex flex-wrap gap-2">
-                    {results[inputMode][activeTab].official_links && results[inputMode][activeTab].official_links.map((link, idx) => (
+                    {results[activeTab].official_links && results[activeTab].official_links.map((link, idx) => (
                       <a 
                         key={idx}
                         href={link.url} 
@@ -1512,9 +1496,9 @@ ${truncatedTranscript}
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Hashtags</label>
-                  <button onClick={() => copyToClipboard(results[inputMode][activeTab].tags)} className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 태그 복사</button>
+                  <button onClick={() => copyToClipboard(results[activeTab].tags)} className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 태그 복사</button>
                 </div>
-                <p className="text-blue-600 font-medium">{results[inputMode][activeTab].tags || '#해시태그'}</p>
+                <p className="text-blue-600 font-medium">{results[activeTab].tags || '#해시태그'}</p>
               </div>
             </div>
           </div>
@@ -1945,14 +1929,14 @@ ${truncatedTranscript}
                   정찰 쿼리 (Search Queries)
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {groundingMetadata[inputMode]?.searchEntryPoint?.renderedContent ? (
+                  {groundingMetadata?.searchEntryPoint?.renderedContent ? (
                     <div 
                       className="w-full"
-                      dangerouslySetInnerHTML={{ __html: groundingMetadata[inputMode].searchEntryPoint.renderedContent }} 
+                      dangerouslySetInnerHTML={{ __html: groundingMetadata.searchEntryPoint.renderedContent }} 
                     />
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {groundingMetadata[inputMode]?.searchEntryPoint?.sdkBlob?.googleSearchEntryPoint?.searchQueries?.map((query, idx) => (
+                      {groundingMetadata?.searchEntryPoint?.sdkBlob?.googleSearchEntryPoint?.searchQueries?.map((query, idx) => (
                         <a 
                           key={idx} 
                           href={`https://www.google.com/search?q=${encodeURIComponent(query)}`}
@@ -1982,7 +1966,7 @@ ${truncatedTranscript}
                   신뢰 출처 (Reliable Sources)
                 </h4>
                 <div className="space-y-2">
-                  {groundingMetadata[inputMode]?.groundingChunks?.map((chunk, idx) => (
+                  {groundingMetadata?.groundingChunks?.map((chunk, idx) => (
                     chunk.web && (
                       <div key={idx} className="bg-white border border-slate-200 p-3 rounded-xl hover:border-indigo-300 transition-all shadow-sm">
                         <div className="flex justify-between items-start gap-2">
