@@ -99,16 +99,6 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.3',
-      date: '2026-05-09',
-      title: '📺 Tube-Master: 스마트 자막 정제 필터 탑재',
-      tags: ['기능개선', '유튜브', '품질향상'],
-      details: [
-        '유튜브 자막에 섞여 들어오는 [음악], [박수] 등의 불필요한 효과음 텍스트를 자동으로 삭제하는 정규식 필터를 적용했습니다.',
-        '문맥에 맞지 않는 자동 자막의 오탈자를 AI가 스스로 판단하여 자연스럽게 교정하도록 프롬프트를 강화했습니다.'
-      ]
-    },
-    {
       version: 'V3.7.2',
       date: '2026-05-08',
       title: '🐛 렌더링 버그 픽스 (True-Visual 복원)',
@@ -681,21 +671,12 @@ function App() {
       let finalTopicContext = `주제: "${topic}"`;
       
       if (inputMode === 'youtube') {
-        // [V3.7.3] 자막 정제 로직 (대괄호 효과음 제거 및 공백 압축)
-        let cleanedTranscript = youtubeTranscript
-          .replace(/\[.*?\]/g, '')
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        const truncatedTranscript = cleanedTranscript.length > 15000 
-          ? cleanedTranscript.substring(0, 15000) + '... (이하 생략)' 
-          : cleanedTranscript;
+        const truncatedTranscript = youtubeTranscript.length > 15000 
+          ? youtubeTranscript.substring(0, 15000) + '... (이하 생략)' 
+          : youtubeTranscript;
           
         finalTopicContext = `[특별 임무: 유튜브 영상 요약 및 큐레이션]
 아래 제공된 유튜브 영상 자막을 완벽하게 분석하고, 단순 요약이 아닌 전문가의 시선이 담긴 깊이 있는 블로그 글로 연성해. 원본 영상의 핵심을 짚어주고 독자가 궁금해할 만한 인사이트를 반드시 추가해. 영상의 제목이나 분위기도 유추해서 글에 녹여내.
-
-[필독: 자막 교정 지침]
-유튜브 자동 생성 자막의 특성상 오탈자나 문맥에 맞지 않는 엉뚱한 단어가 다수 포함되어 있을 수 있어. 전체 문맥을 파악하여 이상한 단어나 오탈자는 자연스럽고 올바른 단어로 완벽하게 교정해서 글을 작성해.
 
 [영상 자막 원본]:
 """
@@ -1140,7 +1121,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.3</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1154,7 +1135,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.3 [📺 Tube-Master] 스마트 자막 정제 및 오탈자 자동 교정 필터 탑재 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.2 [🐛 버그 픽스] 탑재 - 가독성 100% 보장 True-Visual 렌더링 복구 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
