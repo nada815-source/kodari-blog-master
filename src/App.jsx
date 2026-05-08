@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 // 🛡️ KODARI 내장 아이콘 컴포넌트 (외부 의존성 제거)
 const Copy = ({ size = 16, className = "" }) => (
@@ -98,6 +99,16 @@ function App() {
   const [groundingMetadata, setGroundingMetadata] = useState(null);
 
   const patchNotes = [
+    {
+      version: 'V3.7.4',
+      date: '2026-05-09',
+      title: '📊 마크다운 표(Table) 렌더링 엔진 장착',
+      tags: ['기능개선', 'UI/UX'],
+      details: [
+        '화면 미리보기에서 표(Table)가 텍스트로 깨져서 보이던 현상을 해결했습니다.',
+        'remark-gfm 플러그인을 도입하여 화면에서도 완벽한 디자인의 표를 확인할 수 있습니다.'
+      ]
+    },
     {
       version: 'V3.7.3',
       date: '2026-05-09',
@@ -1140,7 +1151,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.3</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.4</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1154,7 +1165,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.3 [📺 Tube-Master] 스마트 자막 정제 및 오탈자 자동 교정 필터 탑재 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.4 [📊 마크다운 표 지원] 완벽한 표 렌더링 엔진 장착 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1428,8 +1439,8 @@ ${truncatedTranscript}
                   </div>
                 </div>
                 <div className="bg-white p-6 rounded-2xl border border-slate-200 min-h-[300px] shadow-sm group">
-                  <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2 prose-table:w-full prose-table:border-collapse prose-th:bg-slate-50 prose-th:border prose-th:border-slate-200 prose-th:p-3 prose-td:border prose-td:border-slate-200 prose-td:p-3">
-                    <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2 prose-table:w-full prose-table:border-collapse prose-table:my-8 prose-th:bg-indigo-50 prose-th:text-indigo-900 prose-th:border prose-th:border-indigo-100 prose-th:p-3 prose-td:border prose-td:border-slate-200 prose-td:p-3 prose-td:text-slate-700 hover:prose-tr:bg-slate-50">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                       {results[activeTab].content
                         .replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-slate-900 px-1 rounded">$1</mark>')
                         .replace(/\+\+([^+]+)\+\+/g, '<span class="text-blue-600 font-black">$1</span>')
