@@ -100,6 +100,16 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.7.7',
+      date: '2026-05-09',
+      title: '🌐 글로벌 플랫폼 100% 한글화 강제',
+      tags: ['품질향상', '프롬프트'],
+      details: [
+        '워드프레스 등 특정 글로벌 플랫폼명에 반응하여 AI가 임의로 영문 본문을 출력하던 현상을 원천 차단했습니다.',
+        '수동 이미지 변경 시 발생하는 참조 에러를 해결했습니다.'
+      ]
+    },
+    {
       version: 'V3.7.6',
       date: '2026-05-09',
       title: '🏠 듀얼 워크스페이스 (작업실 완전 분리)',
@@ -667,10 +677,13 @@ function App() {
         const newImageUrl = data.results[0].urls.regular;
         setResults(prev => ({
           ...prev,
-          [activeTab]: { 
-            ...prev[activeTab], 
-            image: newImageUrl,
-            image_desc: customImageKeyword
+          [inputMode]: { 
+            ...prev[inputMode],
+            [activeTab]: {
+              ...prev[inputMode][activeTab],
+              image: newImageUrl,
+              image_desc: customImageKeyword
+            }
           }
         }));
         triggerToast('이미지가 교체되었습니다! ✨');
@@ -746,7 +759,7 @@ ${truncatedTranscript}
 [필독: 생성 지침 - 고밀도 콤팩트 리포트 스타일]
 [필독: 사족 금지 - '글을 마치며', '결론', '맺음말', '요약' 등의 기계적이고 뻔한 섹션 제목을 사용하는 것을 **절대 엄금**해. 정보 전달이 끝나면 자연스럽고 깔끔하게 글을 맺어.]
 [필독: 팩트 체크 - 반드시 '구글 검색' 결과를 바탕으로 정확한 정보만 기록해. 확실하지 않은 수치는 절대 지어내지 마.]
-[필독: 언어 설정 - 모든 텍스트는 반드시 **한국어**로만 작성해.]
+[필독: 언어 설정 - 모든 텍스트(특히 워드프레스 본문을 포함한 전체 데이터)는 무조건 **한국어(Korean)**로만 작성해. 절대 영어로 번역하거나 답변하지 마.]
 
 0. **이미지 검색 및 생성 전략 (KODARI Visual Engine 3.3):**
    - **[1단계: 상상]**: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 **최적의 시각적 장면**을 먼저 상상해.
@@ -1189,7 +1202,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.6</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.7</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1203,7 +1216,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.6 [🏠 듀얼 워크스페이스] 일반/유튜브 작업실 완벽 분리 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.7 [🌐 글로벌 100% 한글화] 영문 출력 원천 차단 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
