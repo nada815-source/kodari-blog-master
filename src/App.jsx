@@ -742,7 +742,7 @@ function App() {
     setIsQuoteLoading(true);
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${finalKey}`;
       const prompt = `주제: "${targetTopic}"\n\n위 주제를 직접 겪은 일반인의 생생한 후기나 감상평을 블로그 본문 첫머리나 마지막에 바로 복사해서 쓸 수 있게 구어체로 딱 1~2줄만 작성해줘. 이모지도 1~2개 넣어줘. (예: 저도 어제 직접 해봤는데 생각보다 너무 편해서 깜짝 놀랐어요! 😲 진작 해볼 걸 그랬네요.)`;
       const req = await fetch(API_URL, {
         method: 'POST',
@@ -813,7 +813,7 @@ ${truncatedTranscript}
 """`;
       }
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${finalKey}`;
       
       const styleGuide = visualStyle === 'photo' 
         ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
@@ -884,7 +884,8 @@ ${truncatedTranscript}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: combinedPrompt }] }],
-          tools: [{ google_search: {} }] 
+          tools: [{ google_search: {} }],
+          generationConfig: { responseMimeType: "application/json" }
         })
       });
 
@@ -949,7 +950,7 @@ ${truncatedTranscript}
     setLoading(true);
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${finalKey}`;
       
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       
@@ -1268,7 +1269,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.9</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.1.0</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1282,7 +1283,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.0.9 [💎 카드 가독성 극대화] 모바일에서도 제목 잘림 없는 완벽한 시야 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.1.0 [💎 Pro Engine 탑재] 최고 지능 기반 완벽한 JSON 출력 및 검색 제어 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
