@@ -68,17 +68,6 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V4.0.9',
-      date: '2026-05-10',
-      title: '💎 카드 가독성 극대화 [Readability]',
-      tags: ['레이아웃패치', '모바일최적화'],
-      details: [
-        'AIO 지수 라벨을 제목 상단으로 이동시켜 가로 공간 대폭 확보.',
-        '제목의 말줄임표(truncate)를 제거하고 줄바꿈을 허용하여 주제가 끝까지 보이도록 수정.',
-        '이동 화살표 버튼의 크기를 최적화(w-10)하여 제목 영역과의 충돌 방지.'
-      ]
-    },
-    {
       version: 'V4.0.8',
       date: '2026-05-10',
       title: '📱 모바일 풀-뷰 탭 [Visibility]',
@@ -1266,7 +1255,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.9</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.7</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1280,7 +1269,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.0.9 [💎 카드 가독성 극대화] 모바일에서도 제목 잘림 없는 완벽한 시야 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.0.7 [📱 모바일 레이더 정상화] 3열 그리드 및 최신 모바일 최적화 이식 완료 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1958,24 +1947,21 @@ ${truncatedTranscript}
                                 disabled={isRed}
                                 className={`w-full text-left rounded-2xl border transition-all ${colorClass} group flex justify-between items-center gap-6 p-8`}
                               >
-                                <div className="flex-1 min-w-0 space-y-2">
-                                  {/* AIO 지수를 상단으로 배치 (V4.0.9) */}
-                                  <div className="flex">
-                                    <span className={`shrink-0 font-black px-2 py-0.5 rounded-md ${isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-red-500'} text-white shadow-lg text-[10px]`}>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-4 mb-2">
+                                    <h5 className={`font-black truncate text-xl ${isRed ? 'text-slate-500 line-through' : 'text-slate-100 group-hover:text-indigo-300 transition-colors'}`}>
+                                      {item.keyword}
+                                    </h5>
+                                    <span className={`shrink-0 font-black px-2 py-0.5 rounded-md ${isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-red-500'} text-white shadow-lg text-xs`}>
                                       AIO {score}
                                     </span>
                                   </div>
-                                  
-                                  <h5 className={`font-black text-xl leading-tight ${isRed ? 'text-slate-500 line-through' : 'text-slate-100 group-hover:text-indigo-300 transition-colors'}`}>
-                                    {item.keyword}
-                                  </h5>
-                                  
                                   <p className="text-sm text-slate-400 font-medium leading-relaxed">
                                     {item.reason}
                                   </p>
                                 </div>
                                 {!isRed && (
-                                  <div className="shrink-0 w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner text-lg">
+                                  <div className="shrink-0 w-14 h-14 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner text-xl">
                                     <span className="font-black">➔</span>
                                   </div>
                                 )}
