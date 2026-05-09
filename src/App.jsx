@@ -884,8 +884,7 @@ ${truncatedTranscript}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: combinedPrompt }] }],
-          tools: [{ google_search: {} }],
-          generationConfig: { responseMimeType: "application/json" }
+          tools: [{ google_search: {} }] 
         })
       });
 
@@ -1269,7 +1268,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.1.1</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.1.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1283,7 +1282,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.1.1 [⚡ gemini-2.5-flash 순정 탑재] 초고속 생성 및 완벽한 JSON 파싱 엔진 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.1.2 [⚖️ Flash 황금밸런스] 구글 검색 화력과 안정적인 데이터 추출의 완벽한 조화 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
