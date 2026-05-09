@@ -1647,7 +1647,7 @@ ${truncatedTranscript}
               <p className="text-xs text-slate-500 font-medium px-1 italic">"본문의 각 소제목 흐름에 딱 맞는 4가지 이미지를 생성해 보세요!"</p>
               
               <div className="grid grid-cols-1 gap-4">
-                {results[activeTab].section_prompts && results[activeTab].section_prompts.map((item, idx) => (
+                {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.map((item, idx) => (
                   <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                     
