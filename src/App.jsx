@@ -68,14 +68,14 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.8.0',
+      version: 'V3.8.1',
       date: '2026-05-09',
-      title: '🎣 키워드 낚시왕 레이더 탑재',
-      tags: ['신기능', 'AI분석'],
+      title: '💡 체감 후기 추천기 탑재',
+      tags: ['신기능', 'SEO최적화'],
       details: [
-        '구식 소재 연구소를 폐기하고 최첨단 트렌드 분석기인 [키워드 낚시왕] 레이더를 탑재했습니다.',
-        'AIO(AI Overview) 침투지수를 통해 트래픽을 독식할 수 있는 블루오션 키워드를 색상(초록/노랑/빨강)으로 직관적으로 판별합니다.',
-        '실시간, 이번 달, 연간 타임슬라이스 필터와 나노 단위 취향을 반영한 세부 키워드 발굴이 가능해졌습니다.'
+        'AIO 시대를 돌파할 E-E-A-T 확보용 [코다리의 체감 후기 한 줄 추천] 박스가 추가되었습니다.',
+        '글 생성 시 구글 트렌드를 반영한 자연스러운 구어체 감상평 1~2줄을 자동 생성합니다.',
+        '원하는 뉘앙스가 나올 때까지 무한 새로고침 및 원클릭 복사가 가능합니다.'
       ]
     },
     {
@@ -1123,7 +1123,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.8.0</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.8.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1137,7 +1137,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.8.0 [🎣 키워드 낚시왕] AIO 시대 돌파용 첨단 레이더 가동 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.8.1 [💡 체감 후기 추천기] 트래픽 독식용 신무기 장착 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
