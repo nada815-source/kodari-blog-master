@@ -66,7 +66,7 @@ function App() {
   });
   const [platforms, setPlatforms] = useState({ naver: true, tistory: true, wordpress: true });
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
-  const [unsplashKey, setUnsplashKey] = useState(localStorage.getItem('unsplash_key') || '');
+
   const [loading, setLoading] = useState(false);
   const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
@@ -76,7 +76,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('naver');
   const [error, setError] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
-  const [showUnsplashKey, setShowUnsplashKey] = useState(false);
+
   const [useImage, setUseImage] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('is_authenticated') === 'true');
@@ -85,7 +85,7 @@ function App() {
   const [isPatchNotesOpen, setIsPatchNotesOpen] = useState(false);
   const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
   const [isStyleGuideOpen, setIsStyleGuideOpen] = useState(false);
-  const [visualStyle, setVisualStyle] = useState('photo'); // 'photo' or '3d'
+  const [visualStyle, setVisualStyle] = useState('3d'); // 'photo' or '3d'
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [customImageKeyword, setCustomImageKeyword] = useState('');
@@ -613,90 +613,6 @@ function App() {
     localStorage.setItem('gemini_api_key', key);
   };
 
-  const handleDownloadBackup = async () => {
-    try {
-      const response = await fetch('/src/App.jsx');
-      const code = await response.text();
-      const blob = new Blob([code], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const now = new Date();
-      const formattedDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-      
-      link.href = url;
-      link.download = `KODARI_App_V2_Backup_${formattedDate}.jsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      triggerToast('대표님! 현재 버전의 소스 코드를 컴퓨터에 즉시 저장했습니다! 📂✨');
-    } catch (err) {
-      triggerToast('백업 다운로드 중 오류가 발생했습니다. 부장님에게 채팅으로 요청해 주세요! 🐟💦');
-    }
-  };
-
-  const fetchImages = async (keywords) => {
-    if (!unsplashKey) return ['', '', ''];
-    try {
-      const fetchImage = async (keyword) => {
-        const query = encodeURIComponent(keyword);
-        let response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${unsplashKey}`);
-        let data = await response.json();
-        if (!data.results || data.results.length === 0) {
-          response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent('Modern lifestyle')}&per_page=1&client_id=${unsplashKey}`);
-          data = await response.json();
-        }
-        return data.results?.[0]?.urls?.regular || '';
-      };
-      const kws = Array.isArray(keywords) ? keywords : [topic, topic, topic];
-      return await Promise.all(kws.map(kw => fetchImage(kw)));
-    } catch (err) {
-      console.error('Image fetch error:', err);
-      return ['', '', ''];
-    }
-  };
-
-  const refreshImage = async () => {
-    if (!customImageKeyword.trim()) {
-      triggerToast('검색어를 입력해 주세요! 🔍');
-      return;
-    }
-    if (!unsplashKey) {
-      setIsSettingsOpen(true);
-      triggerToast('⚙️ Unsplash API 키를 먼저 설정해 주세요!');
-      return;
-    }
-
-    setIsImageLoading(true);
-    try {
-      const query = encodeURIComponent(customImageKeyword);
-      const response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${unsplashKey}`);
-      const data = await response.json();
-      
-      if (data.results && data.results.length > 0) {
-        const newImageUrl = data.results[0].urls.regular;
-        setResults(prev => ({
-          ...prev,
-          [inputMode]: { 
-            ...prev[inputMode],
-            [activeTab]: {
-              ...prev[inputMode][activeTab],
-              image: newImageUrl,
-              image_desc: customImageKeyword
-            }
-          }
-        }));
-        triggerToast('이미지가 교체되었습니다! ✨');
-        setCustomImageKeyword('');
-      } else {
-        triggerToast('검색 결과가 없습니다. 💦');
-      }
-    } catch (err) {
-      triggerToast('이미지 검색 중 오류가 발생했습니다.');
-    } finally {
-      setIsImageLoading(false);
-    }
-  };
 
   const generateContent = async () => {
     if (!isAuthenticated) {
@@ -852,11 +768,6 @@ ${truncatedTranscript}
       const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
 
       let finalImages = ['', '', ''];
-      if (useImage && unsplashKey) {
-        const enQueries = (parsedData.image_queries || []).map(q => q.en);
-        const fallbackTopic = inputMode === 'youtube' ? 'YouTube, technology, modern' : topic;
-        finalImages = await fetchImages(enQueries.length > 0 ? enQueries : [fallbackTopic, fallbackTopic, fallbackTopic]);
-      }
 
       const koDescs = (parsedData.image_queries || []).map(q => q.ko);
       const sectionPrompts = parsedData.section_prompts || [];
@@ -1202,7 +1113,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.7</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1216,7 +1127,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.7 [🌐 글로벌 100% 한글화] 영문 출력 원천 차단 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8 [🗑️ 엔진 다이어트] 불필요한 기능(Unsplash/백업 UI) 제거 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1409,60 +1320,16 @@ ${truncatedTranscript}
             </div>
 
             <div className="p-6 space-y-6">
-              {results[inputMode][activeTab].image && (
-                <div className="space-y-3 mb-6">
-                  <div className="relative group rounded-2xl overflow-hidden shadow-lg border border-slate-100">
-                    <img src={results[inputMode][activeTab].image} alt="Blog Background" className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-105" />
-                    {isImageLoading && (
-                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-2">
-                          <svg className="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                          <span className="text-xs font-bold text-indigo-600">이미지 교체 중...</span>
-                        </div>
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
-                      <span>📸 Photo via Unsplash (AI 추천 이미지)</span>
-                      {results[inputMode][activeTab].image_desc && (
-                        <span className="bg-indigo-500/80 px-2 py-0.5 rounded-md backdrop-blur-sm">컨셉: {results[inputMode][activeTab].image_desc}</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* 이미지 재검색 UI */}
-                  <div className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">Current Concept</span>
-                      <span className="text-xs font-bold text-slate-600">{results[inputMode][activeTab].image_desc || '지정된 키워드 없음'}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <input 
-                        type="text"
-                        value={customImageKeyword}
-                        onChange={(e) => setCustomImageKeyword(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && refreshImage()}
-                        placeholder="새로운 검색어 입력 (영문 추천)"
-                        className="flex-1 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs px-3 py-2 shadow-sm"
-                      />
-                      <button 
-                        onClick={refreshImage}
-                        disabled={isImageLoading}
-                        className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-xs transition-all shadow-md flex items-center gap-2 shrink-0"
-                      >
-                        {isImageLoading ? '...' : '🔍 사진 변경'}
-                      </button>
-                    </div>
-                    
-                    {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.length > 0 && (
-                      <button 
-                        onClick={() => setIsAiPromptOpen(true)}
-                        className="w-full mt-1 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-[10px] transition-all border border-indigo-100 flex items-center justify-center gap-1.5"
-                      >
-                        🎨 AI 이미지 생성 프롬프트 보기
-                      </button>
-                    )}
-                  </div>
+              {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.length > 0 && (
+                <div className="mb-6">
+                  <button 
+                    onClick={() => setIsAiPromptOpen(true)}
+                    className="w-full py-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white font-black rounded-2xl text-lg transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5 animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  >
+                    <span className="text-2xl animate-bounce">🎨</span> AI 이미지 생성 프롬프트 보기
+                  </button>
                 </div>
+              )}
               )}
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
@@ -1740,17 +1607,7 @@ ${truncatedTranscript}
                 <button type="button" onClick={() => setShowApiKey(!showApiKey)} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">{showApiKey ? "👁️" : "👁️‍🗨️"}</button>
               </div>
             </div>
-            <div className="space-y-4">
-              <label className="text-sm font-bold text-slate-700 flex items-center gap-2">📸 Unsplash Access Key</label>
-              <div className="relative group">
-                <input type={showUnsplashKey ? "text" : "password"} value={unsplashKey} onChange={(e) => { setUnsplashKey(e.target.value); localStorage.setItem('unsplash_key', e.target.value); }} className="w-full p-4 pr-12 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all font-mono text-sm" placeholder="Unsplash 키를 입력하세요" />
-                <button type="button" onClick={() => setShowUnsplashKey(!showUnsplashKey)} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">{showUnsplashKey ? "👁️" : "👁️‍🗨️"}</button>
-              </div>
-            </div>
-            <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-3 text-left">
-              <h3 className="text-sm font-black text-indigo-600 uppercase tracking-wider">💾 코다리 백업 관리</h3>
-              <button onClick={handleDownloadBackup} className="w-full py-3 bg-white hover:bg-indigo-100 text-indigo-600 rounded-xl font-bold text-sm shadow-sm border border-indigo-200 transition-all">📂 현재 버전 즉시 백업(다운로드)</button>
-            </div>
+
             <div className="pt-4 border-t border-slate-100">
               <button onClick={() => { localStorage.setItem('gemini_api_key', apiKey); setIsSettingsOpen(false); triggerToast('대표님, 설정이 저장되었습니다! 🫡'); }} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-lg shadow-xl transition-all">설정 저장 및 적용</button>
             </div>
