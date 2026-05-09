@@ -57,7 +57,7 @@ function App() {
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isKeywordFishingOpen, setIsKeywordFishingOpen] = useState(false);
-  const [fishingCategory, setFishingCategory] = useState('💻 IT/테크');
+  const [fishingCategory, setFishingCategory] = useState('🏛️ 정부정책');
   const [fishingTimeSlice, setFishingTimeSlice] = useState('실시간');
   const [fishingResults, setFishingResults] = useState([]);
   const [isFishingLoading, setIsFishingLoading] = useState(false);
@@ -1645,7 +1645,7 @@ ${truncatedTranscript}
                 <div className="w-full md:w-auto space-y-3">
                   <label className="text-xs font-black text-slate-400 uppercase tracking-widest">분석 카테고리</label>
                   <div className="flex flex-wrap gap-2">
-                    {['💻 IT/테크', '💰 경제/재테크', '💪 건강/운동', '✈️ 여행/생활', '🏛️ 정부정책'].map(cat => (
+                    {['🏛️ 정부정책', '💻 IT/테크', '💰 경제/재테크', '💪 건강/운동', '✈️ 여행/생활'].map(cat => (
                       <button
                         key={cat}
                         onClick={() => setFishingCategory(cat)}
@@ -1679,7 +1679,7 @@ ${truncatedTranscript}
                 <button 
                   onClick={runKeywordFishing}
                   disabled={isFishingLoading}
-                  className="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   {isFishingLoading ? '🔄 탐색 중...' : '🎣 레이더 가동'}
                 </button>
