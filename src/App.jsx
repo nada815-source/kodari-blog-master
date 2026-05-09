@@ -860,7 +860,7 @@ ${truncatedTranscript}
 4. **JSON 및 말투 가이드:**
    - 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 세련된 이모지를 적절히 섞어줘.
 
-결과는 반드시 아래의 JSON 형식으로만 답변해:
+결과는 반드시 아래의 JSON 형식으로만 답변하고, JSON 외의 어떤 설명이나 사족도 절대 붙이지 마:
 {
   "image_queries": [ {"en": "...", "ko": "..." }, ... ],
   "section_prompts": [
@@ -877,7 +877,7 @@ ${truncatedTranscript}
   "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
 }
 
-[필독: 해시태그는 '#'을 붙여 한 줄로 나열하고, 워드프레스를 포함한 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
+[필독: 해시태그는 '#'을 붙여 한 줄로 나열하고, 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -905,7 +905,7 @@ ${truncatedTranscript}
 
       let responseTextRaw = data.candidates[0].content.parts[0].text;
       
-      // [철벽 파싱] JSON 블록만 정밀 추출
+      // [철벽 파싱 2.0] JSON 블록 정밀 추출 및 제어 문자 제거
       let responseText = "";
       const jsonMatch = responseTextRaw.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -913,8 +913,10 @@ ${truncatedTranscript}
       } else {
         responseText = responseTextRaw.replace(/```json/gi, '').replace(/```/gi, '').trim();
       }
-
-      const parsedData = JSON.parse(responseText);
+      
+      // JSON 내부의 유효하지 않은 제어 문자(줄바꿈 등) 정제
+      const cleanedJson = responseText.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+      const parsedData = JSON.parse(cleanedJson);
       const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
 
       let finalImages = ['', '', ''];
