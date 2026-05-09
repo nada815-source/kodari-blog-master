@@ -1340,7 +1340,6 @@ ${truncatedTranscript}
                   </button>
                 </div>
               )}
-              )}
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider">Title</label>
