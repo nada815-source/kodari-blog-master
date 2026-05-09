@@ -62,6 +62,8 @@ function App() {
   const [fishingResults, setFishingResults] = useState([]);
   const [isFishingLoading, setIsFishingLoading] = useState(false);
   const [isFactCheckOpen, setIsFactCheckOpen] = useState(false);
+  const [experienceQuote, setExperienceQuote] = useState('');
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
 
   const patchNotes = [
@@ -614,6 +616,33 @@ function App() {
   };
 
 
+  const generateExperienceQuote = async (targetTopic) => {
+    if (!targetTopic) return;
+    setIsQuoteLoading(true);
+    try {
+      const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const prompt = `주제: "${targetTopic}"\n\n위 주제를 직접 겪은 일반인의 생생한 후기나 감상평을 블로그 본문 첫머리나 마지막에 바로 복사해서 쓸 수 있게 구어체로 딱 1~2줄만 작성해줘. 이모지도 1~2개 넣어줘. (예: 저도 어제 직접 해봤는데 생각보다 너무 편해서 깜짝 놀랐어요! 😲 진작 해볼 걸 그랬네요.)`;
+      const req = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.8, maxOutputTokens: 100 }
+        })
+      });
+      const data = await req.json();
+      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        setExperienceQuote(data.candidates[0].content.parts[0].text.trim().replace(/^"|"$/g, ''));
+      }
+    } catch (err) {
+      console.error(err);
+      setExperienceQuote('추천 문구를 불러오지 못했습니다. 😢');
+    } finally {
+      setIsQuoteLoading(false);
+    }
+  };
+
   const generateContent = async () => {
     if (!isAuthenticated) {
       setIsAuthModalOpen(true);
@@ -780,6 +809,9 @@ ${truncatedTranscript}
           wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
         }
       }));
+
+      // 체감 후기 추천 자동 생성
+      generateExperienceQuote(inputMode === 'topic' ? topic : "유튜브 영상 요약");
 
     } catch (err) {
       console.error(err);
@@ -1316,6 +1348,34 @@ ${truncatedTranscript}
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[inputMode][activeTab].title || '제목 생성 중...'}</h2>
               </div>
+
+              {/* [신규] 체감 후기 추천 박스 */}
+              {results[inputMode][activeTab].title && (
+                <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-xs font-bold text-amber-600 uppercase tracking-wider">💡 코다리의 체감 후기 한 줄 추천 (E-E-A-T 확보용)</label>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => generateExperienceQuote(inputMode === 'topic' ? topic : "유튜브 영상 요약")} 
+                        disabled={isQuoteLoading}
+                        className="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-amber-200 flex items-center gap-1"
+                      >
+                        {isQuoteLoading ? '⏳ 생성 중...' : '🔄 다른 문구 추천'}
+                      </button>
+                      <button 
+                        onClick={() => { navigator.clipboard.writeText(experienceQuote); triggerToast('추천 문구 복사 완료!'); }} 
+                        className="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-amber-200 flex items-center gap-1"
+                      >
+                        📋 복사
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-amber-900 bg-white/50 p-3 rounded-lg border border-amber-100/50">
+                    {isQuoteLoading ? '구글 트렌드를 분석하여 찰진 후기를 생성하고 있습니다...' : (experienceQuote || '문구를 생성하려면 새로고침을 눌러주세요.')}
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
