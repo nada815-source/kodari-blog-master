@@ -68,17 +68,6 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.9.0',
-      date: '2026-05-09',
-      title: '🏛️ 정부 정책 자동 난시 엔진 탑재',
-      tags: ['실시간', 'AI검색'],
-      details: [
-        '키워드 낙시왕 레이더에서 🏛️ 정부정책 선택 시, AI가 2026년 최신 정부 지원 사업을 자동 분석합니다.',
-        '정책 키워드에는 낙은 AIO 침투지수를 자동 부여하여 블루오션 작성 기회를 직관적으로 판별합니다.',
-        'AI 응답 안정성 및 오류 진단 로직을 전면 개선하여 레이더 무결점 가동을 보장합니다.'
-      ]
-    },
-    {
       version: 'V3.8.1',
       date: '2026-05-09',
       title: '💡 체감 후기 추천기 탑재',
@@ -703,7 +692,7 @@ ${truncatedTranscript}
 """`;
       }
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const styleGuide = visualStyle === 'photo' 
         ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
@@ -837,7 +826,7 @@ ${truncatedTranscript}
     setLoading(true);
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       
@@ -992,37 +981,22 @@ ${truncatedTranscript}
     triggerToast('🔄 AI 레이더가 실시간 트렌드 및 AIO 침투지수를 분석 중입니다...');
 
     try {
-      const isGovPolicy = fishingCategory === '🏛️ 정부정책';
-      // gemini-2.5-flash: V3.8.1부터 정상 작동 확인된 안정적 모델
+      // Use gemini-2.5-flash as per KODARI PROTOCOL
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
-
-      const policyPrompt = `당신은 대한민국 중소벤처기업부, 창업진흥원, 소상공인시장진흥공단의 2026년 최신 지원 사업 정보를 꿰뚫고 있는 정책 전문가입니다.
-요청: 초기 창업자, 소상공인이 신청할 수 있는 대표적인 정부 지원 사업 10개를 리스트업해 주세요.
-
-반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트나 마크다운은 절대 포함하지 마세요.
-[
-  {
-    "keyword": "사업명 (예: 2026 초기창업패키지 딥테크 특화형)",
-    "aio_index": 20,
-    "reason": "[기한: ~2026.06.30] 지원금 최대 1.5억! 대상: 3년 이내 창업자"
-  }
-]`;
-
-      const normalPrompt = `당신은 구글 검색 동향을 분석하는 2026년 최고의 SEO 전문가입니다.
+      const prompt = `당신은 구글 검색 동향을 분석하는 2026년 최고의 SEO 전문가입니다.
 사용자가 선택한 카테고리: [${fishingCategory}]
 시간 범위: [${fishingTimeSlice}] (실시간/이번달/연간)
 
 위 조건에 맞는 블로그 조회수가 폭발할 만한 '롱테일 핫이슈 키워드' 10개를 발굴해 주세요.
-반드시 아래 JSON 배열 형식으로만 응답하세요. 마크다운이나 백틱 없이 오직 JSON 배열만 출력할 것.
+각 키워드에 대해 다음 정보를 반드시 JSON 배열 형태로만 제공하세요. (마크다운 포맷이나 백틱 없이 오직 JSON 배열만 출력할 것)
+
 [
   {
     "keyword": "키워드명 (예: 아이폰 16 파인우븐 케이스 1달 쌩얼 후기)",
-    "aio_index": 30,
+    "aio_index": "AI Overview 침투지수 (0~100 숫자). 수치가 높을수록 AI가 완벽한 정답을 제시하여 블로그 트래픽이 안 나옴. 수치가 낮을수록(0~40) 사람의 생생한 후기나 취향이 필요하여 블로그 트래픽이 폭발함.",
     "reason": "왜 이 AIO 침투지수를 부여했는지 1줄 설명."
   }
 ]`;
-
-      const prompt = isGovPolicy ? policyPrompt : normalPrompt;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -1031,30 +1005,20 @@ ${truncatedTranscript}
       });
       
       const data = await response.json();
-
-      if (data.error) throw new Error(data.error.message);
-
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error('AI 응답이 비어있습니다. 다시 시도해 주세요.');
+      const text = data.candidates[0].content.parts[0].text;
       
+      // Extract JSON using regex
       const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
       if (jsonMatch) {
-        let parsedResults = JSON.parse(jsonMatch[0]);
-        // [V3.9.0 핵심] 정부정책은 AIO 지수가 낮을수록 블루오션 → AI가 잘못된 값을 주더라도 10~25로 강제 보정
-        if (isGovPolicy) {
-          parsedResults = parsedResults.map((item, idx) => ({
-            ...item,
-            aio_index: 10 + (idx % 16) // 10~25 범위 순환
-          }));
-        }
+        const parsedResults = JSON.parse(jsonMatch[0]);
         setFishingResults(parsedResults);
         triggerToast(`✨ [${fishingCategory}] 어군 탐지 완료! 월척을 낚아보세요!`);
       } else {
-        throw new Error('응답 형식 오류. 다시 시도해 주세요.');
+        throw new Error("Invalid JSON response from Gemini");
       }
     } catch (err) {
       console.error(err);
-      triggerToast(`❌ ${err.message}`);
+      triggerToast('❌ 레이더 분석 중 오류가 발생했습니다. 다시 시도해 주세요.');
     } finally {
       setIsFishingLoading(false);
     }
@@ -1159,7 +1123,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.9.0</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.8.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1173,7 +1137,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.9.0 [🏛️ 정부 정책 자동 낚시 엔진] 대한민국 모든 예산 정보 실시간 추적 중 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.8.1 [💡 체감 후기 추천기] 트래픽 독식용 신무기 장착 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">

@@ -703,7 +703,7 @@ ${truncatedTranscript}
 """`;
       }
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const styleGuide = visualStyle === 'photo' 
         ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
@@ -837,7 +837,7 @@ ${truncatedTranscript}
     setLoading(true);
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       

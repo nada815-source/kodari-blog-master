@@ -48,12 +48,10 @@
 
 ---
 
-## ⚙️ 5. 기술적 고정 가이드 (KODARI ENGINE SPEC V3.9.0)
-- **표준 API 모델명**: 반드시 **`gemini-2.5-flash`**를 사용한다. (V3.8.1/V3.9.0에서 검증된 유일한 안정 모델)
-- **절대 금지**: `gemini-1.5-pro-latest`나 구형 모델명을 사용하지 않는다. (API 키 호환성 문제 발생 방지)
-- **표준 API URL**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`
-- **API 버전**: 반드시 `v1beta` 엔드포인트를 사용한다.
-- **예외 사항**: `gemini-pro`는 비상시에만 사용하며, 모든 신규 기능(낚시 레이더 등)은 `gemini-2.5-flash`에 최적화한다.
+## ⚙️ 5. 기술적 고정 가이드 (Technical Constraints)
+- **Gemini API 모델명**: 반드시 **`gemini-2.5-flash`** 또는 **`gemini-pro`**를 기본으로 사용한다.
+- **API 버전**: `v1beta` 엔드포인트를 기본으로 사용한다.
+- **표(Table) 변환**: `copyToClipboard` 함수 내의 HTML 변환 로직은 네이버 블로그 호환성을 위해 수정 시 반드시 검증을 거친다.
 
 ---
 

@@ -19,7 +19,41 @@ const Image = ({ size = 16, className = "" }) => (
   </svg>
 );
 
-// 키워드 낚시왕 V3.8.0 - 동적 실시간 트렌드 분석기로 교체됨 (기존 topicDatabase 삭제됨)
+// 소재 연구소 V3.5 마스터 데이터베이스 (컴포넌트 외부로 이동하여 안정화)
+const topicDatabase = {
+  categories: [
+    { 
+      name: '🏛️ 정부정책', 
+      monthly: ['청년도약계좌 신청', '지자체별 지원금 소식', '부모급여 및 아동수당', '에너지 바우처 혜택', '임대주택 입주 공고', '문화누리카드 신청', '청년 월세 지원', '이사 비용 지원 사업', '내 집 마련 디딤돌 대출', '버팀목 전세 자금'],
+      annual: ['정부 예산안 발표', '최저임금 결정', '세법 개정안 핵심 정리', '대선/총선 관련 공약', '병사 월급 인상 소식', '건강보험료 개편안', '노령연금 수급 자격', '기초수급자 혜택 정리', '근로장려금 지급 시기', '자녀장려금 자격 확인'],
+      gold: ['실업급여 수급 자격', '국민내일배움카드 활용', '주거급여 신청 방법', '소상공인 지원 정책', '국가 장학금 신청법', '경기 컬처패스 활용', 'K-패스 환급 제도', '육아휴직 급여 계산', '출산 장려금 지역별 정리', '긴급 복지 지원 제도']
+    },
+    { 
+      name: '💰 경제/재테크', 
+      monthly: ['5월 종합소득세 신고', '공모주 청약 일정', '반기별 예적금 특판', '근로장려금 신청', '가정의 달 절약법', '여름 휴가 적금 추천', '장마 대비 보험 점검', '하반기 증시 전망', '추석 상여금 활용법', '블랙프라이데이 소비전략'],
+      annual: ['매년 연말정산 대비', '연초 재테크 계획', '금리 변동 전망', '국세청 환급금 찾기', 'ISA 계좌 활용법', 'IRP 절세 전략', '배당주 투자 시기', '연간 가계부 결산', '부동산 공시지가 확인', '지방세 납부 기간'],
+      gold: ['주식 투자 입문 가이드', '부동산 청약 제도 해설', '앱테크 베스트 10', '가계부 다이어트 비법', '미국 주식 시작하기', '금 투자 방법', '비트코인 초보 가이드', '사회초년생 돈 모으기', '통장 쪼개기 기술', '노후 자금 준비법']
+    },
+    { 
+      name: '💪 건강/운동', 
+      monthly: ['환절기 면역력 강화', '여름 다이어트 식단', '황사/미세먼지 대처', '봄철 야외 운동 가이드', '여름철 식중독 예방', '휴가지 물놀이 안전', '무더위 온열질환 주의', '가을철 등산 주의사항', '겨울철 독감 예방', '실내 스트레칭 루틴'],
+      annual: ['무료 건강검진 대상', '계절별 보양식 총정리', '독감 예방접종 시기', '새해 금연 결심 지원', '연령별 필수 영양제', '대상포진 예방 접종', '겨울철 혈관 건강', '명절 증후군 극복', '비타민 D 부족 해결', '치아 스케일링 보험'],
+      gold: ['홈트레이닝 필수 장비', '영양제 과잉 섭취 주의', '스트레스 해소법 7가지', '수면의 질 높이는 법', '거북목 교정 스트레칭', '공복 유산소 효과', '간헐적 단식 방법', '물 많이 마시기 효과', '바른 자세 앉는 법', '명상 입문 가이드']
+    },
+    { 
+      name: '💻 IT/테크', 
+      monthly: ['갤럭시/아이폰 최신 루머', '유튜브 알고리즘 변화', '신규 게임 출시 일정', '윈도우 보안 업데이트', '맥북 신형 리뷰', '유용한 크롬 확장프로그램', '갤럭시 워치 팁', '애플 워치 활용법', '카카오톡 숨은 기능', '인스타그램 릴스 만드는 법'],
+      annual: ['CES/MWC 주요 기술', '애플 WWDC 발표', '구글 I/O 신기술', '연말 가전 세일 정보', '블랙프라이데이 직구', '올해의 베스트 앱', 'IT 트렌드 전망', '신형 CPU/GPU 출시', '클라우드 서비스 비교', '최신 모니터 고르는 법'],
+      gold: ['최강의 업무용 툴 추천', '스마트폰 사진 잘 찍는 법', 'PC 속도 빨라지는 법', 'AI 챗봇 활용 꿀팁', '엑셀 필수 단축키', '유튜브 프리미엄 우회', '넷플릭스 요금제 팁', '클라우드 스토리지 비교', '협업 툴 노션 가이드', '아이패드 공부법 추천']
+    },
+    { 
+      name: '✈️ 여행/생활', 
+      monthly: ['5월 가정의 달 나들이', '여름 휴가 항공권 예약', '벚꽃/단풍 지도', '캠핑 명소 추천', '국내 풀빌라 순위', '여름 바다 축제', '겨울 온천 여행', '스키장 개장 정보', '글램핑장 베스트 5', '지역별 축제 일정'],
+      annual: ['해외여행 국가별 성수기', '전국 축제 총정리', '연간 연휴 황금 일정', '여권 재발급 팁', '항공 마일리지 적립법', '면세점 쇼핑 리스트', '국제면허증 발급', '한 달 살기 도시 추천', '유럽 기차 패스 가이드', '비자 발급 주의사항'],
+      gold: ['여행 짐 싸기 체크리스트', '가성비 숙소 예약법', '제주도 한 달 살기 가이드', '현지인 맛집 찾는 법', '비행기 좌석 꿀팁', '에어비앤비 할인법', '자취생 필수 가전', '미니멀 라이프 입문', '인생 사진 명소 추천', '해외 결제 카드 추천']
+    }
+  ]
+};
 
 function App() {
   const [inputMode, setInputMode] = useState('topic'); // 'topic' or 'youtube'
@@ -32,7 +66,7 @@ function App() {
   });
   const [platforms, setPlatforms] = useState({ naver: true, tistory: true, wordpress: true });
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
-
+  const [unsplashKey, setUnsplashKey] = useState(localStorage.getItem('unsplash_key') || '');
   const [loading, setLoading] = useState(false);
   const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
@@ -42,7 +76,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('naver');
   const [error, setError] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
-
+  const [showUnsplashKey, setShowUnsplashKey] = useState(false);
   const [useImage, setUseImage] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('is_authenticated') === 'true');
@@ -51,67 +85,20 @@ function App() {
   const [isPatchNotesOpen, setIsPatchNotesOpen] = useState(false);
   const [isAiPromptOpen, setIsAiPromptOpen] = useState(false);
   const [isStyleGuideOpen, setIsStyleGuideOpen] = useState(false);
-  const [visualStyle, setVisualStyle] = useState('3d'); // 'photo' or '3d'
+  const [visualStyle, setVisualStyle] = useState('photo'); // 'photo' or '3d'
   const [toast, setToast] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
-  const [isKeywordFishingOpen, setIsKeywordFishingOpen] = useState(false);
-  const [fishingCategory, setFishingCategory] = useState('🏛️ 정부정책');
-  const [fishingTimeSlice, setFishingTimeSlice] = useState('실시간');
-  const [fishingResults, setFishingResults] = useState([]);
-  const [isFishingLoading, setIsFishingLoading] = useState(false);
+  const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
+  const [isLiveLoading, setIsLiveLoading] = useState(false);
+  const [dynamicTopics, setDynamicTopics] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
+  const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
   const [isFactCheckOpen, setIsFactCheckOpen] = useState(false);
-  const [experienceQuote, setExperienceQuote] = useState('');
-  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
 
   const patchNotes = [
-    {
-      version: 'V3.9.0',
-      date: '2026-05-09',
-      title: '🏛️ 정부 정책 자동 난시 엔진 탑재',
-      tags: ['실시간', 'AI검색'],
-      details: [
-        '키워드 낙시왕 레이더에서 🏛️ 정부정책 선택 시, AI가 2026년 최신 정부 지원 사업을 자동 분석합니다.',
-        '정책 키워드에는 낙은 AIO 침투지수를 자동 부여하여 블루오션 작성 기회를 직관적으로 판별합니다.',
-        'AI 응답 안정성 및 오류 진단 로직을 전면 개선하여 레이더 무결점 가동을 보장합니다.'
-      ]
-    },
-    {
-      version: 'V3.8.1',
-      date: '2026-05-09',
-      title: '💡 체감 후기 추천기 탑재',
-      tags: ['신기능', 'SEO최적화'],
-      details: [
-        'AIO 시대를 돌파할 E-E-A-T 확보용 [코다리의 체감 후기 한 줄 추천] 박스가 추가되었습니다.',
-        '글 생성 시 구글 트렌드를 반영한 자연스러운 구어체 감상평 1~2줄을 자동 생성합니다.',
-        '원하는 뉘앙스가 나올 때까지 무한 새로고침 및 원클릭 복사가 가능합니다.'
-      ]
-    },
-    {
-      version: 'V3.8.0',
-      date: '2026-05-09',
-      title: '🎣 키워드 낚시왕 레이더 탑재',
-      tags: ['신기능', 'AI분석'],
-      details: [
-        '구식 소재 연구소를 폐기하고 최첨단 트렌드 분석기인 [키워드 낚시왕] 레이더를 탑재했습니다.',
-        'AIO(AI Overview) 침투지수를 통해 트래픽을 독식할 수 있는 블루오션 키워드를 색상(초록/노랑/빨강)으로 직관적으로 판별합니다.',
-        '실시간, 이번 달, 연간 타임슬라이스 필터와 나노 단위 취향을 반영한 세부 키워드 발굴이 가능해졌습니다.'
-      ]
-    },
-    {
-      version: 'V3.7.8',
-      date: '2026-05-09',
-      title: '🗑️ KODARI 엔진 다이어트 (Unsplash 퇴출)',
-      tags: ['최적화', 'UI개편'],
-      details: [
-        '사용 빈도가 낮고 품질을 저하시키는 무료 이미지(Unsplash) 기능을 엔진에서 과감히 도려냈습니다.',
-        '본문 상단에 [🎨 AI 이미지 프롬프트 보기] 버튼을 거대하게 배치하여 고품질 이미지 생성 동선을 최적화했습니다.',
-        '로컬 개발용이었던 무용지물 [즉시 백업] 버튼을 설정창에서 제거하여 시스템을 가볍게 만들었습니다.',
-        'AI 이미지 스타일의 기본값을 세련된 [3D 일러스트]로 변경했습니다.'
-      ]
-    },
     {
       version: 'V3.7.7',
       date: '2026-05-09',
@@ -626,31 +613,88 @@ function App() {
     localStorage.setItem('gemini_api_key', key);
   };
 
-
-  const generateExperienceQuote = async (targetTopic) => {
-    if (!targetTopic) return;
-    setIsQuoteLoading(true);
+  const handleDownloadBackup = async () => {
     try {
-      const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
-      const prompt = `주제: "${targetTopic}"\n\n위 주제를 직접 겪은 일반인의 생생한 후기나 감상평을 블로그 본문 첫머리나 마지막에 바로 복사해서 쓸 수 있게 구어체로 딱 1~2줄만 작성해줘. 이모지도 1~2개 넣어줘. (예: 저도 어제 직접 해봤는데 생각보다 너무 편해서 깜짝 놀랐어요! 😲 진작 해볼 걸 그랬네요.)`;
-      const req = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 100 }
-        })
-      });
-      const data = await req.json();
-      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        setExperienceQuote(data.candidates[0].content.parts[0].text.trim().replace(/^"|"$/g, ''));
+      const response = await fetch('/src/App.jsx');
+      const code = await response.text();
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      link.href = url;
+      link.download = `KODARI_App_V2_Backup_${formattedDate}.jsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      triggerToast('대표님! 현재 버전의 소스 코드를 컴퓨터에 즉시 저장했습니다! 📂✨');
+    } catch (err) {
+      triggerToast('백업 다운로드 중 오류가 발생했습니다. 부장님에게 채팅으로 요청해 주세요! 🐟💦');
+    }
+  };
+
+  const fetchImages = async (keywords) => {
+    if (!unsplashKey) return ['', '', ''];
+    try {
+      const fetchImage = async (keyword) => {
+        const query = encodeURIComponent(keyword);
+        let response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${unsplashKey}`);
+        let data = await response.json();
+        if (!data.results || data.results.length === 0) {
+          response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent('Modern lifestyle')}&per_page=1&client_id=${unsplashKey}`);
+          data = await response.json();
+        }
+        return data.results?.[0]?.urls?.regular || '';
+      };
+      const kws = Array.isArray(keywords) ? keywords : [topic, topic, topic];
+      return await Promise.all(kws.map(kw => fetchImage(kw)));
+    } catch (err) {
+      console.error('Image fetch error:', err);
+      return ['', '', ''];
+    }
+  };
+
+  const refreshImage = async () => {
+    if (!customImageKeyword.trim()) {
+      triggerToast('검색어를 입력해 주세요! 🔍');
+      return;
+    }
+    if (!unsplashKey) {
+      setIsSettingsOpen(true);
+      triggerToast('⚙️ Unsplash API 키를 먼저 설정해 주세요!');
+      return;
+    }
+
+    setIsImageLoading(true);
+    try {
+      const query = encodeURIComponent(customImageKeyword);
+      const response = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${unsplashKey}`);
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        const newImageUrl = data.results[0].urls.regular;
+        setResults(prev => ({
+          ...prev,
+          [inputMode]: { 
+            ...prev[inputMode],
+            [activeTab]: {
+              ...prev[inputMode][activeTab],
+              image: newImageUrl,
+              image_desc: customImageKeyword
+            }
+          }
+        }));
+        triggerToast('이미지가 교체되었습니다! ✨');
+        setCustomImageKeyword('');
+      } else {
+        triggerToast('검색 결과가 없습니다. 💦');
       }
     } catch (err) {
-      console.error(err);
-      setExperienceQuote('추천 문구를 불러오지 못했습니다. 😢');
+      triggerToast('이미지 검색 중 오류가 발생했습니다.');
     } finally {
-      setIsQuoteLoading(false);
+      setIsImageLoading(false);
     }
   };
 
@@ -703,7 +747,7 @@ ${truncatedTranscript}
 """`;
       }
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const styleGuide = visualStyle === 'photo' 
         ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
@@ -808,6 +852,11 @@ ${truncatedTranscript}
       const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
 
       let finalImages = ['', '', ''];
+      if (useImage && unsplashKey) {
+        const enQueries = (parsedData.image_queries || []).map(q => q.en);
+        const fallbackTopic = inputMode === 'youtube' ? 'YouTube, technology, modern' : topic;
+        finalImages = await fetchImages(enQueries.length > 0 ? enQueries : [fallbackTopic, fallbackTopic, fallbackTopic]);
+      }
 
       const koDescs = (parsedData.image_queries || []).map(q => q.ko);
       const sectionPrompts = parsedData.section_prompts || [];
@@ -820,9 +869,6 @@ ${truncatedTranscript}
           wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
         }
       }));
-
-      // 체감 후기 추천 자동 생성
-      generateExperienceQuote(inputMode === 'topic' ? topic : "유튜브 영상 요약");
 
     } catch (err) {
       console.error(err);
@@ -837,7 +883,7 @@ ${truncatedTranscript}
     setLoading(true);
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       
@@ -965,10 +1011,9 @@ ${truncatedTranscript}
   };
 
   const handleSelectTopic = (selectedTopic) => {
-    setInputMode('topic');
     setTopic(selectedTopic);
-    setIsKeywordFishingOpen(false);
-    triggerToast(`🎣 '${selectedTopic}' 낚시 성공! 월척입니다! ✨`);
+    setIsTopicLabOpen(false);
+    triggerToast(`💡 '${selectedTopic}' 주제가 선택되었습니다! ✨`);
   };
 
   const handleSubCopyChange = (idx, newCopy) => {
@@ -981,48 +1026,28 @@ ${truncatedTranscript}
     });
   };
 
-  const runKeywordFishing = async () => {
+  const refreshLiveTrends = async () => {
     const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
     if (!finalKey) {
-      triggerToast('⚙️ API 키를 설정해야 낚시 레이더를 가동할 수 있습니다!');
+      triggerToast('⚙️ API 키를 설정해야 실시간 분석이 가능합니다!');
       return;
     }
 
-    setIsFishingLoading(true);
-    triggerToast('🔄 AI 레이더가 실시간 트렌드 및 AIO 침투지수를 분석 중입니다...');
+    setIsLiveLoading(true);
+    triggerToast('🔄 AI가 현재 대한민국 트렌드를 분석 중입니다...');
 
     try {
-      const isGovPolicy = fishingCategory === '🏛️ 정부정책';
-      // gemini-2.5-flash: V3.8.1부터 정상 작동 확인된 안정적 모델
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
+      const prompt = `당신은 대한민국의 최신 트렌드를 분석하는 일타 강사입니다. 
+현재 선택된 카테고리 [${selectedCategory}]에 대하여, 오늘 날짜(${new Date().toLocaleDateString()}) 기준 블로그 조회수가 폭발할 만한 '실시간 핫이슈 주제' 5개를 추천하세요.
 
-      const policyPrompt = `당신은 대한민국 중소벤처기업부, 창업진흥원, 소상공인시장진흥공단의 2026년 최신 지원 사업 정보를 꿰뚫고 있는 정책 전문가입니다.
-요청: 초기 창업자, 소상공인이 신청할 수 있는 대표적인 정부 지원 사업 10개를 리스트업해 주세요.
-
-반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트나 마크다운은 절대 포함하지 마세요.
-[
-  {
-    "keyword": "사업명 (예: 2026 초기창업패키지 딥테크 특화형)",
-    "aio_index": 20,
-    "reason": "[기한: ~2026.06.30] 지원금 최대 1.5억! 대상: 3년 이내 창업자"
-  }
-]`;
-
-      const normalPrompt = `당신은 구글 검색 동향을 분석하는 2026년 최고의 SEO 전문가입니다.
-사용자가 선택한 카테고리: [${fishingCategory}]
-시간 범위: [${fishingTimeSlice}] (실시간/이번달/연간)
-
-위 조건에 맞는 블로그 조회수가 폭발할 만한 '롱테일 핫이슈 키워드' 10개를 발굴해 주세요.
-반드시 아래 JSON 배열 형식으로만 응답하세요. 마크다운이나 백틱 없이 오직 JSON 배열만 출력할 것.
-[
-  {
-    "keyword": "키워드명 (예: 아이폰 16 파인우븐 케이스 1달 쌩얼 후기)",
-    "aio_index": 30,
-    "reason": "왜 이 AIO 침투지수를 부여했는지 1줄 설명."
-  }
-]`;
-
-      const prompt = isGovPolicy ? policyPrompt : normalPrompt;
+반드시 아래 형식을 엄수하여 소재만 나열하세요:
+[LIVE]
+주제1
+주제2
+주제3
+주제4
+주제5`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -1031,34 +1056,52 @@ ${truncatedTranscript}
       });
       
       const data = await response.json();
-
-      if (data.error) throw new Error(data.error.message);
-
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error('AI 응답이 비어있습니다. 다시 시도해 주세요.');
+      const text = data.candidates[0].content.parts[0].text;
       
-      const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-      if (jsonMatch) {
-        let parsedResults = JSON.parse(jsonMatch[0]);
-        // [V3.9.0 핵심] 정부정책은 AIO 지수가 낮을수록 블루오션 → AI가 잘못된 값을 주더라도 10~25로 강제 보정
-        if (isGovPolicy) {
-          parsedResults = parsedResults.map((item, idx) => ({
-            ...item,
-            aio_index: 10 + (idx % 16) // 10~25 범위 순환
-          }));
-        }
-        setFishingResults(parsedResults);
-        triggerToast(`✨ [${fishingCategory}] 어군 탐지 완료! 월척을 낚아보세요!`);
-      } else {
-        throw new Error('응답 형식 오류. 다시 시도해 주세요.');
+      const liveSection = text.split('[LIVE]')[1];
+      if (liveSection) {
+        const lines = liveSection.trim().split('\n').filter(l => l.trim() !== '').slice(0, 5);
+        const processedTopics = lines.map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim());
+        setDynamicTopics(processedTopics);
+        triggerToast(`✨ [${selectedCategory}] 실시간 트렌드 분석 완료!`);
       }
     } catch (err) {
       console.error(err);
-      triggerToast(`❌ ${err.message}`);
+      triggerToast('❌ 트렌드 분석 중 오류가 발생했습니다.');
     } finally {
-      setIsFishingLoading(false);
+      setIsLiveLoading(false);
     }
   };
+
+  const refreshStaticSection = (categoryName, sectionName) => {
+    const category = topicDatabase.categories.find(c => c.name === categoryName);
+    if (!category) return;
+    
+    const pool = category[sectionName];
+    if (!pool || pool.length === 0) return;
+    
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 4);
+    
+    setDisplayedStaticTopics(prev => ({
+      ...prev,
+      [`${categoryName}_${sectionName}`]: selected
+    }));
+  };
+
+  // 초기 로딩 및 카테고리 변경 시 키워드 셔플 (안전한 버전)
+  useEffect(() => {
+    if (isTopicLabOpen) {
+      topicDatabase.categories.forEach(cat => {
+        ['monthly', 'annual', 'gold'].forEach(sec => {
+          const key = `${cat.name}_${sec}`;
+          if (!displayedStaticTopics[key]) {
+            refreshStaticSection(cat.name, sec);
+          }
+        });
+      });
+    }
+  }, [selectedCategory, isTopicLabOpen]);
 
   const convertMarkdownToHtml = (text) => {
     const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
@@ -1159,7 +1202,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.9.0</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.7</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1173,7 +1216,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.9.0 [🏛️ 정부 정책 자동 낚시 엔진] 대한민국 모든 예산 정보 실시간 추적 중 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.7 [🌐 글로벌 100% 한글화] 영문 출력 원천 차단 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1222,11 +1265,11 @@ ${truncatedTranscript}
                 )}
               </div>
               <button 
-                onClick={() => setIsKeywordFishingOpen(true)}
-                className="hidden md:flex px-8 py-4 bg-gradient-to-br from-blue-50 to-indigo-100 hover:from-blue-100 hover:to-indigo-200 text-indigo-700 rounded-2xl font-black text-sm transition-all flex-col items-center justify-center gap-1 border-2 border-indigo-200 shadow-md whitespace-nowrap active:scale-95 group"
+                onClick={() => setIsTopicLabOpen(true)}
+                className="hidden md:flex px-8 py-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-2xl font-black text-sm transition-all flex-col items-center justify-center gap-1 border-2 border-indigo-100 shadow-sm whitespace-nowrap active:scale-95"
               >
-                <span className="text-2xl group-hover:animate-bounce">🎣</span>
-                키워드 낚시왕
+                <span className="text-2xl">💡</span>
+                소재 연구소
               </button>
             </div>
           </div>
@@ -1366,14 +1409,59 @@ ${truncatedTranscript}
             </div>
 
             <div className="p-6 space-y-6">
-              {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.length > 0 && (
-                <div className="mb-6">
-                  <button 
-                    onClick={() => setIsAiPromptOpen(true)}
-                    className="w-full py-5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white font-black rounded-2xl text-lg transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 transform hover:-translate-y-0.5 animate-in fade-in slide-in-from-bottom-2 duration-500"
-                  >
-                    <span className="text-2xl animate-bounce">🎨</span> AI 이미지 생성 프롬프트 보기
-                  </button>
+              {results[inputMode][activeTab].image && (
+                <div className="space-y-3 mb-6">
+                  <div className="relative group rounded-2xl overflow-hidden shadow-lg border border-slate-100">
+                    <img src={results[inputMode][activeTab].image} alt="Blog Background" className="w-full h-[350px] object-cover transition-transform duration-700 group-hover:scale-105" />
+                    {isImageLoading && (
+                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <svg className="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                          <span className="text-xs font-bold text-indigo-600">이미지 교체 중...</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center">
+                      <span>📸 Photo via Unsplash (AI 추천 이미지)</span>
+                      {results[inputMode][activeTab].image_desc && (
+                        <span className="bg-indigo-500/80 px-2 py-0.5 rounded-md backdrop-blur-sm">컨셉: {results[inputMode][activeTab].image_desc}</span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* 이미지 재검색 UI */}
+                  <div className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full uppercase tracking-tighter">Current Concept</span>
+                      <span className="text-xs font-bold text-slate-600">{results[inputMode][activeTab].image_desc || '지정된 키워드 없음'}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text"
+                        value={customImageKeyword}
+                        onChange={(e) => setCustomImageKeyword(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && refreshImage()}
+                        placeholder="새로운 검색어 입력 (영문 추천)"
+                        className="flex-1 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-xs px-3 py-2 shadow-sm"
+                      />
+                      <button 
+                        onClick={refreshImage}
+                        disabled={isImageLoading}
+                        className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-lg text-xs transition-all shadow-md flex items-center gap-2 shrink-0"
+                      >
+                        {isImageLoading ? '...' : '🔍 사진 변경'}
+                      </button>
+                    </div>
+                    
+                    {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.length > 0 && (
+                      <button 
+                        onClick={() => setIsAiPromptOpen(true)}
+                        className="w-full mt-1 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold rounded-lg text-[10px] transition-all border border-indigo-100 flex items-center justify-center gap-1.5"
+                      >
+                        🎨 AI 이미지 생성 프롬프트 보기
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
@@ -1383,34 +1471,6 @@ ${truncatedTranscript}
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[inputMode][activeTab].title || '제목 생성 중...'}</h2>
               </div>
-
-              {/* [신규] 체감 후기 추천 박스 */}
-              {results[inputMode][activeTab].title && (
-                <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-xs font-bold text-amber-600 uppercase tracking-wider">💡 코다리의 체감 후기 한 줄 추천 (E-E-A-T 확보용)</label>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => generateExperienceQuote(inputMode === 'topic' ? topic : "유튜브 영상 요약")} 
-                        disabled={isQuoteLoading}
-                        className="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-amber-200 flex items-center gap-1"
-                      >
-                        {isQuoteLoading ? '⏳ 생성 중...' : '🔄 다른 문구 추천'}
-                      </button>
-                      <button 
-                        onClick={() => { navigator.clipboard.writeText(experienceQuote); triggerToast('추천 문구 복사 완료!'); }} 
-                        className="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-amber-200 flex items-center gap-1"
-                      >
-                        📋 복사
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-amber-900 bg-white/50 p-3 rounded-lg border border-amber-100/50">
-                    {isQuoteLoading ? '구글 트렌드를 분석하여 찰진 후기를 생성하고 있습니다...' : (experienceQuote || '문구를 생성하려면 새로고침을 눌러주세요.')}
-                  </p>
-                </div>
-              )}
-
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
@@ -1680,7 +1740,17 @@ ${truncatedTranscript}
                 <button type="button" onClick={() => setShowApiKey(!showApiKey)} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">{showApiKey ? "👁️" : "👁️‍🗨️"}</button>
               </div>
             </div>
-
+            <div className="space-y-4">
+              <label className="text-sm font-bold text-slate-700 flex items-center gap-2">📸 Unsplash Access Key</label>
+              <div className="relative group">
+                <input type={showUnsplashKey ? "text" : "password"} value={unsplashKey} onChange={(e) => { setUnsplashKey(e.target.value); localStorage.setItem('unsplash_key', e.target.value); }} className="w-full p-4 pr-12 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:outline-none transition-all font-mono text-sm" placeholder="Unsplash 키를 입력하세요" />
+                <button type="button" onClick={() => setShowUnsplashKey(!showUnsplashKey)} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">{showUnsplashKey ? "👁️" : "👁️‍🗨️"}</button>
+              </div>
+            </div>
+            <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-3 text-left">
+              <h3 className="text-sm font-black text-indigo-600 uppercase tracking-wider">💾 코다리 백업 관리</h3>
+              <button onClick={handleDownloadBackup} className="w-full py-3 bg-white hover:bg-indigo-100 text-indigo-600 rounded-xl font-bold text-sm shadow-sm border border-indigo-200 transition-all">📂 현재 버전 즉시 백업(다운로드)</button>
+            </div>
             <div className="pt-4 border-t border-slate-100">
               <button onClick={() => { localStorage.setItem('gemini_api_key', apiKey); setIsSettingsOpen(false); triggerToast('대표님, 설정이 저장되었습니다! 🫡'); }} className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-lg shadow-xl transition-all">설정 저장 및 적용</button>
             </div>
@@ -1721,131 +1791,123 @@ ${truncatedTranscript}
         </div>
       )}
 
-      {isKeywordFishingOpen && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-start md:items-center justify-center z-[100] p-2 md:p-4 overflow-y-auto pt-4 md:pt-0">
-          <div className="bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-4xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto">
+      {isTopicLabOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-start md:items-center justify-center z-[100] p-2 md:p-4 overflow-y-auto pt-4 md:pt-0">
+          <div className="bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto">
             <div className="flex justify-between items-center mb-8">
               <div className="space-y-1">
                 <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                  🎣 키워드 낚시왕 <span className="text-sm font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full uppercase tracking-widest">Radar</span>
+                  💡 소재 연구소 <span className="text-sm font-bold bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest">Lab</span>
                 </h2>
-                <p className="text-sm text-slate-500 font-medium">AIO(AI Overview) 시대를 돌파할 나만의 황금 어장을 탐색하세요.</p>
+                <p className="text-sm text-slate-400 font-medium">조회수가 터지는 황금 키워드를 발굴하세요.</p>
               </div>
-              <button onClick={() => setIsKeywordFishingOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
+              <button onClick={() => setIsTopicLabOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
             </div>
 
             <div className="space-y-8">
-              {/* 컨트롤 패널 */}
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col md:flex-row gap-6 items-center justify-between">
-                <div className="w-full md:w-auto space-y-3">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">분석 카테고리</label>
-                  <div className="flex flex-wrap gap-2">
-                    {['🏛️ 정부정책', '💻 IT/테크', '💰 경제/재테크', '💪 건강/운동', '✈️ 여행/생활'].map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setFishingCategory(cat)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                          fishingCategory === cat ? 'bg-white text-indigo-600 shadow-md ring-2 ring-indigo-500/20' : 'bg-transparent text-slate-500 hover:bg-slate-200/50'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="w-full md:w-auto space-y-3">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">타임슬라이스</label>
-                  <div className="flex bg-slate-200 p-1 rounded-2xl">
-                    {['실시간', '이번 달', '연간'].map(ts => (
-                      <button
-                        key={ts}
-                        onClick={() => setFishingTimeSlice(ts)}
-                        className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${
-                          fishingTimeSlice === ts ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                        }`}
-                      >
-                        {ts === '실시간' ? '⚡ ' : ts === '이번 달' ? '📅 ' : '🌟 '}{ts}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <button 
-                  onClick={runKeywordFishing}
-                  disabled={isFishingLoading}
-                  className="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
-                >
-                  {isFishingLoading ? '🔄 탐색 중...' : '🎣 레이더 가동'}
-                </button>
+              {/* 카테고리 탭 네비게이션 */}
+              <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-3xl">
+                {topicDatabase.categories.map((cat, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setSelectedCategory(cat.name); setDynamicTopics(null); }}
+                    className={`px-5 py-3 rounded-2xl font-black text-xs transition-all ${
+                      selectedCategory === cat.name 
+                      ? 'bg-white text-indigo-600 shadow-md scale-105' 
+                      : 'text-slate-500 hover:text-indigo-600 hover:bg-white/50'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
               </div>
 
-              {/* 결과 보드 */}
-              <div className="bg-slate-900 rounded-[30px] p-6 shadow-2xl border border-slate-800 min-h-[300px]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                  <h3 className="text-white font-black">AIO 침투지수 분석 보드</h3>
-                  <div className="ml-auto flex gap-3 text-[10px] font-bold">
-                    <span className="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-md">🟢 침투 가능 (0~39)</span>
-                    <span className="bg-amber-500/20 text-amber-400 px-2 py-1 rounded-md">🟡 경쟁 치열 (40~69)</span>
-                    <span className="bg-red-500/20 text-red-400 px-2 py-1 rounded-md">🔴 진입 금지 (70~100)</span>
+              {/* 4대 전략 대시보드 그리드 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 1. 실시간 트렌드 카드 */}
+                <div className="bg-slate-900 rounded-[30px] p-6 shadow-xl border border-white/10 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-white font-black text-sm flex items-center gap-2">
+                      ⚡ 실시간 주제
+                      <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                    </h3>
+                    <button 
+                      onClick={refreshLiveTrends}
+                      disabled={isLiveLoading}
+                      className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                    >
+                      {isLiveLoading ? '분석 중...' : '새로고침 🔄'}
+                    </button>
+                  </div>
+                  <div className="space-y-2 min-h-[150px] flex flex-col justify-center">
+                    {dynamicTopics ? (
+                      dynamicTopics.map((t, i) => (
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 truncate">
+                          {i+1}. {t}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="text-center space-y-3">
+                        <p className="text-slate-500 text-xs font-bold">지금 가장 핫한 주제는?</p>
+                        <button onClick={refreshLiveTrends} className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black shadow-lg shadow-indigo-900/40 active:scale-95">실시간 분석 시작 🚀</button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {isFishingLoading ? (
-                  <div className="flex flex-col items-center justify-center h-48 space-y-4">
-                    <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-                    <p className="text-indigo-400 font-bold animate-pulse">심해의 트렌드를 스캔하고 있습니다...</p>
+                {/* 2. 이번 달 주제 카드 */}
+                <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                      🗓️ 이번 달 주제
+                      <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Monthly</span>
+                    </h3>
+                    <button onClick={() => refreshStaticSection(selectedCategory, 'monthly')} className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors">새로고침 🔄</button>
                   </div>
-                ) : fishingResults.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                    {fishingResults.map((item, idx) => {
-                      const score = parseInt(item.aio_index);
-                      const isGreen = score < 40;
-                      const isYellow = score >= 40 && score < 70;
-                      const isRed = score >= 70;
-                      
-                      const colorClass = isGreen ? 'border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10' : 
-                                         isYellow ? 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10' : 
-                                         'border-red-500/30 bg-red-500/5 hover:bg-red-500/10 opacity-70 cursor-not-allowed';
-                      
-                      const badgeClass = isGreen ? 'bg-emerald-500 text-white' : 
-                                         isYellow ? 'bg-amber-500 text-white' : 
-                                         'bg-red-500 text-white';
+                  <div className="space-y-2">
+                    {(displayedStaticTopics[`${selectedCategory}_monthly`] || []).map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-                      return (
-                        <button 
-                          key={idx} 
-                          onClick={() => !isRed && handleSelectTopic(item.keyword)}
-                          disabled={isRed}
-                          className={`w-full text-left p-4 rounded-2xl border transition-all ${colorClass} group`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className={`font-black text-sm pr-4 ${isRed ? 'text-slate-400 line-through' : 'text-slate-200 group-hover:text-white transition-colors'}`}>
-                              {item.keyword}
-                            </h4>
-                            <span className={`shrink-0 text-[10px] font-black px-2 py-0.5 rounded-md ${badgeClass}`}>
-                              AIO {score}
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
-                            {item.reason}
-                          </p>
-                          {!isRed && (
-                            <div className="mt-3 text-[10px] font-black text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                              작성하기 ➔
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                {/* 3. 연간 주제 카드 */}
+                <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                      📅 연간 주제
+                      <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase">Annual</span>
+                    </h3>
+                    <button onClick={() => refreshStaticSection(selectedCategory, 'annual')} className="text-[10px] font-bold text-slate-400 hover:text-amber-600 transition-colors">새로고침 🔄</button>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-48 space-y-3 opacity-50">
-                    <span className="text-4xl">📡</span>
-                    <p className="text-slate-400 text-sm font-bold">레이더 가동 버튼을 눌러 어군을 탐지하세요.</p>
+                  <div className="space-y-2">
+                    {(displayedStaticTopics[`${selectedCategory}_annual`] || []).map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        {t}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
+
+                {/* 4. 황금 키워드 카드 */}
+                <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                      💎 황금 키워드
+                      <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Evergreen</span>
+                    </h3>
+                    <button onClick={() => refreshStaticSection(selectedCategory, 'gold')} className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">새로고침 🔄</button>
+                  </div>
+                  <div className="space-y-2">
+                    {(displayedStaticTopics[`${selectedCategory}_gold`] || []).map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
