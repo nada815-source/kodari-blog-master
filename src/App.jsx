@@ -68,6 +68,17 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V4.0.8',
+      date: '2026-05-10',
+      title: '📱 모바일 풀-뷰 탭 [Visibility]',
+      tags: ['UX최적화', '반응형그리드'],
+      details: [
+        '모바일 세로모드에서 버튼이 잘리던 문제를 해결하기 위해 3열 그리드 시스템 도입.',
+        '모든 어장(실시간/이달/연간/황금/전체)과 새로고침 버튼을 한눈에 보이도록 배치.',
+        'PC 환경에서는 기존의 슬림한 가로 한 줄 레이아웃 유지 (반응형 최적화).'
+      ]
+    },
+    {
       version: 'V4.0.7',
       date: '2026-05-10',
       title: '📱 모바일 레이더 정상화 [Full Sync]',
@@ -1244,7 +1255,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.7</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.8</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1258,7 +1269,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.0.7 [📱 모바일 레이더 정상화] 전 기종 완벽 호환 및 클린 네비게이션 적용 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.0.8 [📱 모바일 풀-뷰 탭] 세로모드에서도 모든 어장을 한눈에 포착 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1861,10 +1872,10 @@ ${truncatedTranscript}
                   </div>
                 </div>
 
-                {/* 🚀 포커스 탭 네비게이터 & 퀵 리프레시 (V4.0.3) */}
+                {/* 🚀 포커스 탭 & 퀵 리프레시 그리드 (V4.0.8 반응형 최적화) */}
                 {Object.values(fishingResults).some(arr => arr.length > 0) && !isFishingLoading && (
-                  <div className="flex gap-2 mb-6 p-2 bg-slate-800/50 rounded-2xl border border-slate-700/30 items-center">
-                    <div className="flex gap-2 flex-1 overflow-x-auto no-scrollbar">
+                  <div className="mb-6 p-2 bg-slate-800/50 rounded-2xl border border-slate-700/30">
+                    <div className="grid grid-cols-3 md:flex md:gap-2 gap-2">
                       {[
                         { id: 'realTime', title: '실시간', icon: '⚡' },
                         { id: 'monthly', title: '이달', icon: '📅' },
@@ -1875,23 +1886,25 @@ ${truncatedTranscript}
                         <button
                           key={nav.id}
                           onClick={() => setActiveFishingTab(nav.id)}
-                          className={`min-w-[70px] py-2.5 px-3 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
+                          className={`py-3 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
                             activeFishingTab === nav.id 
                               ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40' 
                               : 'bg-slate-700/40 text-slate-400 hover:bg-slate-700/60'
                           }`}
                         >
-                          <span>{nav.icon}</span> {nav.title}
+                          <span className="text-sm">{nav.icon}</span> {nav.title}
                         </button>
                       ))}
+                      {/* 새로고침 버튼을 그리드 마지막 칸으로 통합 */}
+                      <button
+                        onClick={runKeywordFishing}
+                        className="py-3 px-2 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-95 group"
+                        title="즉시 재탐색"
+                      >
+                        <span className="text-sm group-hover:rotate-180 transition-transform duration-500">🔄</span>
+                        <span className="text-[11px] font-black md:hidden">새로고침</span>
+                      </button>
                     </div>
-                    <button
-                      onClick={runKeywordFishing}
-                      className="shrink-0 w-10 h-10 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-xl transition-all flex items-center justify-center group"
-                      title="즉시 재탐색"
-                    >
-                      <span className="text-lg group-hover:rotate-180 transition-transform duration-500">🔄</span>
-                    </button>
                   </div>
                 )}
 
