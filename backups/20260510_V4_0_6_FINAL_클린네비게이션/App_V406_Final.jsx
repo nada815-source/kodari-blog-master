@@ -68,17 +68,6 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V4.0.7',
-      date: '2026-05-10',
-      title: '📱 모바일 레이더 정상화 [Full Sync]',
-      tags: ['모바일최적화', '버그픽스'],
-      details: [
-        '모바일 화면의 구형 [소재 연구소] 버튼을 최신 [키워드 낚시왕] 레이더로 전면 교체.',
-        '끊어져 있던 모바일 버튼의 이벤트 핸들러를 최신 낚시 엔진 모달과 재연결.',
-        '기존 버전(V3.8.1, V3.9.0)부터 이어진 모바일 작동 불능 현상 완벽 해결.'
-      ]
-    },
-    {
       version: 'V4.0.6',
       date: '2026-05-10',
       title: '💎 클린 네비게이션 시스템',
@@ -1244,7 +1233,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.7</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.0.6</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1258,7 +1247,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.0.7 [📱 모바일 레이더 정상화] 전 기종 완벽 호환 및 클린 네비게이션 적용 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.0.6 [💎 클린 네비게이션] 중복 요소 제거 및 직관적 인터페이스 최적화 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1272,10 +1261,10 @@ ${truncatedTranscript}
                 </div>
               </div>
               <button 
-                onClick={() => setIsKeywordFishingOpen(true)}
+                onClick={() => setIsTopicLabOpen(true)}
                 className="md:hidden px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-[11px] border-2 border-indigo-100 shadow-sm flex items-center gap-1 active:scale-95"
               >
-                <span>🎣 키워드 낚시왕</span>
+                <span>💡 소재 연구소</span>
               </button>
             </div>
             <div className="flex gap-3">
