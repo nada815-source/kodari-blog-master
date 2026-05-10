@@ -906,7 +906,11 @@ EN: 영어검색어3 | KO: 한글설명3
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: combinedPrompt }] }],
-          tools: [{ google_search: {} }] 
+          tools: [{ google_search: {} }],
+          generationConfig: {
+            maxOutputTokens: 8192,
+            temperature: 0.7
+          }
         })
       });
 
