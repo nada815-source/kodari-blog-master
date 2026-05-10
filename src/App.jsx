@@ -860,24 +860,46 @@ ${truncatedTranscript}
 4. **JSON 및 말투 가이드:**
    - 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 세련된 이모지를 적절히 섞어줘.
 
-결과는 반드시 아래의 JSON 형식으로만 답변하고, JSON 외의 어떤 설명이나 사족도 절대 붙이지 마:
-{
-  "image_queries": [ {"en": "...", "ko": "..." }, ... ],
-  "section_prompts": [
-    {
-      "title": "소제목",
-      "main_title": "메인 제목 (한글)",
-      "sub_copy": "보조 문구 (한글)",
-      "prompt": "상세 영어 프롬프트"
-    },
-    ... (총 4개 생성)
-  ],
-  "naver": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
-  "tistory": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
-  "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
-}
+결과는 반드시 아래의 XML 태그 형식을 엄격히 지켜서 답변해:
 
-[필독: 해시태그는 '#'을 붙여 한 줄로 나열하고, 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
+<image_queries>
+EN: 영어검색어1 | KO: 한글설명1
+EN: 영어검색어2 | KO: 한글설명2
+EN: 영어검색어3 | KO: 한글설명3
+</image_queries>
+
+<section_prompts>
+<section>
+<title>소제목1</title>
+<main_title>메인 제목1</main_title>
+<sub_copy>보조 문구1</sub_copy>
+<prompt>영어 프롬프트1</prompt>
+</section>
+... (총 4개 생성)
+</section_prompts>
+
+<naver>
+<title>네이버 제목</title>
+<content>네이버 본문</content>
+<tags>#태그1 #태그2</tags>
+<links>링크이름1 | url1</links>
+</naver>
+
+<tistory>
+<title>티스토리 제목</title>
+<content>티스토리 본문</content>
+<tags>#태그1 #태그2</tags>
+<links>링크이름1 | url1</links>
+</tistory>
+
+<wordpress>
+<title>워드프레스 제목</title>
+<content>워드프레스 본문</content>
+<tags>#태그1 #태그2</tags>
+<links>링크이름1 | url1</links>
+</wordpress>
+
+[필독: 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -905,20 +927,63 @@ ${truncatedTranscript}
 
       let responseTextRaw = data.candidates[0].content.parts[0].text;
       
-      // [철벽 파싱 2.0] JSON 블록 정밀 추출 및 제어 문자 제거
-      let responseText = "";
-      const jsonMatch = responseTextRaw.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        responseText = jsonMatch[0];
-      } else {
-        responseText = responseTextRaw.replace(/```json/gi, '').replace(/```/gi, '').trim();
-      }
-      
-      // JSON 내부의 유효하지 않은 제어 문자(줄바꿈 등) 정제
-      const cleanedJson = responseText.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
-      const parsedData = JSON.parse(cleanedJson);
-      const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
+      // [무적의 태그 파싱 엔진 1.0] 정규표현식 기반 XML 데이터 추출
+      const extractTag = (tag, text) => {
+        const regex = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, 'i');
+        const match = text.match(regex);
+        return match ? match[1].trim() : '';
+      };
 
+      const parseSectionPrompts = (text) => {
+        const sections = text.match(/<section>([\s\S]*?)<\/section>/gi) || [];
+        return sections.map(s => ({
+          title: extractTag('title', s),
+          main_title: extractTag('main_title', s),
+          sub_copy: extractTag('sub_copy', s),
+          prompt: extractTag('prompt', s)
+        }));
+      };
+
+      const parseLinks = (text) => {
+        return (text || '').split('\n').filter(l => l.includes('|')).map(l => {
+          const [name, url] = l.split('|').map(s => s.trim());
+          return { name, url };
+        });
+      };
+
+      const naverRaw = extractTag('naver', responseTextRaw);
+      const tistoryRaw = extractTag('tistory', responseTextRaw);
+      const wordpressRaw = extractTag('wordpress', responseTextRaw);
+      const imageQueriesRaw = extractTag('image_queries', responseTextRaw);
+      const sectionPromptsRaw = extractTag('section_prompts', responseTextRaw);
+
+      const parsedData = {
+        image_queries: (imageQueriesRaw || '').split('\n').filter(l => l.includes('|')).map(l => {
+          const [en, ko] = l.replace(/^EN:\s*/i, '').split('|').map(s => s.replace(/^KO:\s*/i, '').trim());
+          return { en, ko };
+        }),
+        section_prompts: parseSectionPrompts(sectionPromptsRaw),
+        naver: {
+          title: extractTag('title', naverRaw),
+          content: extractTag('content', naverRaw),
+          tags: extractTag('tags', naverRaw),
+          official_links: parseLinks(extractTag('links', naverRaw))
+        },
+        tistory: {
+          title: extractTag('title', tistoryRaw),
+          content: extractTag('content', tistoryRaw),
+          tags: extractTag('tags', tistoryRaw),
+          official_links: parseLinks(extractTag('links', tistoryRaw))
+        },
+        wordpress: {
+          title: extractTag('title', wordpressRaw),
+          content: extractTag('content', wordpressRaw),
+          tags: extractTag('tags', wordpressRaw),
+          official_links: parseLinks(extractTag('links', wordpressRaw))
+        }
+      };
+
+      const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
       let finalImages = ['', '', ''];
 
       const koDescs = (parsedData.image_queries || []).map(q => q.ko);
@@ -927,9 +992,9 @@ ${truncatedTranscript}
       setResults(prev => ({
         ...prev,
         [inputMode]: {
-          naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
-          tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
-          wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
+          naver: parsedData.naver.title ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
+          tistory: parsedData.tistory.title ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
+          wordpress: parsedData.wordpress.title ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
         }
       }));
 
@@ -1268,7 +1333,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.1.2</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.0</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1282,7 +1347,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.1.2 [⚖️ Flash 황금밸런스] 구글 검색 화력과 안정적인 데이터 추출의 완벽한 조화 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.2.0 [🛡️ 무적의 태그 엔진] 파싱 오류 0% 도전! 구글 검색 화력 100% 개방 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
