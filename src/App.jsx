@@ -101,6 +101,16 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.7.8.3',
+      date: '2026-05-10',
+      title: '🕒 타임 스탬프 엔진: 실시간 시간 인식',
+      tags: ['기능강화', '지능화'],
+      details: [
+        'AI가 글 작성 시점(오늘 날짜/요일)을 스스로 인식하도록 타임 엔진을 장착했습니다.',
+        '과거(2024, 2025)의 낡은 자료가 아닌 현재(2026)의 최신 정책과 뉴스를 우선 정찰하도록 검색 지침을 강화했습니다.'
+      ]
+    },
+    {
       version: 'V3.7.8.2',
       date: '2026-05-10',
       title: '⚓ 레드 스크롤바 활성화 및 물량 증강',
@@ -700,7 +710,12 @@ ${truncatedTranscript}
         ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
         : "스타일: 반드시 'Modern Isometric Digital Illustration' 스타일로 묘사해. (Keywords: Professional infographic layout, flat design with 3D depth, organized visual information, clean lines, bright and optimistic palette)";
 
-      const combinedPrompt = `${finalTopicContext}
+      const todayDate = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+      
+      const combinedPrompt = `[현재 시각 동기화]: 오늘은 **${todayDate}**입니다. 
+당신은 현재 시점의 가장 생생한 정보를 전달해야 하는 임무를 띠고 있습니다. 2024년이나 2025년의 낡은 정책이나 과거 데이터가 아닌, 반드시 **2026년 현재**의 최신 정책, 시행령, 뉴스 데이터를 구글 검색을 통해 우선적으로 정찰하고 반영하십시오.
+
+${finalTopicContext}
 이미지 스타일: ${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'}
 
 [필독: 생성 지침 - 고밀도 콤팩트 리포트 스타일]
@@ -1149,7 +1164,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.2</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.3</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1163,7 +1178,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.2 [⚓ 항해일지 복구] 키워드 대량 투입(12개) 및 레드 스크롤 엔진 활성화 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.3 [🕒 타임 스탬프] 작성 시점 실시간 인식 및 최신 정보(2026년) 강제 정찰 엔진 장착 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
