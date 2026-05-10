@@ -19,7 +19,41 @@ const Image = ({ size = 16, className = "" }) => (
   </svg>
 );
 
-// 키워드 낚시왕 V3.8.0 - 동적 실시간 트렌드 분석기로 교체됨 (기존 topicDatabase 삭제됨)
+// 소재 연구소 V3.5 마스터 데이터베이스 (컴포넌트 외부로 이동하여 안정화)
+const topicDatabase = {
+  categories: [
+    { 
+      name: '🏛️ 정부정책', 
+      monthly: ['청년도약계좌 신청', '지자체별 지원금 소식', '부모급여 및 아동수당', '에너지 바우처 혜택', '임대주택 입주 공고', '문화누리카드 신청', '청년 월세 지원', '이사 비용 지원 사업', '내 집 마련 디딤돌 대출', '버팀목 전세 자금'],
+      annual: ['정부 예산안 발표', '최저임금 결정', '세법 개정안 핵심 정리', '대선/총선 관련 공약', '병사 월급 인상 소식', '건강보험료 개편안', '노령연금 수급 자격', '기초수급자 혜택 정리', '근로장려금 지급 시기', '자녀장려금 자격 확인'],
+      gold: ['실업급여 수급 자격', '국민내일배움카드 활용', '주거급여 신청 방법', '소상공인 지원 정책', '국가 장학금 신청법', '경기 컬처패스 활용', 'K-패스 환급 제도', '육아휴직 급여 계산', '출산 장려금 지역별 정리', '긴급 복지 지원 제도']
+    },
+    { 
+      name: '💰 경제/재테크', 
+      monthly: ['5월 종합소득세 신고', '공모주 청약 일정', '반기별 예적금 특판', '근로장려금 신청', '가정의 달 절약법', '여름 휴가 적금 추천', '장마 대비 보험 점검', '하반기 증시 전망', '추석 상여금 활용법', '블랙프라이데이 소비전략'],
+      annual: ['매년 연말정산 대비', '연초 재테크 계획', '금리 변동 전망', '국세청 환급금 찾기', 'ISA 계좌 활용법', 'IRP 절세 전략', '배당주 투자 시기', '연간 가계부 결산', '부동산 공시지가 확인', '지방세 납부 기간'],
+      gold: ['주식 투자 입문 가이드', '부동산 청약 제도 해설', '앱테크 베스트 10', '가계부 다이어트 비법', '미국 주식 시작하기', '금 투자 방법', '비트코인 초보 가이드', '사회초년생 돈 모으기', '통장 쪼개기 기술', '노후 자금 준비법']
+    },
+    { 
+      name: '💪 건강/운동', 
+      monthly: ['환절기 면역력 강화', '여름 다이어트 식단', '황사/미세먼지 대처', '봄철 야외 운동 가이드', '여름철 식중독 예방', '휴가지 물놀이 안전', '무더위 온열질환 주의', '가을철 등산 주의사항', '겨울철 독감 예방', '실내 스트레칭 루틴'],
+      annual: ['무료 건강검진 대상', '계절별 보양식 총정리', '독감 예방접종 시기', '새해 금연 결심 지원', '연령별 필수 영양제', '대상포진 예방 접종', '겨울철 혈관 건강', '명절 증후군 극복', '비타민 D 부족 해결', '치아 스케일링 보험'],
+      gold: ['홈트레이닝 필수 장비', '영양제 과잉 섭취 주의', '스트레스 해소법 7가지', '수면의 질 높이는 법', '거북목 교정 스트레칭', '공복 유산소 효과', '간헐적 단식 방법', '물 많이 마시기 효과', '바른 자세 앉는 법', '명상 입문 가이드']
+    },
+    { 
+      name: '💻 IT/테크', 
+      monthly: ['갤럭시/아이폰 최신 루머', '유튜브 알고리즘 변화', '신규 게임 출시 일정', '윈도우 보안 업데이트', '맥북 신형 리뷰', '유용한 크롬 확장프로그램', '갤럭시 워치 팁', '애플 워치 활용법', '카카오톡 숨은 기능', '인스타그램 릴스 만드는 법'],
+      annual: ['CES/MWC 주요 기술', '애플 WWDC 발표', '구글 I/O 신기술', '연말 가전 세일 정보', '블랙프라이데이 직구', '올해의 베스트 앱', 'IT 트렌드 전망', '신형 CPU/GPU 출시', '클라우드 서비스 비교', '최신 모니터 고르는 법'],
+      gold: ['최강의 업무용 툴 추천', '스마트폰 사진 잘 찍는 법', 'PC 속도 빨라지는 법', 'AI 챗봇 활용 꿀팁', '엑셀 필수 단축키', '유튜브 프리미엄 우회', '넷플릭스 요금제 팁', '클라우드 스토리지 비교', '협업 툴 노션 가이드', '아이패드 공부법 추천']
+    },
+    { 
+      name: '✈️ 여행/생활', 
+      monthly: ['5월 가정의 달 나들이', '여름 휴가 항공권 예약', '벚꽃/단풍 지도', '캠핑 명소 추천', '국내 풀빌라 순위', '여름 바다 축제', '겨울 온천 여행', '스키장 개장 정보', '글램핑장 베스트 5', '지역별 축제 일정'],
+      annual: ['해외여행 국가별 성수기', '전국 축제 총정리', '연간 연휴 황금 일정', '여권 재발급 팁', '항공 마일리지 적립법', '면세점 쇼핑 리스트', '국제면허증 발급', '한 달 살기 도시 추천', '유럽 기차 패스 가이드', '비자 발급 주의사항'],
+      gold: ['여행 짐 싸기 체크리스트', '가성비 숙소 예약법', '제주도 한 달 살기 가이드', '현지인 맛집 찾는 법', '비행기 좌석 꿀팁', '에어비앤비 할인법', '자취생 필수 가전', '미니멀 라이프 입문', '인생 사진 명소 추천', '해외 결제 카드 추천']
+    }
+  ]
+};
 
 function App() {
   const [inputMode, setInputMode] = useState('topic'); // 'topic' or 'youtube'
@@ -56,172 +90,16 @@ function App() {
   const [showToast, setShowToast] = useState(false);
   const [customImageKeyword, setCustomImageKeyword] = useState('');
   const [isImageLoading, setIsImageLoading] = useState(false);
-  const [isKeywordFishingOpen, setIsKeywordFishingOpen] = useState(false);
-  const [fishingCategory, setFishingCategory] = useState('🏛️ 정부정책');
-  const [fishingResults, setFishingResults] = useState({ realTime: [], monthly: [], annual: [], evergreen: [] });
-  const [isFishingLoading, setIsFishingLoading] = useState(false);
-  const [activeFishingTab, setActiveFishingTab] = useState('all');
+  const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
+  const [labFilter, setLabFilter] = useState('all');
+  const [isLiveLoading, setIsLiveLoading] = useState(false);
+  const [dynamicTopics, setDynamicTopics] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
+  const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
   const [isFactCheckOpen, setIsFactCheckOpen] = useState(false);
-  const [experienceQuote, setExperienceQuote] = useState('');
-  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
 
   const patchNotes = [
-    {
-      version: 'V4.0.9',
-      date: '2026-05-10',
-      title: '💎 카드 가독성 극대화 [Readability]',
-      tags: ['레이아웃패치', '모바일최적화'],
-      details: [
-        'AIO 지수 라벨을 제목 상단으로 이동시켜 가로 공간 대폭 확보.',
-        '제목의 말줄임표(truncate)를 제거하고 줄바꿈을 허용하여 주제가 끝까지 보이도록 수정.',
-        '이동 화살표 버튼의 크기를 최적화(w-10)하여 제목 영역과의 충돌 방지.'
-      ]
-    },
-    {
-      version: 'V4.0.8',
-      date: '2026-05-10',
-      title: '📱 모바일 풀-뷰 탭 [Visibility]',
-      tags: ['UX최적화', '반응형그리드'],
-      details: [
-        '모바일 세로모드에서 버튼이 잘리던 문제를 해결하기 위해 3열 그리드 시스템 도입.',
-        '모든 어장(실시간/이달/연간/황금/전체)과 새로고침 버튼을 한눈에 보이도록 배치.',
-        'PC 환경에서는 기존의 슬림한 가로 한 줄 레이아웃 유지 (반응형 최적화).'
-      ]
-    },
-    {
-      version: 'V4.0.7',
-      date: '2026-05-10',
-      title: '📱 모바일 레이더 정상화 [Full Sync]',
-      tags: ['모바일최적화', '버그픽스'],
-      details: [
-        '모바일 화면의 구형 [소재 연구소] 버튼을 최신 [키워드 낚시왕] 레이더로 전면 교체.',
-        '끊어져 있던 모바일 버튼의 이벤트 핸들러를 최신 낚시 엔진 모달과 재연결.',
-        '기존 버전(V3.8.1, V3.9.0)부터 이어진 모바일 작동 불능 현상 완벽 해결.'
-      ]
-    },
-    {
-      version: 'V4.0.6',
-      date: '2026-05-10',
-      title: '💎 클린 네비게이션 시스템',
-      tags: ['UI다이어트', '직관성강화'],
-      details: [
-        '중복되었던 상단 [타임슬라이스] 영역을 삭제하여 화면 공간 확보 및 혼선 방지.',
-        '레이더 가동 버튼을 카테고리 선택 옆으로 배치하여 동선 최적화.',
-        '하단의 포커스 탭이 모든 시간대 제어를 전담하도록 인터페이스 구조 단일화.'
-      ]
-    },
-    {
-      version: 'V4.0.5',
-      date: '2026-05-10',
-      title: '💎 심리스 표적 낚시 엔진',
-      tags: ['UX최적화', '중단없는데이터'],
-      details: [
-        '새로고침 시 기존 데이터를 유지하며 백그라운드에서 교체하는 [심리스 렌더링] 도입.',
-        '로딩 중에는 화면의 투명도를 조절하여 탐색 중임을 시각적으로 알림.',
-        '표적 낚시 매칭 로직 보강으로 개별 구역 최신화 안정성 대폭 강화.'
-      ]
-    },
-    {
-      version: 'V4.0.4',
-      date: '2026-05-10',
-      title: '💎 표적 낚시 시스템 & 프리미엄 가독성',
-      tags: ['정밀타격', '가독성끝판왕'],
-      details: [
-        '현재 보고 있는 탭의 데이터만 핀포인트로 업데이트하는 [표적 낚시 엔진] 탑재.',
-        '전체보기를 포함한 모든 모드에 P-8 패딩과 text-xl 대형 폰트 기본 적용.',
-        '탭 순서 재배치: [실시간-이달-연간-황금-전체] 순으로 전략적 어장 구성.'
-      ]
-    },
-    {
-      version: 'V4.0.3',
-      date: '2026-05-10',
-      title: '💎 딥다이브 & 퀵 리프레시 엔진',
-      tags: ['가독성최적화', '기동성강화'],
-      details: [
-        '개별 탭 선택 시 카드 크기와 폰트를 자동으로 키우는 [딥다이브 모드] 탑재.',
-        '탭 바 우측에 즉시 재탐색이 가능한 [🔄 새로고침] 버튼 추가로 동선 최소화.',
-        '정밀 분석을 위한 최적의 패딩과 타이포그래피 스케일 적용.'
-      ]
-    },
-    {
-      version: 'V4.0.2',
-      date: '2026-05-10',
-      title: '💎 포커스 탭 엔진 [Deep Focus Mode]',
-      tags: ['인터페이스혁명', '집중력강화'],
-      details: [
-        '필요한 어장만 선별해서 보여주는 [포커스 탭] 시스템 도입으로 분석 효율성 극대화.',
-        '전체보기/실시간/이달/연간/황금 탭 전환 시 불필요한 데이터를 숨겨 가독성 한계 돌파.',
-        '활성 탭 하이라이트 기능을 통해 현재 탐색 중인 어장을 직관적으로 파악 가능.'
-      ]
-    },
-    {
-      version: 'V4.0.1',
-      date: '2026-05-10',
-      title: '🚀 가독성 끝판왕 [순간이동 네비게이터]',
-      tags: ['UX최적화', '가독성혁명'],
-      details: [
-        '복잡했던 4분할 격자를 시원한 [버티컬 피드] 구조로 개편하여 텍스트 가독성 대폭 향상.',
-        '원하는 구역으로 즉시 이동하는 [순간이동 네비게이터] 버튼 및 스무스 스크롤 기능 탑재.',
-        '스티키 헤더(Sticky Header) 적용으로 스크롤 중에도 현재 섹션 정보를 상단에 고정.'
-      ]
-    },
-    {
-      version: 'V4.0.0',
-      date: '2026-05-10',
-      title: '💎 하이브리드 쿼드런트 엔진 [소재연구소 x 낚시왕]',
-      tags: ['대규모패치', 'UI혁명'],
-      details: [
-        '소재 연구소의 [4분할 그리드]와 키워드 낚시왕의 [AIO 데이터 분석]을 하나로 합친 완전체 엔진 탑재.',
-        '실시간/이번달/연간/황금 키워드를 한 번에 탐지하며, 각 구역에 독립적인 [슬림 스크롤 바]를 적용하여 무한 탐색 가능.',
-        '정부 정책 데이터 추출 로직을 하이브리드 구조에 맞게 최적화하여 4개 구역 모두에서 정책 월척을 낚아옵니다.'
-      ]
-    },
-    {
-      version: 'V3.9.0',
-      date: '2026-05-09',
-      title: '🏛️ 정부 정책 자동 난시 엔진 탑재',
-      tags: ['실시간', 'AI검색'],
-      details: [
-        '키워드 낙시왕 레이더에서 🏛️ 정부정책 선택 시, AI가 2026년 최신 정부 지원 사업을 자동 분석합니다.',
-        '정책 키워드에는 낙은 AIO 침투지수를 자동 부여하여 블루오션 작성 기회를 직관적으로 판별합니다.',
-        'AI 응답 안정성 및 오류 진단 로직을 전면 개선하여 레이더 무결점 가동을 보장합니다.'
-      ]
-    },
-    {
-      version: 'V3.8.1',
-      date: '2026-05-09',
-      title: '💡 체감 후기 추천기 탑재',
-      tags: ['신기능', 'SEO최적화'],
-      details: [
-        'AIO 시대를 돌파할 E-E-A-T 확보용 [코다리의 체감 후기 한 줄 추천] 박스가 추가되었습니다.',
-        '글 생성 시 구글 트렌드를 반영한 자연스러운 구어체 감상평 1~2줄을 자동 생성합니다.',
-        '원하는 뉘앙스가 나올 때까지 무한 새로고침 및 원클릭 복사가 가능합니다.'
-      ]
-    },
-    {
-      version: 'V3.8.0',
-      date: '2026-05-09',
-      title: '🎣 키워드 낚시왕 레이더 탑재',
-      tags: ['신기능', 'AI분석'],
-      details: [
-        '구식 소재 연구소를 폐기하고 최첨단 트렌드 분석기인 [키워드 낚시왕] 레이더를 탑재했습니다.',
-        'AIO(AI Overview) 침투지수를 통해 트래픽을 독식할 수 있는 블루오션 키워드를 색상(초록/노랑/빨강)으로 직관적으로 판별합니다.',
-        '실시간, 이번 달, 연간 타임슬라이스 필터와 나노 단위 취향을 반영한 세부 키워드 발굴이 가능해졌습니다.'
-      ]
-    },
-    {
-      version: 'V3.7.8',
-      date: '2026-05-09',
-      title: '🗑️ KODARI 엔진 다이어트 (Unsplash 퇴출)',
-      tags: ['최적화', 'UI개편'],
-      details: [
-        '사용 빈도가 낮고 품질을 저하시키는 무료 이미지(Unsplash) 기능을 엔진에서 과감히 도려냈습니다.',
-        '본문 상단에 [🎨 AI 이미지 프롬프트 보기] 버튼을 거대하게 배치하여 고품질 이미지 생성 동선을 최적화했습니다.',
-        '로컬 개발용이었던 무용지물 [즉시 백업] 버튼을 설정창에서 제거하여 시스템을 가볍게 만들었습니다.',
-        'AI 이미지 스타일의 기본값을 세련된 [3D 일러스트]로 변경했습니다.'
-      ]
-    },
     {
       version: 'V3.7.7',
       date: '2026-05-09',
@@ -737,33 +615,6 @@ function App() {
   };
 
 
-  const generateExperienceQuote = async (targetTopic) => {
-    if (!targetTopic) return;
-    setIsQuoteLoading(true);
-    try {
-      const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
-      const prompt = `주제: "${targetTopic}"\n\n위 주제를 직접 겪은 일반인의 생생한 후기나 감상평을 블로그 본문 첫머리나 마지막에 바로 복사해서 쓸 수 있게 구어체로 딱 1~2줄만 작성해줘. 이모지도 1~2개 넣어줘. (예: 저도 어제 직접 해봤는데 생각보다 너무 편해서 깜짝 놀랐어요! 😲 진작 해볼 걸 그랬네요.)`;
-      const req = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8, maxOutputTokens: 100 }
-        })
-      });
-      const data = await req.json();
-      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        setExperienceQuote(data.candidates[0].content.parts[0].text.trim().replace(/^"|"$/g, ''));
-      }
-    } catch (err) {
-      console.error(err);
-      setExperienceQuote('추천 문구를 불러오지 못했습니다. 😢');
-    } finally {
-      setIsQuoteLoading(false);
-    }
-  };
-
   const generateContent = async () => {
     if (!isAuthenticated) {
       setIsAuthModalOpen(true);
@@ -813,7 +664,7 @@ ${truncatedTranscript}
 """`;
       }
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const styleGuide = visualStyle === 'photo' 
         ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
@@ -842,9 +693,8 @@ ${truncatedTranscript}
       8) **Safety**: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.**
 
 1. **[정밀 화력] 콤팩트한 정보 밀도 (V3.5.9 스타일 계승):** 
-   - 본문은 공백 제외 **약 1700자 내외의 가독성 좋은 분량**으로 작성해. 
+   - 본문은 공백 제외 **최소 1500자 이상의 풍성한 분량**으로 작성해. 
    - 불필요한 미사여구는 빼고, **'핵심 정보'와 '실전 팁'** 중심으로 밀도 높게 구성해.
-   - **[절대 금지]: ### 기호를 절대 사용하지 마.** 소제목은 오직 ## 또는 굵은 글씨와 이모지 조합으로만 구성해.
    - **[구조]**: 소제목에 번호를 붙이지 말고, ## 기호를 사용하여 깔끔한 제목 스타일로 구성해. 
 
 2. **가독성 극대화 및 [3중 하이브리드 강조 - 밀착 강조 규칙]:**
@@ -854,65 +704,38 @@ ${truncatedTranscript}
    - **[파랑강조]**: ++핵심단어/수치++
    - **[빨강주의]**: !!필독정보!!
 
-3. **[경고] 모든 플랫폼 표(Table) 삽입 필수 및 기호 절대 금지:**
-   - 네이버, 티스토리, 워드프레스 **모든 플랫폼 본문에 최소 1개 이상의 Markdown Table을 반드시 포함**해.
+3. **[경고] 표(Table) 내부 기호 절대 금지 (Zero-Symbol Policy):**
    - 모든 정보성 데이터는 **무조건 Markdown Table 형식**으로 시각화해. 
    - **[절대 엄금]: 표 내부에는 절대로 강조 기호(**, ==, ++, !!)를 사용하지 마라.** 순수한 텍스트만 입력해.
 
 4. **JSON 및 말투 가이드:**
    - 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 세련된 이모지를 적절히 섞어줘.
 
-결과는 반드시 아래의 XML 태그 형식을 엄격히 지켜서 답변해:
+결과는 반드시 아래의 JSON 형식으로만 답변해:
+{
+  "image_queries": [ {"en": "...", "ko": "..." }, ... ],
+  "section_prompts": [
+    {
+      "title": "소제목",
+      "main_title": "메인 제목 (한글)",
+      "sub_copy": "보조 문구 (한글)",
+      "prompt": "상세 영어 프롬프트"
+    },
+    ... (총 4개 생성)
+  ],
+  "naver": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
+  "tistory": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
+  "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
+}
 
-<image_queries>
-EN: 영어검색어1 | KO: 한글설명1
-EN: 영어검색어2 | KO: 한글설명2
-EN: 영어검색어3 | KO: 한글설명3
-</image_queries>
-
-<section_prompts>
-<section>
-<title>소제목1</title>
-<main_title>메인 제목1</main_title>
-<sub_copy>보조 문구1</sub_copy>
-<prompt>영어 프롬프트1</prompt>
-</section>
-... (총 4개 생성)
-</section_prompts>
-
-<naver>
-<title>네이버 제목</title>
-<content>네이버 본문</content>
-<tags>#태그1 #태그2</tags>
-<links>링크이름1 | url1</links>
-</naver>
-
-<tistory>
-<title>티스토리 제목</title>
-<content>티스토리 본문</content>
-<tags>#태그1 #태그2</tags>
-<links>링크이름1 | url1</links>
-</tistory>
-
-<wordpress>
-<title>워드프레스 제목</title>
-<content>워드프레스 본문</content>
-<tags>#태그1 #태그2</tags>
-<links>링크이름1 | url1</links>
-</wordpress>
-
-[필독: 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
+[필독: 해시태그는 '#'을 붙여 한 줄로 나열하고, 워드프레스를 포함한 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: combinedPrompt }] }],
-          tools: [{ google_search: {} }],
-          generationConfig: {
-            maxOutputTokens: 8192,
-            temperature: 0.7
-          }
+          tools: [{ google_search: {} }] 
         })
       });
 
@@ -933,63 +756,18 @@ EN: 영어검색어3 | KO: 한글설명3
 
       let responseTextRaw = data.candidates[0].content.parts[0].text;
       
-      // [무적의 태그 파싱 엔진 1.0] 정규표현식 기반 XML 데이터 추출
-      const extractTag = (tag, text) => {
-        const regex = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, 'i');
-        const match = text.match(regex);
-        return match ? match[1].trim() : '';
-      };
+      // [철벽 파싱] JSON 블록만 정밀 추출
+      let responseText = "";
+      const jsonMatch = responseTextRaw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        responseText = jsonMatch[0];
+      } else {
+        responseText = responseTextRaw.replace(/```json/gi, '').replace(/```/gi, '').trim();
+      }
 
-      const parseSectionPrompts = (text) => {
-        const sections = text.match(/<section>([\s\S]*?)<\/section>/gi) || [];
-        return sections.map(s => ({
-          title: extractTag('title', s),
-          main_title: extractTag('main_title', s),
-          sub_copy: extractTag('sub_copy', s),
-          prompt: extractTag('prompt', s)
-        }));
-      };
-
-      const parseLinks = (text) => {
-        return (text || '').split('\n').filter(l => l.includes('|')).map(l => {
-          const [name, url] = l.split('|').map(s => s.trim());
-          return { name, url };
-        });
-      };
-
-      const naverRaw = extractTag('naver', responseTextRaw);
-      const tistoryRaw = extractTag('tistory', responseTextRaw);
-      const wordpressRaw = extractTag('wordpress', responseTextRaw);
-      const imageQueriesRaw = extractTag('image_queries', responseTextRaw);
-      const sectionPromptsRaw = extractTag('section_prompts', responseTextRaw);
-
-      const parsedData = {
-        image_queries: (imageQueriesRaw || '').split('\n').filter(l => l.includes('|')).map(l => {
-          const [en, ko] = l.replace(/^EN:\s*/i, '').split('|').map(s => s.replace(/^KO:\s*/i, '').trim());
-          return { en, ko };
-        }),
-        section_prompts: parseSectionPrompts(sectionPromptsRaw),
-        naver: {
-          title: extractTag('title', naverRaw),
-          content: extractTag('content', naverRaw),
-          tags: extractTag('tags', naverRaw),
-          official_links: parseLinks(extractTag('links', naverRaw))
-        },
-        tistory: {
-          title: extractTag('title', tistoryRaw),
-          content: extractTag('content', tistoryRaw),
-          tags: extractTag('tags', tistoryRaw),
-          official_links: parseLinks(extractTag('links', tistoryRaw))
-        },
-        wordpress: {
-          title: extractTag('title', wordpressRaw),
-          content: extractTag('content', wordpressRaw),
-          tags: extractTag('tags', wordpressRaw),
-          official_links: parseLinks(extractTag('links', wordpressRaw))
-        }
-      };
-
+      const parsedData = JSON.parse(responseText);
       const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
+
       let finalImages = ['', '', ''];
 
       const koDescs = (parsedData.image_queries || []).map(q => q.ko);
@@ -998,14 +776,11 @@ EN: 영어검색어3 | KO: 한글설명3
       setResults(prev => ({
         ...prev,
         [inputMode]: {
-          naver: parsedData.naver.title ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
-          tistory: parsedData.tistory.title ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
-          wordpress: parsedData.wordpress.title ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
+          naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
+          tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
+          wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
         }
       }));
-
-      // 체감 후기 추천 자동 생성
-      generateExperienceQuote(inputMode === 'topic' ? topic : "유튜브 영상 요약");
 
     } catch (err) {
       console.error(err);
@@ -1020,7 +795,7 @@ EN: 영어검색어3 | KO: 한글설명3
     setLoading(true);
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
       
@@ -1148,10 +923,9 @@ EN: 영어검색어3 | KO: 한글설명3
   };
 
   const handleSelectTopic = (selectedTopic) => {
-    setInputMode('topic');
     setTopic(selectedTopic);
-    setIsKeywordFishingOpen(false);
-    triggerToast(`🎣 '${selectedTopic}' 낚시 성공! 월척입니다! ✨`);
+    setIsTopicLabOpen(false);
+    triggerToast(`💡 '${selectedTopic}' 주제가 선택되었습니다! ✨`);
   };
 
   const handleSubCopyChange = (idx, newCopy) => {
@@ -1164,49 +938,28 @@ EN: 영어검색어3 | KO: 한글설명3
     });
   };
 
-  const runKeywordFishing = async () => {
+  const refreshLiveTrends = async () => {
     const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
     if (!finalKey) {
-      triggerToast('⚙️ API 키를 설정해야 낚시 레이더를 가동할 수 있습니다!');
+      triggerToast('⚙️ API 키를 설정해야 실시간 분석이 가능합니다!');
       return;
     }
 
-    setIsFishingLoading(true);
-    const target = activeFishingTab; // 현재 탭 인식
-    triggerToast(target === 'all' ? '🔄 4대 어장 전체 스캔 중...' : `🔄 [${target}] 구역 정밀 타격 중...`);
+    setIsLiveLoading(true);
+    triggerToast('🔄 AI가 현재 대한민국 트렌드를 분석 중입니다...');
 
     try {
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
+      const prompt = `당신은 대한민국의 최신 트렌드를 분석하는 일타 강사입니다. 
+현재 선택된 카테고리 [${selectedCategory}]에 대하여, 오늘 날짜(${new Date().toLocaleDateString()}) 기준 블로그 조회수가 폭발할 만한 '실시간 핫이슈 주제' 5개를 추천하세요.
 
-      let prompt = `당신은 대한민국 최고의 SEO 전문가이자 데이터 분석가입니다.
-사용자가 선택한 카테고리: [${fishingCategory}]
-
-[구역 정의]
-1. realTime: 지금 이 순간 급상승 중인 핫이슈
-2. monthly: 이번 달 내내 조회수가 높을 트렌드
-3. annual: 매년 이맘때 반복되는 시즌/공고/이벤트
-4. evergreen: 시기와 상관없이 꾸준히 사랑받는 황금 키워드
-
-[정부정책 특화 지침]
-- 카테고리가 '🏛️ 정부정책'인 경우, 실제 2026년 정부 지원 사업명을 정확히 기재하세요.
-- aio_index는 10~25 사이(블루오션)로 부여하고 reason에는 [기한/지원금/대상]을 포함하세요.
-
-`;
-
-      if (target === 'all') {
-        prompt += `위 4가지 구역별로 각각 5~8개씩 발굴하여 아래 JSON 구조로 응답하세요.
-{
-  "realTime": [ { "keyword": "...", "aio_index": 20, "reason": "..." }, ... ],
-  "monthly": [ ... ],
-  "annual": [ ... ],
-  "evergreen": [ ... ]
-}`;
-      } else {
-        prompt += `현재 [${target}] 구역에 대해서만 월척 키워드 8~10개를 발굴하여 아래 JSON 구조로 응답하세요.
-{
-  "${target}": [ { "keyword": "...", "aio_index": 20, "reason": "..." }, ... ]
-}`;
-      }
+반드시 아래 형식을 엄수하여 소재만 나열하세요:
+[LIVE]
+주제1
+주제2
+주제3
+주제4
+주제5`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -1215,30 +968,52 @@ EN: 영어검색어3 | KO: 한글설명3
       });
       
       const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) throw new Error('AI 응답이 비어있습니다.');
+      const text = data.candidates[0].content.parts[0].text;
       
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsedResults = JSON.parse(jsonMatch[0]);
-        if (target === 'all') {
-          setFishingResults(parsedResults);
-        } else {
-          setFishingResults(prev => ({ ...prev, [target]: parsedResults[target] || [] }));
-        }
-        triggerToast(`✨ [V4.0.4] ${target === 'all' ? '전체 어장' : target} 탐지 완료!`);
-      } else {
-        throw new Error('데이터 파싱 오류');
+      const liveSection = text.split('[LIVE]')[1];
+      if (liveSection) {
+        const lines = liveSection.trim().split('\n').filter(l => l.trim() !== '').slice(0, 5);
+        const processedTopics = lines.map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim());
+        setDynamicTopics(processedTopics);
+        triggerToast(`✨ [${selectedCategory}] 실시간 트렌드 분석 완료!`);
       }
     } catch (err) {
       console.error(err);
-      triggerToast(`❌ ${err.message}`);
+      triggerToast('❌ 트렌드 분석 중 오류가 발생했습니다.');
     } finally {
-      setIsFishingLoading(false);
+      setIsLiveLoading(false);
     }
   };
+
+  const refreshStaticSection = (categoryName, sectionName) => {
+    const category = topicDatabase.categories.find(c => c.name === categoryName);
+    if (!category) return;
+    
+    const pool = category[sectionName];
+    if (!pool || pool.length === 0) return;
+    
+    const shuffled = [...pool].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 4);
+    
+    setDisplayedStaticTopics(prev => ({
+      ...prev,
+      [`${categoryName}_${sectionName}`]: selected
+    }));
+  };
+
+  // 초기 로딩 및 카테고리 변경 시 키워드 셔플 (안전한 버전)
+  useEffect(() => {
+    if (isTopicLabOpen) {
+      topicDatabase.categories.forEach(cat => {
+        ['monthly', 'annual', 'gold'].forEach(sec => {
+          const key = `${cat.name}_${sec}`;
+          if (!displayedStaticTopics[key]) {
+            refreshStaticSection(cat.name, sec);
+          }
+        });
+      });
+    }
+  }, [selectedCategory, isTopicLabOpen]);
 
   const convertMarkdownToHtml = (text) => {
     const naverFont = "font-family: '나눔고딕', NanumGothic, sans-serif;";
@@ -1272,7 +1047,6 @@ EN: 영어검색어3 | KO: 한글설명3
     return processed.split(/\r?\n/).map(line => {
       const trimmed = line.trim();
       if (!trimmed) return '<p>&nbsp;</p>';
-      if (trimmed.startsWith('### ')) return `<p style="margin: 20px 0 10px;"><span style="font-size: 14pt; font-weight: bold; color: #444; ${naverFont}">${trimmed.slice(4)}</span></p>`;
       if (trimmed.startsWith('## ')) return `<p style="margin: 30px 0 10px;"><span style="font-size: 20pt; font-weight: bold; ${naverFont}">${trimmed.slice(3)}</span></p>`;
       if (trimmed.startsWith('<table') || trimmed.startsWith('<li')) return trimmed;
       return `<p style="margin: 10px 0;"><span style="font-size: 12pt; line-height: 1.8; ${naverFont}">${trimmed}</span></p>`;
@@ -1340,7 +1114,7 @@ EN: 영어검색어3 | KO: 한글설명3
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.4</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1354,7 +1128,7 @@ EN: 영어검색어3 | KO: 한글설명3
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.2.4 [🛡️ 렌더러 철벽 방어] 마크다운 기호 자동 보정 및 네이버 표 강제 생성 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.1 [🏗️ 소재연구소 혁신] 필터링 시스템 및 독립 스크롤 엔진 장착 완료 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1368,10 +1142,10 @@ EN: 영어검색어3 | KO: 한글설명3
                 </div>
               </div>
               <button 
-                onClick={() => setIsKeywordFishingOpen(true)}
+                onClick={() => setIsTopicLabOpen(true)}
                 className="md:hidden px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-[11px] border-2 border-indigo-100 shadow-sm flex items-center gap-1 active:scale-95"
               >
-                <span>🎣 키워드 낚시왕</span>
+                <span>💡 소재 연구소</span>
               </button>
             </div>
             <div className="flex gap-3">
@@ -1403,11 +1177,11 @@ EN: 영어검색어3 | KO: 한글설명3
                 )}
               </div>
               <button 
-                onClick={() => setIsKeywordFishingOpen(true)}
-                className="hidden md:flex px-8 py-4 bg-gradient-to-br from-blue-50 to-indigo-100 hover:from-blue-100 hover:to-indigo-200 text-indigo-700 rounded-2xl font-black text-sm transition-all flex-col items-center justify-center gap-1 border-2 border-indigo-200 shadow-md whitespace-nowrap active:scale-95 group"
+                onClick={() => setIsTopicLabOpen(true)}
+                className="hidden md:flex px-8 py-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-2xl font-black text-sm transition-all flex-col items-center justify-center gap-1 border-2 border-indigo-100 shadow-sm whitespace-nowrap active:scale-95"
               >
-                <span className="text-2xl group-hover:animate-bounce">🎣</span>
-                키워드 낚시왕
+                <span className="text-2xl">💡</span>
+                소재 연구소
               </button>
             </div>
           </div>
@@ -1557,6 +1331,7 @@ EN: 영어검색어3 | KO: 한글설명3
                   </button>
                 </div>
               )}
+              )}
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider">Title</label>
@@ -1564,34 +1339,6 @@ EN: 영어검색어3 | KO: 한글설명3
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[inputMode][activeTab].title || '제목 생성 중...'}</h2>
               </div>
-
-              {/* [신규] 체감 후기 추천 박스 */}
-              {results[inputMode][activeTab].title && (
-                <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="block text-xs font-bold text-amber-600 uppercase tracking-wider">💡 코다리의 체감 후기 한 줄 추천 (E-E-A-T 확보용)</label>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => generateExperienceQuote(inputMode === 'topic' ? topic : "유튜브 영상 요약")} 
-                        disabled={isQuoteLoading}
-                        className="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-amber-200 flex items-center gap-1"
-                      >
-                        {isQuoteLoading ? '⏳ 생성 중...' : '🔄 다른 문구 추천'}
-                      </button>
-                      <button 
-                        onClick={() => { navigator.clipboard.writeText(experienceQuote); triggerToast('추천 문구 복사 완료!'); }} 
-                        className="px-3 py-1.5 bg-white hover:bg-amber-100 text-amber-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-amber-200 flex items-center gap-1"
-                      >
-                        📋 복사
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-amber-900 bg-white/50 p-3 rounded-lg border border-amber-100/50">
-                    {isQuoteLoading ? '구글 트렌드를 분석하여 찰진 후기를 생성하고 있습니다...' : (experienceQuote || '문구를 생성하려면 새로고침을 눌러주세요.')}
-                  </p>
-                </div>
-              )}
-
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
@@ -1614,8 +1361,6 @@ EN: 영어검색어3 | KO: 한글설명3
                   <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2 prose-table:w-full prose-table:border-collapse prose-table:my-8 prose-th:bg-indigo-50 prose-th:text-indigo-900 prose-th:border prose-th:border-indigo-100 prose-th:p-3 prose-td:border prose-td:border-slate-200 prose-td:p-3 prose-td:text-slate-700 hover:prose-tr:bg-slate-50">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                       {results[inputMode][activeTab].content
-                        .replace(/^###\s*(.*$)/gm, '### $1') 
-                        .replace(/^##\s*(.*$)/gm, '## $1')
                         .replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-slate-900 px-1 rounded">$1</mark>')
                         .replace(/\+\+([^+]+)\+\+/g, '<span class="text-blue-600 font-black">$1</span>')
                         .replace(/!!([^!]+)!!/g, '<span class="text-red-600 font-black">$1</span>')
@@ -1904,168 +1649,151 @@ EN: 영어검색어3 | KO: 한글설명3
         </div>
       )}
 
-      {isKeywordFishingOpen && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-start md:items-center justify-center z-[100] p-2 md:p-4 overflow-y-auto pt-4 md:pt-0">
-          <div className="bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-4xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto">
+      {isTopicLabOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-start md:items-center justify-center z-[100] p-2 md:p-4 overflow-y-auto pt-4 md:pt-0">
+          <div className="bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto">
             <div className="flex justify-between items-center mb-8">
               <div className="space-y-1">
                 <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                  🎣 키워드 낚시왕 <span className="text-sm font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full uppercase tracking-widest">Radar</span>
+                  💡 소재 연구소 <span className="text-sm font-bold bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest">Lab</span>
                 </h2>
-                <p className="text-sm text-slate-500 font-medium">AIO(AI Overview) 시대를 돌파할 나만의 황금 어장을 탐색하세요.</p>
+                <p className="text-sm text-slate-400 font-medium">조회수가 터지는 황금 키워드를 발굴하세요.</p>
               </div>
-              <button onClick={() => setIsKeywordFishingOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
+              <button onClick={() => setIsTopicLabOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
             </div>
 
-            <div className="space-y-8">
-              {/* 컨트롤 패널 */}
-              {/* 컨트롤 패널 (V4.0.6 최적화) */}
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex flex-col md:flex-row gap-6 items-center justify-between">
-                <div className="w-full md:w-auto space-y-3">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">분석 카테고리</label>
-                  <div className="flex flex-wrap gap-2">
-                    {['🏛️ 정부정책', '💻 IT/테크', '💰 경제/재테크', '💪 건강/운동', '✈️ 여행/생활'].map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setFishingCategory(cat)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                          fishingCategory === cat ? 'bg-white text-indigo-600 shadow-md ring-2 ring-indigo-500/20' : 'bg-transparent text-slate-500 hover:bg-slate-200/50'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <button 
-                  onClick={runKeywordFishing}
-                  disabled={isFishingLoading}
-                  className="w-full md:w-auto px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
-                >
-                  {isFishingLoading ? '🔄 탐색 중...' : '🎣 전체 레이더 가동'}
-                </button>
+            <div className="space-y-6">
+              {/* 카테고리 탭 네비게이션 */}
+              <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-3xl">
+                {topicDatabase.categories.map((cat, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setSelectedCategory(cat.name); setDynamicTopics(null); }}
+                    className={`px-5 py-3 rounded-2xl font-black text-xs transition-all ${
+                      selectedCategory === cat.name 
+                      ? 'bg-white text-indigo-600 shadow-md scale-105' 
+                      : 'text-slate-500 hover:text-indigo-600 hover:bg-white/50'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
               </div>
 
-              {/* 결과 보드 */}
-              <div className="bg-slate-900 rounded-[30px] p-6 shadow-2xl border border-slate-800 min-h-[300px]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-                  <h3 className="text-white font-black">AIO 침투지수 분석 보드</h3>
-                  <div className="ml-auto flex gap-3 text-[10px] font-bold">
-                    <span className="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-md">🟢 침투 가능 (0~39)</span>
-                    <span className="bg-amber-500/20 text-amber-400 px-2 py-1 rounded-md">🟡 경쟁 치열 (40~69)</span>
-                    <span className="bg-red-500/20 text-red-400 px-2 py-1 rounded-md">🔴 진입 금지 (70~100)</span>
-                  </div>
-                </div>
+              {/* [V3.7.8.1] 노란색 필터 버튼 그룹 */}
+              <div className="flex flex-wrap gap-2 px-1">
+                {[
+                  { id: 'realtime', label: '실시간' },
+                  { id: 'monthly', label: '이번달' },
+                  { id: 'annual', label: '연간' },
+                  { id: 'gold', label: '황금' },
+                  { id: 'all', label: '전체' }
+                ].map((btn) => (
+                  <button
+                    key={btn.id}
+                    onClick={() => setLabFilter(btn.id)}
+                    className={`px-6 py-2 rounded-lg font-black text-sm border-2 border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${
+                      labFilter === btn.id ? 'bg-amber-400 text-black' : 'bg-white text-slate-400 border-slate-200 shadow-none'
+                    }`}
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+              </div>
 
-                {/* 🚀 포커스 탭 & 퀵 리프레시 그리드 (V4.0.8 반응형 최적화) */}
-                {Object.values(fishingResults).some(arr => arr.length > 0) && !isFishingLoading && (
-                  <div className="mb-6 p-2 bg-slate-800/50 rounded-2xl border border-slate-700/30">
-                    <div className="grid grid-cols-3 md:flex md:gap-2 gap-2">
-                      {[
-                        { id: 'realTime', title: '실시간', icon: '⚡' },
-                        { id: 'monthly', title: '이달', icon: '📅' },
-                        { id: 'annual', title: '연간', icon: '🌟' },
-                        { id: 'evergreen', title: '황금', icon: '💎' },
-                        { id: 'all', title: '전체', icon: '🌊' }
-                      ].map(nav => (
-                        <button
-                          key={nav.id}
-                          onClick={() => setActiveFishingTab(nav.id)}
-                          className={`py-3 px-2 rounded-xl text-[11px] font-black transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
-                            activeFishingTab === nav.id 
-                              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40' 
-                              : 'bg-slate-700/40 text-slate-400 hover:bg-slate-700/60'
-                          }`}
-                        >
-                          <span className="text-sm">{nav.icon}</span> {nav.title}
-                        </button>
-                      ))}
-                      {/* 새로고침 버튼을 그리드 마지막 칸으로 통합 */}
-                      <button
-                        onClick={runKeywordFishing}
-                        className="py-3 px-2 bg-indigo-500/20 hover:bg-indigo-500 text-indigo-400 hover:text-white rounded-xl transition-all flex items-center justify-center gap-1.5 active:scale-95 group"
-                        title="즉시 재탐색"
+              {/* 4대 전략 대시보드 리스트 (스크롤 가능) */}
+              <div className="space-y-6 max-h-[65vh] overflow-y-auto pr-2 custom-red-scrollbar">
+                
+                {/* 1. 실시간 트렌드 카드 */}
+                {(labFilter === 'all' || labFilter === 'realtime') && (
+                  <div className="bg-slate-900 rounded-[30px] p-6 shadow-xl border border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-white font-black text-sm flex items-center gap-2">
+                        ⚡ 실시간 주제
+                        <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                      </h3>
+                      <button 
+                        onClick={refreshLiveTrends}
+                        disabled={isLiveLoading}
+                        className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
                       >
-                        <span className="text-sm group-hover:rotate-180 transition-transform duration-500">🔄</span>
-                        <span className="text-[11px] font-black md:hidden">새로고침</span>
+                        {isLiveLoading ? '분석 중...' : '새로고침 🔄'}
                       </button>
+                    </div>
+                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                      {dynamicTopics ? (
+                        dynamicTopics.map((t, i) => (
+                          <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 truncate">
+                            {i+1}. {t}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="text-center py-10 space-y-3">
+                          <p className="text-slate-500 text-xs font-bold">지금 가장 핫한 주제는?</p>
+                          <button onClick={refreshLiveTrends} className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black shadow-lg shadow-indigo-900/40 active:scale-95">실시간 분석 시작 🚀</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
 
-                {/* 🚀 렌더링 로직: 데이터가 있으면 로딩 중이라도 화면 유지 (V4.0.5) */}
-                {isFishingLoading && Object.values(fishingResults).every(arr => arr.length === 0) ? (
-                  <div className="flex flex-col items-center justify-center h-48 space-y-4">
-                    <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-                    <p className="text-indigo-400 font-bold animate-pulse">심해의 트렌드를 스캔하고 있습니다...</p>
+                {/* 2. 이번 달 주제 카드 */}
+                {(labFilter === 'all' || labFilter === 'monthly') && (
+                  <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                        🗓️ 이번 달 주제
+                        <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Monthly</span>
+                      </h3>
+                      <button onClick={() => refreshStaticSection(selectedCategory, 'monthly')} className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors">새로고침 🔄</button>
+                    </div>
+                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                      {(displayedStaticTopics[`${selectedCategory}_monthly`] || []).map((t, i) => (
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                          {t}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ) : Object.values(fishingResults).some(arr => arr.length > 0) ? (
-                  <div className={`max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar space-y-10 transition-opacity duration-300 ${isFishingLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                    {[
-                      { id: 'realTime', title: '실시간 핫이슈 (HOT)', icon: '⚡', color: 'text-orange-400' },
-                      { id: 'monthly', title: '이달의 트렌드 (TREND)', icon: '📅', color: 'text-blue-400' },
-                      { id: 'annual', title: '연간 공고/이벤트 (ANNUAL)', icon: '🌟', color: 'text-yellow-400' },
-                      { id: 'evergreen', title: '황금 키워드 (EVERGREEN)', icon: '💎', color: 'text-emerald-400' }
-                    ].filter(quad => activeFishingTab === 'all' || activeFishingTab === quad.id)
-                     .map(quad => fishingResults[quad.id]?.length > 0 && (
-                      <div key={quad.id} id={`section-${quad.id}`} className="space-y-4">
-                        <div className="flex items-center gap-3 sticky top-0 bg-slate-900/95 backdrop-blur-sm py-2 z-10 border-b border-slate-800">
-                          <span className="text-xl">{quad.icon}</span>
-                          <h4 className={`text-sm font-black ${quad.color} tracking-tight`}>{quad.title}</h4>
-                          <span className="text-[10px] text-slate-500 font-bold ml-auto">{fishingResults[quad.id].length}개의 월척 탐지</span>
-                        </div>
-                        <div className="grid grid-cols-1 gap-3">
-                          {fishingResults[quad.id].map((item, idx) => {
-                            const score = parseInt(item.aio_index);
-                            const isGreen = score < 40;
-                            const isYellow = score >= 40 && score < 70;
-                            const isRed = score >= 70;
-                            
-                            const colorClass = isGreen ? 'border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10' : 
-                                               isYellow ? 'border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10' : 
-                                               'border-red-500/20 bg-red-500/5 hover:bg-red-500/10 opacity-60';
-                            
-                            return (
-                              <button 
-                                key={idx} 
-                                onClick={() => !isRed && handleSelectTopic(item.keyword)}
-                                disabled={isRed}
-                                className={`w-full text-left rounded-2xl border transition-all ${colorClass} group flex justify-between items-center gap-6 p-8`}
-                              >
-                                <div className="flex-1 min-w-0 space-y-2">
-                                  {/* AIO 지수를 상단으로 배치 (V4.0.9) */}
-                                  <div className="flex">
-                                    <span className={`shrink-0 font-black px-2 py-0.5 rounded-md ${isGreen ? 'bg-emerald-500' : isYellow ? 'bg-amber-500' : 'bg-red-500'} text-white shadow-lg text-[10px]`}>
-                                      AIO {score}
-                                    </span>
-                                  </div>
-                                  
-                                  <h5 className={`font-black text-xl leading-tight ${isRed ? 'text-slate-500 line-through' : 'text-slate-100 group-hover:text-indigo-300 transition-colors'}`}>
-                                    {item.keyword}
-                                  </h5>
-                                  
-                                  <p className="text-sm text-slate-400 font-medium leading-relaxed">
-                                    {item.reason}
-                                  </p>
-                                </div>
-                                {!isRed && (
-                                  <div className="shrink-0 w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-inner text-lg">
-                                    <span className="font-black">➔</span>
-                                  </div>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+                )}
+
+                {/* 3. 연간 주제 카드 */}
+                {(labFilter === 'all' || labFilter === 'annual') && (
+                  <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                        📅 연간 주제
+                        <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase">Annual</span>
+                      </h3>
+                      <button onClick={() => refreshStaticSection(selectedCategory, 'annual')} className="text-[10px] font-bold text-slate-400 hover:text-amber-600 transition-colors">새로고침 🔄</button>
+                    </div>
+                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                      {(displayedStaticTopics[`${selectedCategory}_annual`] || []).map((t, i) => (
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                          {t}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-64 space-y-3 opacity-50">
-                    <span className="text-5xl">⚓</span>
-                    <p className="text-slate-400 text-sm font-black tracking-widest uppercase">RADAR STANDBY: PRESS START BUTTON</p>
+                )}
+
+                {/* 4. 황금 키워드 카드 */}
+                {(labFilter === 'all' || labFilter === 'gold') && (
+                  <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                        💎 황금 키워드
+                        <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Evergreen</span>
+                      </h3>
+                      <button onClick={() => refreshStaticSection(selectedCategory, 'gold')} className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">새로고침 🔄</button>
+                    </div>
+                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                      {(displayedStaticTopics[`${selectedCategory}_gold`] || []).map((t, i) => (
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                          {t}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -2086,6 +1814,21 @@ EN: 영어검색어3 | KO: 한글설명3
           15% { opacity: 1; transform: translate(-50%, 0); }
           85% { opacity: 1; transform: translate(-50%, 0); }
           100% { opacity: 0; transform: translate(-50%, -10px); }
+        }
+        .custom-red-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-red-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 10px;
+        }
+        .custom-red-scrollbar::-webkit-scrollbar-thumb {
+          background: #ef4444;
+          border-radius: 10px;
+          border: 2px solid #f1f1f1;
+        }
+        .custom-red-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #dc2626;
         }
       `}</style>
       {/* 🛡️ 팩트체크 리포트 모달 */}
