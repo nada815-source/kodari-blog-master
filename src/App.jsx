@@ -854,7 +854,8 @@ ${truncatedTranscript}
    - **[파랑강조]**: ++핵심단어/수치++
    - **[빨강주의]**: !!필독정보!!
 
-3. **[경고] 표(Table) 내부 기호 절대 금지 (Zero-Symbol Policy):**
+3. **[경고] 모든 플랫폼 표(Table) 삽입 필수 및 기호 절대 금지:**
+   - 네이버, 티스토리, 워드프레스 **모든 플랫폼 본문에 최소 1개 이상의 Markdown Table을 반드시 포함**해.
    - 모든 정보성 데이터는 **무조건 Markdown Table 형식**으로 시각화해. 
    - **[절대 엄금]: 표 내부에는 절대로 강조 기호(**, ==, ++, !!)를 사용하지 마라.** 순수한 텍스트만 입력해.
 
@@ -1339,7 +1340,7 @@ EN: 영어검색어3 | KO: 한글설명3
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.3</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.4</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1353,7 +1354,7 @@ EN: 영어검색어3 | KO: 한글설명3
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.2.3 [💎 1,700자의 정석] ### 기호 소탕 및 분량 최적화 완료 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.2.4 [🛡️ 렌더러 철벽 방어] 마크다운 기호 자동 보정 및 네이버 표 강제 생성 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1613,6 +1614,8 @@ EN: 영어검색어3 | KO: 한글설명3
                   <div className="prose prose-slate max-w-none text-base leading-relaxed prose-h2:text-2xl prose-h2:font-bold prose-h2:text-slate-900 prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100 prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-4 prose-p:mb-6 prose-li:mb-2 prose-table:w-full prose-table:border-collapse prose-table:my-8 prose-th:bg-indigo-50 prose-th:text-indigo-900 prose-th:border prose-th:border-indigo-100 prose-th:p-3 prose-td:border prose-td:border-slate-200 prose-td:p-3 prose-td:text-slate-700 hover:prose-tr:bg-slate-50">
                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                       {results[inputMode][activeTab].content
+                        .replace(/^###\s*(.*$)/gm, '### $1') 
+                        .replace(/^##\s*(.*$)/gm, '## $1')
                         .replace(/==([^=]+)==/g, '<mark class="bg-yellow-200 text-slate-900 px-1 rounded">$1</mark>')
                         .replace(/\+\+([^+]+)\+\+/g, '<span class="text-blue-600 font-black">$1</span>')
                         .replace(/!!([^!]+)!!/g, '<span class="text-red-600 font-black">$1</span>')
