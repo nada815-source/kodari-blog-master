@@ -101,17 +101,17 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.8.3',
+      version: 'V3.7.8.4',
       date: '2026-05-10',
-      title: '🕒 타임 스탬프 엔진: 실시간 시간 인식',
-      tags: ['기능강화', '지능화'],
+      title: '🎨 비주얼 스토리보드: 이미지 가상 시각화',
+      tags: ['디자인', 'UI/UX'],
       details: [
-        'AI가 글 작성 시점(오늘 날짜/요일)을 스스로 인식하도록 타임 엔진을 장착했습니다.',
-        '과거(2024, 2025)의 낡은 자료가 아닌 현재(2026)의 최신 정책과 뉴스를 우선 정찰하도록 검색 지침을 강화했습니다.'
+        '이미지 생성 전, 제목과 문구가 배치된 가상 디자인 카드를 미리 볼 수 있는 스토리보드 기능을 추가했습니다.',
+        '실시간 편집 연동을 통해 문구 수정 시 미리보기 카드에도 즉시 반영되어 최종 디자인 검수가 가능합니다.'
       ]
     },
     {
-      version: 'V3.7.8.2',
+      version: 'V3.7.8.3',
       date: '2026-05-10',
       title: '⚓ 레드 스크롤바 활성화 및 물량 증강',
       tags: ['UI/UX', '기능강화'],
@@ -1164,7 +1164,7 @@ ${finalTopicContext}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.3</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.4</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1178,7 +1178,7 @@ ${finalTopicContext}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.3 [🕒 타임 스탬프] 작성 시점 실시간 인식 및 최신 정보(2026년) 강제 정찰 엔진 장착 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.4 [🎨 비주얼 스토리보드] 이미지 생성 전 가상 레이아웃 실시간 프리뷰 엔진 장착 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1574,68 +1574,113 @@ ${finalTopicContext}
               <button onClick={() => setIsAiPromptOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">✕</button>
             </div>
             
-            <div className="space-y-4">
-              <p className="text-xs text-slate-500 font-medium px-1 italic">"본문의 각 소제목 흐름에 딱 맞는 4가지 이미지를 생성해 보세요!"</p>
+            <div className="space-y-6">
+              <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                <p className="text-xs text-indigo-700 font-bold italic flex items-center gap-2">
+                  <span className="animate-pulse">✨</span> "사령관님, 이미지가 생성되면 아래와 같은 레이아웃으로 멋지게 구성될 것입니다!"
+                </p>
+              </div>
               
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-8">
                 {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.map((item, idx) => (
-                  <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                    
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="w-6 h-6 bg-slate-900 text-white text-[10px] font-black flex items-center justify-center rounded-full">0{idx + 1}</span>
-                        <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Section Target</span>
-                          <span className="text-xs font-bold text-slate-700">{item.title}</span>
+                  <div key={idx} className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
+                    {/* 비주얼 스토리보드 카드 (Premium Preview) */}
+                    <div className={`relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-2xl group border-4 border-white ring-1 ring-slate-200 transition-all hover:scale-[1.01] ${visualStyle === 'photo' ? 'bg-slate-800' : 'bg-indigo-600'}`}>
+                      {/* 가상 배경 (그라데이션) */}
+                      <div className={`absolute inset-0 opacity-40 transition-opacity group-hover:opacity-60 bg-gradient-to-br ${
+                        idx === 0 ? 'from-purple-600 via-indigo-600 to-blue-600' :
+                        idx === 1 ? 'from-blue-600 via-cyan-600 to-teal-600' :
+                        idx === 2 ? 'from-rose-600 via-pink-600 to-purple-600' :
+                        'from-amber-600 via-orange-600 to-rose-600'
+                      }`}></div>
+                      
+                      {/* 글래스모피즘 오버레이 */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-black/10 backdrop-blur-[2px]">
+                        <div className="space-y-4 max-w-lg">
+                          <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-[10px] font-black text-white uppercase tracking-[0.2em] mb-2">
+                            KODARI VISUAL SECTION 0{idx + 1}
+                          </div>
+                          <h4 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-2xl break-keep">
+                            {item.main_title || '메인 제목을 입력하세요'}
+                          </h4>
+                          <p className="text-sm md:text-base font-bold text-white/90 drop-shadow-md italic">
+                            {item.sub_copy || '보조 문구를 입력하세요'}
+                          </p>
+                        </div>
+                        
+                        {/* 하단 스타일 태그 */}
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+                          <div className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-lg border border-white/10 text-[9px] font-bold text-white/80">
+                            {visualStyle === 'photo' ? '📸 PHOTO STYLE' : '🎨 3D ILLUSTRATION'}
+                          </div>
+                          <div className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-lg border border-white/10 text-[9px] font-bold text-white/80">
+                            {item.title}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => { navigator.clipboard.writeText(item.prompt); triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사 완료!`); }} className="p-2 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-xl border border-slate-100 transition-all">
-                          <Copy size={14} />
-                        </button>
-                        <button onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)} className="p-2 bg-slate-50 hover:bg-amber-50 text-slate-400 hover:text-amber-600 rounded-xl border border-slate-100 transition-all">
-                          <Image size={14} />
-                        </button>
+                      
+                      {/* 섹션 넘버 뱃지 */}
+                      <div className="absolute top-6 left-6 w-10 h-10 bg-white text-slate-900 font-black rounded-2xl flex items-center justify-center shadow-xl rotate-[-5deg]">
+                        0{idx + 1}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black text-indigo-500 uppercase">Main Title</span>
-                          <button onClick={() => { navigator.clipboard.writeText(item.main_title); triggerToast('메인 제목 복사!'); }} className="text-indigo-300 hover:text-indigo-500 transition-colors"><Copy size={10} /></button>
+                    {/* 편집 및 복사 컨트롤러 */}
+                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Section Target:</span>
+                          <span className="text-xs font-bold text-indigo-600">{item.title}</span>
                         </div>
-                        <input 
-                          type="text" 
-                          value={item.main_title || ''} 
-                          onChange={(e) => handleMainTitleChange(idx, e.target.value)}
-                          className="w-full p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-black text-blue-500 uppercase">Sub Copy</span>
-                          <button onClick={() => { navigator.clipboard.writeText(item.sub_copy); triggerToast('보조 문구 복사!'); }} className="text-blue-300 hover:text-blue-500 transition-colors"><Copy size={10} /></button>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => { navigator.clipboard.writeText(item.prompt); triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사!`); }}
+                            className="px-3 py-1.5 bg-white hover:bg-indigo-600 hover:text-white text-indigo-600 font-bold rounded-xl border border-indigo-100 transition-all text-[11px] shadow-sm flex items-center gap-1"
+                          >
+                            <Copy size={12} /> 프롬프트 복사
+                          </button>
                         </div>
-                        <input 
-                          type="text" 
-                          value={item.sub_copy || ''} 
-                          onChange={(e) => handleSubCopyChange(idx, e.target.value)}
-                          className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-medium text-slate-600 italic focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        />
                       </div>
-                    </div>
 
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <p className="text-[11px] text-slate-400 leading-relaxed italic font-medium">"{item.prompt}"</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Main Title Edit</label>
+                          <input 
+                            type="text" 
+                            value={item.main_title || ''} 
+                            onChange={(e) => handleMainTitleChange(idx, e.target.value)}
+                            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner"
+                            placeholder="메인 제목을 입력하세요"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Sub Copy Edit</label>
+                          <input 
+                            type="text" 
+                            value={item.sub_copy || ''} 
+                            onChange={(e) => handleSubCopyChange(idx, e.target.value)}
+                            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-600 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner"
+                            placeholder="보조 문구를 입력하세요"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-white/50 rounded-2xl border border-slate-200/50">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-[10px] font-black text-slate-400">🤖 AI PROMPT HINT</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 leading-relaxed italic font-medium">"{item.prompt}"</p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
               
-              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2">
-                <p className="text-[10px] text-slate-400 font-bold leading-tight">💡 위 프롬프트들을 순서대로 **Gemini**나 **ChatGPT**에 입력하여 이미지를 만든 뒤, 블로그 본문의 각 소제목 사이에 삽입하면 전문가의 글처럼 보입니다!</p>
+              <div className="bg-amber-50 p-5 rounded-2xl border border-amber-200 mt-4">
+                <p className="text-xs text-amber-800 font-bold leading-relaxed flex items-start gap-3">
+                  <span className="text-xl">💡</span>
+                  <span>위의 **비주얼 스토리보드**를 통해 최종 디자인을 확인하셨나요? <br/>이제 각 섹션의 프롬프트를 복사하여 이미지 생성 AI(Gemini, ChatGPT 등)에 입력하시면 팩트와 디자인이 결합된 최고의 블로그가 완성됩니다!</span>
+                </p>
               </div>
             </div>
 
