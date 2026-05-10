@@ -101,17 +101,18 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.8.4',
+      version: 'V3.7.8.5',
       date: '2026-05-10',
-      title: '🎨 비주얼 스토리보드: 이미지 가상 시각화',
-      tags: ['디자인', 'UI/UX'],
+      title: '🛠️ 기능 복구 및 설계도 비주얼 강화',
+      tags: ['복구', 'UI/UX'],
       details: [
-        '이미지 생성 전, 제목과 문구가 배치된 가상 디자인 카드를 미리 볼 수 있는 스토리보드 기능을 추가했습니다.',
-        '실시간 편집 연동을 통해 문구 수정 시 미리보기 카드에도 즉시 반영되어 최종 디자인 검수가 가능합니다.'
+        '누락되었던 [스타일 변환복사] 버튼을 스토리보드 카드 내에 완벽하게 복구했습니다.',
+        '스토리보드 카드에 격자 패턴과 포커스 가이드를 추가하여 이미지 설계도 기능을 강화했습니다.',
+        '제목과 보조 문구를 한 번에 복사할 수 있는 일괄 복사 기능을 추가했습니다.'
       ]
     },
     {
-      version: 'V3.7.8.3',
+      version: 'V3.7.8.4',
       date: '2026-05-10',
       title: '⚓ 레드 스크롤바 활성화 및 물량 증강',
       tags: ['UI/UX', '기능강화'],
@@ -1164,7 +1165,7 @@ ${finalTopicContext}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.4</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.5</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1178,7 +1179,7 @@ ${finalTopicContext}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.4 [🎨 비주얼 스토리보드] 이미지 생성 전 가상 레이아웃 실시간 프리뷰 엔진 장착 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.5 [🛠️ 기능 복구] 스타일 변환복사 복구 및 이미지 설계도 비주얼 보강 완료 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1586,19 +1587,29 @@ ${finalTopicContext}
                   <div key={idx} className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
                     {/* 비주얼 스토리보드 카드 (Premium Preview) */}
                     <div className={`relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-2xl group border-4 border-white ring-1 ring-slate-200 transition-all hover:scale-[1.01] ${visualStyle === 'photo' ? 'bg-slate-800' : 'bg-indigo-600'}`}>
-                      {/* 가상 배경 (그라데이션) */}
+                      {/* 가상 배경 (그라데이션 + 격자 패턴) */}
                       <div className={`absolute inset-0 opacity-40 transition-opacity group-hover:opacity-60 bg-gradient-to-br ${
                         idx === 0 ? 'from-purple-600 via-indigo-600 to-blue-600' :
                         idx === 1 ? 'from-blue-600 via-cyan-600 to-teal-600' :
                         idx === 2 ? 'from-rose-600 via-pink-600 to-purple-600' :
                         'from-amber-600 via-orange-600 to-rose-600'
                       }`}></div>
+                      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
                       
+                      {/* 카메라 포커스 가이드 (V3.7.8.5 추가) */}
+                      <div className="absolute inset-8 border border-white/10 flex items-center justify-center pointer-events-none">
+                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white/30"></div>
+                        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white/30"></div>
+                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-white/30"></div>
+                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-white/30"></div>
+                        <div className="w-2 h-2 bg-white/20 rounded-full"></div>
+                      </div>
+
                       {/* 글래스모피즘 오버레이 */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-black/10 backdrop-blur-[2px]">
                         <div className="space-y-4 max-w-lg">
                           <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-[10px] font-black text-white uppercase tracking-[0.2em] mb-2">
-                            KODARI VISUAL SECTION 0{idx + 1}
+                            KODARI BLUEPRINT SECTION 0{idx + 1}
                           </div>
                           <h4 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-2xl break-keep">
                             {item.main_title || '메인 제목을 입력하세요'}
@@ -1632,10 +1643,22 @@ ${finalTopicContext}
                           <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Section Target:</span>
                           <span className="text-xs font-bold text-indigo-600">{item.title}</span>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
+                          <button 
+                            onClick={() => { navigator.clipboard.writeText(`${item.main_title}\n${item.sub_copy}`); triggerToast(`[섹션 ${idx + 1}] 제목/문구 일괄 복사!`); }}
+                            className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 font-bold rounded-xl border border-indigo-100 transition-all text-[11px] shadow-sm flex items-center gap-1"
+                          >
+                            <Type size={12} /> 일괄 복사
+                          </button>
+                          <button 
+                            onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)}
+                            className="px-3 py-1.5 bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-600 font-bold rounded-xl border border-amber-100 transition-all text-[11px] shadow-sm flex items-center gap-1"
+                          >
+                            <Sparkles size={12} /> 스타일 변환복사
+                          </button>
                           <button 
                             onClick={() => { navigator.clipboard.writeText(item.prompt); triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사!`); }}
-                            className="px-3 py-1.5 bg-white hover:bg-indigo-600 hover:text-white text-indigo-600 font-bold rounded-xl border border-indigo-100 transition-all text-[11px] shadow-sm flex items-center gap-1"
+                            className="px-3 py-1.5 bg-white hover:bg-slate-900 hover:text-white text-slate-600 font-bold rounded-xl border border-slate-200 transition-all text-[11px] shadow-sm flex items-center gap-1"
                           >
                             <Copy size={12} /> 프롬프트 복사
                           </button>
