@@ -1340,7 +1340,7 @@ EN: 영어검색어3 | KO: 한글설명3
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.5</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.4</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1354,7 +1354,7 @@ EN: 영어검색어3 | KO: 한글설명3
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.2.5 [👑 최후의 완벽] 제목 기호 자동 소탕 및 복사 편의성 극대화 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.2.4 [🛡️ 렌더러 철벽 방어] 마크다운 기호 자동 보정 및 네이버 표 강제 생성 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1560,9 +1560,9 @@ EN: 영어검색어3 | KO: 한글설명3
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-blue-500 uppercase tracking-wider">Title</label>
-                  <button onClick={() => copyToClipboard(results[inputMode][activeTab].title.replace(/[=*\+#\!]{2,}/g, ''))} className="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-blue-100 flex items-center gap-1">📋 제목 복사</button>
+                  <button onClick={() => copyToClipboard(results[inputMode][activeTab].title)} className="px-3 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-blue-100 flex items-center gap-1">📋 제목 복사</button>
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 leading-tight">{(results[inputMode][activeTab].title || '제목 생성 중...').replace(/[=*\+#\!]{2,}/g, '')}</h2>
+                <h2 className="text-xl font-bold text-slate-800 leading-tight">{results[inputMode][activeTab].title || '제목 생성 중...'}</h2>
               </div>
 
               {/* [신규] 체감 후기 추천 박스 */}
