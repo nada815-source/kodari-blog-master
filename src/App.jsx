@@ -101,6 +101,36 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.7.8.2',
+      date: '2026-05-10',
+      title: '⚓ 레드 스크롤바 활성화 및 물량 증강',
+      tags: ['UI/UX', '기능강화'],
+      details: [
+        '키워드 노출량을 4개에서 12개로 대폭 늘려 사령관님이 요청하신 [레드 스크롤바]를 활성화했습니다.',
+        '실시간 트렌드 분석 프롬프트를 강화하여 10개 이상의 낚시 포인트를 동시에 포착합니다.'
+      ]
+    },
+    {
+      version: 'V3.7.8.1',
+      date: '2026-05-10',
+      title: '🏗️ 소재연구소 혁신: 5종 필터 시스템',
+      tags: ['UI/UX', '개편'],
+      details: [
+        '노란색 택티컬 버튼을 통한 실시간/이번달/연간/황금/전체 필터링 시스템을 구축했습니다.',
+        '4대 전략 세션을 수직 스택 구조로 변경하여 한눈에 훑어볼 수 있게 개선했습니다.'
+      ]
+    },
+    {
+      version: 'V3.7.8',
+      date: '2026-05-09',
+      title: '🗑️ 엔진 다이어트 및 소재연구소 보존',
+      tags: ['최적화'],
+      details: [
+        'Unsplash 연동 및 불필요한 백업 UI를 제거하여 함선의 기동성을 높였습니다.',
+        '소재 연구소(Topic Lab)의 마지막 안정화 버전입니다.'
+      ]
+    },
+    {
       version: 'V3.7.7',
       date: '2026-05-09',
       title: '🌐 글로벌 플랫폼 100% 한글화 강제',
@@ -951,7 +981,7 @@ ${truncatedTranscript}
     try {
       const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
       const prompt = `당신은 대한민국의 최신 트렌드를 분석하는 일타 강사입니다. 
-현재 선택된 카테고리 [${selectedCategory}]에 대하여, 오늘 날짜(${new Date().toLocaleDateString()}) 기준 블로그 조회수가 폭발할 만한 '실시간 핫이슈 주제' 5개를 추천하세요.
+현재 선택된 카테고리 [${selectedCategory}]에 대하여, 오늘 날짜(${new Date().toLocaleDateString()}) 기준 블로그 조회수가 폭발할 만한 '실시간 핫이슈 주제' 10개를 추천하세요.
 
 반드시 아래 형식을 엄수하여 소재만 나열하세요:
 [LIVE]
@@ -959,7 +989,12 @@ ${truncatedTranscript}
 주제2
 주제3
 주제4
-주제5`;
+주제5
+주제6
+주제7
+주제8
+주제9
+주제10`;
 
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -972,7 +1007,7 @@ ${truncatedTranscript}
       
       const liveSection = text.split('[LIVE]')[1];
       if (liveSection) {
-        const lines = liveSection.trim().split('\n').filter(l => l.trim() !== '').slice(0, 5);
+        const lines = liveSection.trim().split('\n').filter(l => l.trim() !== '').slice(0, 10);
         const processedTopics = lines.map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim());
         setDynamicTopics(processedTopics);
         triggerToast(`✨ [${selectedCategory}] 실시간 트렌드 분석 완료!`);
@@ -993,7 +1028,7 @@ ${truncatedTranscript}
     if (!pool || pool.length === 0) return;
     
     const shuffled = [...pool].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 4);
+    const selected = shuffled.slice(0, 12);
     
     setDisplayedStaticTopics(prev => ({
       ...prev,
@@ -1114,7 +1149,7 @@ ${truncatedTranscript}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.1</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1128,7 +1163,7 @@ ${truncatedTranscript}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.1 [🏗️ 소재연구소 혁신] 필터링 시스템 및 독립 스크롤 엔진 장착 완료 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.2 [⚓ 항해일지 복구] 키워드 대량 투입(12개) 및 레드 스크롤 엔진 활성화 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
