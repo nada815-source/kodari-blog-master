@@ -1333,7 +1333,7 @@ EN: 영어검색어3 | KO: 한글설명3
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.0</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V4.2.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1347,7 +1347,7 @@ EN: 영어검색어3 | KO: 한글설명3
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V4.2.0 [🛡️ 무적의 태그 엔진] 파싱 오류 0% 도전! 구글 검색 화력 100% 개방 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V4.2.1 [🛡️ 태그 엔진 최종 안정화] Ctrl+F5를 눌러 최신 엔진을 확인해 주세요! ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
