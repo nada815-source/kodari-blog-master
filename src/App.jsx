@@ -68,6 +68,7 @@ function App() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
 
   const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
   const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
     topic: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
@@ -568,15 +569,40 @@ ${summaryData}`;
 
       // 1단계: 초안 요약 생성 (gemini-2.5-flash)
       console.log('[코다리 엔진] 1단계: 초안 및 뼈대 정보 팩트체크 기동.');
+      setStatusMessage('🔎 1단계: 실시간 구글 교차 검증 및 팩트 요약 중...');
       const summaryData = await fetchSummaryDraft(inputText, finalKey);
-
-      // 2단계: 3대 플랫폼 병렬 작성 및 이미지 4개 동시 생성 (gemini-3-flash)
-      console.log('[코다리 엔진] 2단계: 플랫폼별 병렬 리라이팅 & 이미지 4종 동시 생성 (Promise.all).');
-      const [naverRaw, tistoryRaw, wordpressRaw] = await Promise.all([
-        platforms.naver ? writePlatformContent('naver', summaryData, finalKey) : Promise.resolve(null),
-        platforms.tistory ? writePlatformContent('tistory', summaryData, finalKey) : Promise.resolve(null),
-        platforms.wordpress ? writePlatformContent('wordpress', summaryData, finalKey) : Promise.resolve(null)
-      ]);
+ 
+      // 2단계: 플랫폼별 순차적(릴레이) 작성
+      let naverRaw = null;
+      let tistoryRaw = null;
+      let wordpressRaw = null;
+ 
+      if (platforms.naver) {
+        setStatusMessage('✍️ 2단계: [네이버 블로그] 맞춤 원고 집필 및 이미지 기획 중...');
+        naverRaw = await writePlatformContent('naver', summaryData, finalKey);
+        
+        if (platforms.tistory || platforms.wordpress) {
+          setStatusMessage('⏳ 구글 API 과부하 방지를 위해 1.2초 대기 중...');
+          await new Promise(resolve => setTimeout(resolve, 1200));
+        }
+      }
+ 
+      if (platforms.tistory) {
+        setStatusMessage('✍️ 2단계: [티스토리] 맞춤 원고 집필 및 이미지 기획 중...');
+        tistoryRaw = await writePlatformContent('tistory', summaryData, finalKey);
+ 
+        if (platforms.wordpress) {
+          setStatusMessage('⏳ 구글 API 과부하 방지를 위해 1.2초 대기 중...');
+          await new Promise(resolve => setTimeout(resolve, 1200));
+        }
+      }
+ 
+      if (platforms.wordpress) {
+        setStatusMessage('✍️ 2단계: [워드프레스] 맞춤 원고 집필 및 이미지 기획 중...');
+        wordpressRaw = await writePlatformContent('wordpress', summaryData, finalKey);
+      }
+ 
+      setStatusMessage('✨ 3단계: 최종 포스팅 결과물 정제 및 렌더링 완료 중...');
 
       const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '', section_prompts: [] };
 
@@ -636,9 +662,11 @@ ${summaryData}`;
       }
 
       console.log(`[코다리 엔진] ${platformName} 글 재생성 시작 - 1단계 초안 생성.`);
+      setStatusMessage(`🔎 [${platformName}] 1단계: 실시간 구글 교차 검증 및 팩트 요약 중...`);
       const summaryData = await fetchSummaryDraft(inputText, finalKey);
-
-      console.log(`[코다리 엔진] ${platformName} 글 재생성 시작 - 2단계 플랫폼 리라이팅 (gemini-3-flash).`);
+ 
+      console.log(`[코다리 엔진] ${platformName} 글 재생성 시작 - 2단계 플랫폼 리라이팅.`);
+      setStatusMessage(`✍️ [${platformName}] 2단계: 맞춤 원고 집필 및 이미지 기획 중...`);
       const parsedData = await writePlatformContent(platform, summaryData, finalKey);
 
       const koDescs = (parsedData.image_prompts || []).map(p => p.sub_copy);
@@ -1090,6 +1118,15 @@ ${summaryData}`;
             </div>
           </div>
 
+          {loading && (
+            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-center animate-pulse">
+              <span className="text-sm font-bold text-indigo-700 flex items-center justify-center gap-2">
+                <svg className="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                {statusMessage}
+              </span>
+            </div>
+          )}
+
           <button 
             onClick={generateContent}
             disabled={loading}
@@ -1098,7 +1135,7 @@ ${summaryData}`;
             {loading ? (
               <>
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                코다리가 맹렬히 작성 중입니다...
+                원고 릴레이 집필 중...
               </>
             ) : '🚀 원버튼 동시 생성하기'}
           </button>
