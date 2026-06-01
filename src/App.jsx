@@ -433,7 +433,6 @@ ${inputText}
   };
 
   const writePlatformContent = async (platform, summaryData, finalKey) => {
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${finalKey}`;
     const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
     const tone = tones[platform];
     const styleGuide = visualStyle === 'photo' 
@@ -489,21 +488,40 @@ ${summaryData}`;
       }
     };
 
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(apiPayload)
-    });
+    let lastError = null;
+    const maxRetries = 2;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[코다리 엔진] 2단계: ${platformName} 글 작성을 시도합니다. (시도 ${attempt}/${maxRetries})`);
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
 
-    if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.error?.message || `${platformName} 글 작성 실패`);
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(apiPayload)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          const errMsg = errData.error?.message || '알 수 없는 오류';
+          throw new Error(errMsg);
+        }
+
+        const data = await res.json();
+        const text = data.candidates[0].content.parts[0].text;
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+
+      } catch (err) {
+        console.warn(`[엔진 예외 발생] 시도 ${attempt} 실패: ${err.message}`);
+        lastError = err;
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+      }
     }
 
-    const data = await res.json();
-    const text = data.candidates[0].content.parts[0].text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    throw new Error(`${platformName} 최종 작성 실패: ${lastError?.message}`);
   };
 
   const generateContent = async () => {
