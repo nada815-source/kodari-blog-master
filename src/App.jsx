@@ -386,37 +386,20 @@ function App() {
     
     let promptContent = `[현재 시각 동기화]: 오늘은 **${todayDate}**입니다.
 제공된 자막 또는 주제를 깊이 있게 정독하고, 핵심 팩트(공식 정책명, 자격 요건, 구체적인 지원 수치 등)를 추출하여 요약 구조를 만드십시오.
-반드시 구글 검색 결과를 바탕으로 정보의 유효성을 검차하십시오.
+반드시 구글 검색 결과를 바탕으로 정보의 유효성을 정밀 팩트체크하여 반영하십시오.
 
 [텍스트 원본]:
 """
 ${inputText}
-"""`;
+"""
+
+결과는 다음 형식과 같이 마크다운 기반 텍스트로 자유롭게 작성하십시오:
+# 핵심 주제
+- 요약 및 세부 섹션별 팩트 수치
+- 추천 해시태그`;
 
     const apiPayload = {
-      contents: [{ parts: [{ text: promptContent }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "OBJECT",
-          properties: {
-            core_title: { type: "STRING", description: "분석된 핵심 대주제 제목" },
-            sections: {
-              type: "ARRAY",
-              items: {
-                type: "OBJECT",
-                properties: {
-                  sub_title: { type: "STRING", description: "소제목" },
-                  key_facts: { type: "STRING", description: "이 섹션에 반드시 들어가야 하는 팩트와 수치 요약" }
-                },
-                required: ["sub_title", "key_facts"]
-              }
-            },
-            hashtags: { type: "STRING", description: "핵심 해시태그 목록" }
-          },
-          required: ["core_title", "sections", "hashtags"]
-        }
-      }
+      contents: [{ parts: [{ text: promptContent }] }]
     };
 
     if (useGoogleSearch) {
@@ -446,9 +429,7 @@ ${inputText}
       setGroundingMetadata(prev => ({ ...prev, [inputMode]: null }));
     }
 
-    const text = data.candidates[0].content.parts[0].text;
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    return data.candidates[0].content.parts[0].text;
   };
 
   const writePlatformContent = async (platform, summaryData, finalKey) => {
@@ -475,7 +456,7 @@ ${inputText}
    - 각 기획마다 이미지 내에 들어갈 한국어 메인카피(main_title)와 보조문구(sub_copy), 그리고 상세 영어 프롬프트(prompt)를 작성하라. 인물은 한국인(Korean/Asian)으로, 배경에 글자가 뭉개지지 않도록 no text 지침을 반영하라.
 
 [1단계 검증 팩트 데이터]:
-${JSON.stringify(summaryData, null, 2)}`;
+${summaryData}`;
 
     const apiPayload = {
       contents: [{ parts: [{ text: promptContent }] }],
