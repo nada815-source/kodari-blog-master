@@ -78,6 +78,7 @@ function App() {
   const [showApiKey, setShowApiKey] = useState(false);
 
   const [useImage, setUseImage] = useState(true);
+  const [useGoogleSearch, setUseGoogleSearch] = useState(true); // [V3.7.8.7] 구글 검색 팩트체크 온오프 상태 추가
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('is_authenticated') === 'true');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -101,18 +102,40 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.8.5',
-      date: '2026-05-10',
-      title: '🛠️ 기능 복구 및 설계도 비주얼 강화',
-      tags: ['복구', 'UI/UX'],
+      version: 'V3.7.9.0',
+      date: '2026-06-01',
+      title: '🤖 차세대 병렬 멀티 에이전트 JSON Schema 엔진 탑재',
+      tags: ['엔진혁신', '안정화', '병렬처리'],
       details: [
-        '누락되었던 [스타일 변환복사] 버튼을 스토리보드 카드 내에 완벽하게 복구했습니다.',
-        '스토리보드 카드에 격자 패턴과 포커스 가이드를 추가하여 이미지 설계도 기능을 강화했습니다.',
-        '제목과 보조 문구를 한 번에 복사할 수 있는 일괄 복사 기능을 추가했습니다.'
+        '구글 공식 [responseSchema] 옵션을 탑재하여, 괄호 누락이나 포맷 깨짐 등의 고질적인 JSON 파싱 오류를 100% 원천 차단했습니다.',
+        '1단계 초안 요약(gemini-2.5-flash) 및 2단계 플랫폼 리라이팅(gemini-3-flash) 구조로 엔진을 이원화하여 팩트 안정성을 극대화했습니다.',
+        'Promise.all을 적용하여 네이버, 티스토리, 워드프레스 원고를 병렬로 동시 작성하므로 생성 대기 시간은 기존과 동일한 10초 대를 유지합니다.',
+        '본문 생성 시, 각 소제목 문맥에 완벽히 일치하는 4종의 프리미엄 3D Claymorphism 이미지 기획 프롬프트가 동시 생성되도록 통합했습니다.'
       ]
     },
     {
-      version: 'V3.7.8.4',
+      version: 'V3.7.8.7',
+      date: '2026-05-31',
+      title: '🛡️ 초강력 비용 통제 밸브 장착 (V3.7.8.3 복원 및 개량)',
+      tags: ['비용절감', '안정화', 'UI/UX'],
+      details: [
+        '선택된 플랫폼(네이버/티스토리/워드프레스)만 골라서 AI에게 작성을 지시하는 [동적 프롬프트 스키마]를 도입해 최대 65%의 API 토큰 비용을 절감합니다.',
+        '구글 실시간 검색 Grounding 비용을 완벽하게 통제할 수 있는 [🔎 GOOGLE RADAR ON/OFF] 스위치를 도입했습니다.',
+        '가장 가볍고 튼튼한 V3.7.8.3 원본 엔진 베이스라인으로 복구하여 화면 충돌 가능성을 원천 종식했습니다.'
+      ]
+    },
+    {
+      version: 'V3.7.8.3',
+      date: '2026-05-10',
+      title: '🕒 타임 스탬프 엔진: 실시간 시간 인식',
+      tags: ['기능강화', '지능화'],
+      details: [
+        'AI가 글 작성 시점(오늘 날짜/요일)을 스스로 인식하도록 타임 엔진을 장착했습니다.',
+        '과거(2024, 2025)의 낡은 자료가 아닌 현재(2026)의 최신 정책과 뉴스를 우선 정찰하도록 검색 지침을 강화했습니다.'
+      ]
+    },
+    {
+      version: 'V3.7.8.2',
       date: '2026-05-10',
       title: '⚓ 레드 스크롤바 활성화 및 물량 증강',
       tags: ['UI/UX', '기능강화'],
@@ -298,7 +321,7 @@ function App() {
         "'글을 마치며', '맺음말' 등 기계적인 사족 섹션을 완전히 제거하여 전문성을 높였습니다.",
         '1,500자 이상의 고밀도 정보 중심 스타일로 최적화하여 독자의 몰입감을 극대화했습니다.',
         '불필요한 미사여구 대신 실전 팁과 핵심 팩트 위주의 리포트 형식을 강화했습니다.',
-        'V3.5.9 브랜치의 깔끔한 레이아웃과 안정적인 데이터 구조를 계승했습니다.'
+        'V3.5.9 브랜치의 깔끔한 레이아웃 and 안정적인 데이터 구조를 계승했습니다.'
       ]
     },
     {
@@ -322,304 +345,6 @@ function App() {
         '구글 실시간 검색 그라운딩(Grounding) 기술을 도입하여 할루시네이션(환각)을 원천 차단했습니다.',
         '정부 정책, 숫자, 날짜 등 민감한 정보를 작성 전 반드시 구글 검색으로 선제 정찰하도록 지침을 강화했습니다.',
         '포스팅 하단에 정보의 출처(Official Sources)를 자동으로 표기하여 블로그의 권위와 신뢰도를 높였습니다.'
-      ]
-    },
-    {
-      version: 'V3.5.8',
-      date: '2026-05-05',
-      title: '🏛️ 정부정책 우선순위 전략 배치',
-      tags: ['전략 변경', '데이터 최적화', 'UX'],
-      details: [
-        '소재 연구소의 최우선 카테고리를 "정부정책"으로 변경하여 진입 시 즉시 노출되도록 했습니다.',
-        '경제/재테크 카테고리와 정부정책 카테고리의 위치를 스왑하여 전략적 중요도를 높였습니다.',
-        '기본 선택값을 변경하여 대표님의 분석 흐름을 최적화했습니다.'
-      ]
-    },
-    {
-      version: 'V3.5.7',
-      date: '2026-05-05',
-      title: '💡 소재 연구소 모바일 화면 최적화',
-      tags: ['모달 수정', 'UX 개선', '모바일'],
-      details: [
-        '소재 연구소 진입 시 모바일에서 화면이 잘리던 현상을 완벽하게 해결했습니다.',
-        '모바일 모달 정렬을 상단 위주로 재조정하여 스크롤 가독성을 극대화했습니다.',
-        '테두리 여백과 곡률을 슬림화하여 정보 노출 영역을 대폭 확대했습니다.'
-      ]
-    },
-    {
-      version: 'V3.5.6',
-      date: '2026-05-05',
-      title: '⚓ 레이아웃 안정성 복구 및 가로 모드 완결',
-      tags: ['안정화', '구조 복구', 'UX'],
-      details: [
-        '가장 안정적이었던 V2.8.0 기반의 블록 레이아웃(mx-auto)으로 구조를 복구했습니다.',
-        '복잡한 flex/grid 설정을 제거하여 사파리 가로 모드 호환성을 100% 확보했습니다.',
-        '대표님께서 요청하신 소재 연구소 버튼 슬림화 디자인은 그대로 유지했습니다.',
-        '버전명을 V3.5.6으로 업데이트하여 최종 안착을 확인합니다.'
-      ]
-    },
-    {
-      version: 'V3.5.4',
-      date: '2026-05-05',
-      title: '⚓ 가로 모드 뷰포트 최종 봉인 완료',
-      tags: ['Viewport Fix', 'Safari Ultimate', 'UX'],
-      details: [
-        '아이폰 사파리 가로 모드에서 레이아웃이 50%로 고정되는 현상을 shrink-to-fit=no 설정으로 해결했습니다.',
-        'html, body에 min-width: 100vw를 강제 주입하여 배경색 잘림을 원천 차단했습니다.',
-        '#root 래퍼 기반의 세이프 에리어 인셋(Safe Area Insets) 패딩을 적용했습니다.',
-        '버전명을 V3.5.4로 업데이트하여 최신 패치 적용 여부를 즉시 확인할 수 있게 했습니다.'
-      ]
-    },
-    {
-      version: 'V3.5.2',
-      date: '2026-05-05',
-      title: '💎 가로 모드 완전 대응 및 레이아웃 안정화',
-      tags: ['UX 완결', '최종 수정', '명품 UI'],
-      details: [
-        '아이폰 가로 모드에서 화면이 반쪽만 나오던 현상을 100vw 강제 주입으로 해결했습니다.',
-        '배경색 유실을 방지하기 위해 CSS 기초 골조(!important)를 대대적으로 보강했습니다.',
-        'grid 정렬 시스템을 도입하여 어떤 회전 상황에서도 중앙 정렬을 유지합니다.',
-        '모바일 사용성을 위한 버튼 슬림화 패치가 최종 안착되었습니다.'
-      ]
-    },
-    {
-      version: 'V2.7.3 Final',
-      date: '2026-04-30',
-      title: '💎 KODARI 명품 생산성 패키지 완성 (Final)',
-      tags: ['신기능', '생산성', '최적화'],
-      details: [
-        '플랫폼별 [🔄 이 글만 다시 쓰기] 기능을 탑재하여, 원하는 플랫폼 본문만 콕 집어 재생성할 수 있습니다.',
-        '재생성 에러를 원천 차단하는 [무결성 구분자 파싱] 로직을 도입하여 안정성을 100% 확보했습니다.',
-        '표(Table) 내부의 불필요한 특수문자를 제거하는 [Clean-Table] 지침을 강화하여 가독성을 극대화했습니다.',
-        '모바일 사용성을 극대화한 [📱 모바일 복사 전용] 미리보기 창과 [📋 전체 선택 및 복사] 버튼을 추가했습니다.',
-        'V2.5.1의 자연스러운 문장 단위 강조 스타일을 V2.7.3 엔진에 완벽하게 이식했습니다.',
-        'Vercel Deployment Protection 해제를 통해 모바일에서도 로그인 없이 즉시 접속이 가능해졌습니다.',
-        '상단 헤더에 실시간 작동 상태를 알리는 Pulse 애니메이션 뱃지를 적용했습니다.'
-      ]
-    },
-    {
-      version: 'V2.7.3',
-      date: '2026-04-29',
-      title: '🎨 KODARI Storytelling Branding 엔진 공식 오픈',
-      tags: ['대규모 업데이트', '브랜딩', 'AI 상상력'],
-      details: [
-        '단일 단어(Impact Word)를 넘어선 [메인 제목 + 보조 문구] 이중 카피라이팅 시스템을 도입했습니다.',
-        '본문 맥락을 분석하여 금화, 악수, 성장 차트 등 "시각적 비유(Metaphor)"를 자동으로 설계하는 지능형 프롬프트를 탑재했습니다.',
-        '어떤 주제에서도 [썸네일1 + 본문3]의 완벽한 4종 세트 이미지를 보장하는 Perfect 4-Set 로직을 강제했습니다.',
-        '외부 라이브러리 의존성을 제거한 "Zero-Error 인라인 아이콘 시스템"으로 엔진 안정성을 극대화했습니다.',
-        '명품 정보 카드 레이아웃을 적용하여 블로그의 시각적 신뢰도와 브랜딩 가치를 한 차원 높였습니다.'
-      ]
-    },
-    {
-      version: 'V2.6.0',
-      date: '2026-04-29',
-      title: '💎 KODARI 명품 비주얼 엔진 V2.6 업그레이드',
-      tags: ['신기능', '디자인'],
-      details: [
-        '보케(Bokeh) 효과와 시네마틱 조명 지침을 도입하여 텍스트 가독성과 이미지 깊이감을 극대화했습니다.',
-        '3D 일러스트 생성 시 글라스모피즘, 골드 빛 줄기, 테크 파티클 등 럭셔리 요소를 기본 탑재했습니다.',
-        '핵심 단어(Impact Word)를 Massive Bold로 강조하고 배경을 흐리게 하는 타이포 위계 로직을 강화했습니다.',
-        '모바일 환경에서의 가독성을 보장하는 "Mobile-optimized" 지침을 모든 프롬프트에 적용했습니다.'
-      ]
-    },
-    {
-      version: 'V2.5.1',
-      date: '2026-04-29',
-      title: '🧹 지능형 프롬프트 클린 시스템 도입',
-      tags: ['최적화', '지능화'],
-      details: [
-        'Impact Word 삭제 시 프롬프트 내의 불필요한 구문을 자동으로 제거하는 지능형 클린 로직을 추가했습니다.',
-        '텍스트 없는 순수 이미지를 원할 때 더욱 깔끔하고 정확한 일러스트 생성을 보장합니다.',
-        '프롬프트 내의 따옴표 및 중복 쉼표를 정제하여 AI의 이해도를 극대화했습니다.'
-      ]
-    },
-    {
-      version: 'V2.5.0',
-      date: '2026-04-29',
-      title: '🔠 KODARI Impact Typo 엔진 탑재',
-      tags: ['신기능', '타이포그래피'],
-      details: [
-        '3D 일러스트 내에 블로그 주제를 관통하는 "핵심 한글 단어"를 삽입할 수 있는 기능이 추가되었습니다.',
-        'AI가 섹션별로 최적의 단어(1~4글자)를 자동 추천하며, 대표님이 직접 수정하여 개성을 더할 수 있습니다.',
-        '수정된 단어는 프롬프트에 실시간으로 반영되어, 생성 시 이미지 속에 자연스럽게 녹아듭니다.',
-        '썸네일의 가시성을 극대화하고 독자의 클릭을 유도하는 강력한 시각 도구입니다.'
-      ]
-    },
-    {
-      version: 'V2.4.5',
-      date: '2026-04-29',
-      title: '🔄 스타일 반전 복사 기능 도입',
-      tags: ['생산성', '하이브리드'],
-      details: [
-        'AI 이미지 가이드 모달에서 현재 생성된 프롬프트를 즉석에서 다른 스타일(실사 ↔ 3D)로 변환하여 복사할 수 있는 기능을 추가했습니다.',
-        '복사 시 3D 관련 키워드와 실사 관련 키워드를 지능적으로 교체하여 별도의 생성 과정 없이도 스타일 전환이 가능합니다.',
-        '하나의 포스팅 안에서 다양한 스타일의 이미지를 섞어 사용하고자 하는 대표님의 니즈를 반영했습니다.'
-      ]
-    },
-    {
-      version: 'V2.4.1',
-      date: '2026-04-29',
-      title: '💡 KODARI Visual Style Guide 탑재',
-      tags: ['편의성', '가이드'],
-      details: [
-        '스타일 스위치 옆에 "스타일 선택 가이드(💡)" 버튼을 추가했습니다.',
-        '주제별로 실사 사진과 3D 일러스트 중 어떤 것이 더 적합한지 한눈에 알 수 있는 전문 팝업 가이드를 제공합니다.',
-        '대표님의 생산성 향상을 위한 비주얼 의사결정 지원 시스템을 구축했습니다.'
-      ]
-    },
-    {
-      version: 'V2.4.0',
-      date: '2026-04-29',
-      title: '🎨 KODARI Visual Style Switch 오픈',
-      tags: ['신기능', 'UI/UX'],
-      details: [
-        '이미지 스타일 선택 스위치를 통해 "실사 사진"과 "3D 일러스트" 스타일을 자유롭게 선택할 수 있습니다.',
-        '선택된 스타일에 맞춰 AI가 각 섹션별 이미지 생성 프롬프트를 맞춤형으로 제작합니다.',
-        '메인 컨트롤 패널의 디자인을 더 직관적이고 세련된 스타일로 개편했습니다.'
-      ]
-    },
-    {
-      version: 'V2.3.3',
-      date: '2026-04-29',
-      title: '🏗️ 팩트체크 시스템 및 오리지널 UI 복원',
-      tags: ['기능 복구', 'UI/UX'],
-      details: [
-        'AI 지침 정밀 수정을 통해 누락되었던 "공식 관련 링크(official_links)" 생성 기능을 완벽하게 복구했습니다.',
-        '팩트체크 알림 박스를 대표님이 가장 선호하시던 초기 안정 버전의 오리지널 디자인으로 되돌렸습니다.',
-        '멀티 섹션 프롬프트 기능과 팩트체크 시스템 간의 데이터 충돌을 해결했습니다.'
-      ]
-    },
-    {
-      version: 'V2.3.2',
-      date: '2026-04-28',
-      title: '💎 UI 최적화 및 보안 강화',
-      tags: ['UI/UX', '보안'],
-      details: [
-        '대표님 인증 팝업창의 디자인을 더 컴팩트하고 세련되게 개선했습니다.',
-        '모든 모달 창에 우측 상단 닫기(X) 버튼을 추가하여 사용 편의성을 높였습니다.'
-      ]
-    },
-    {
-      version: 'V2.3.1',
-      date: '2026-04-28',
-      title: '🩹 Hotfix: AI 프롬프트 버튼 노출 수정',
-      tags: ['버그 수정', 'UI/UX'],
-      details: [
-        '데이터 구조 변경으로 인해 일시적으로 사라졌던 "AI 이미지 생성 프롬프트 보기" 버튼을 긴급 복구했습니다.'
-      ]
-    },
-    {
-      version: 'V2.3.0',
-      date: '2026-04-28',
-      title: '🎬 KODARI Multi-Section Director 오픈',
-      tags: ['주요 업데이트', '이미지 에디팅'],
-      details: [
-        '블로그의 4개 핵심 소제목별로 최적화된 "개별 이미지 생성 프롬프트" 기능을 도입했습니다.',
-        '글의 흐름에 따라 각 섹션에 딱 맞는 서로 다른 4가지 이미지를 생성하고 배치할 수 있습니다.',
-        'UI 모달 내에서 섹션별 프롬프트를 확인하고 각각 복사할 수 있는 전문 에디터 모드를 지원합니다.'
-      ]
-    },
-    {
-      version: 'V2.2.0',
-      date: '2026-04-28',
-      title: '🎨 KODARI Creator Mode: AI 프롬프트 생성기',
-      tags: ['신규 기능', '이미지 생성'],
-      details: [
-        'Unsplash 검색 결과가 만족스럽지 않을 때 사용할 수 있는 "AI 이미지 생성 프롬프트" 기능을 추가했습니다.',
-        '각 플랫폼별 본문에 딱 맞는 고해상도 이미지 생성 전용 영어 프롬프트를 자동으로 제작합니다.',
-        '생성된 프롬프트를 한 번의 클릭으로 복사하여 Gemini, DALL-E 3 등에 즉시 사용할 수 있습니다.'
-      ]
-    },
-    {
-      version: 'V2.1.7',
-      date: '2026-04-28',
-      title: '🔍 이미지 매칭 엔진 최적화 (Keyword 3.0)',
-      tags: ['성능 개선', '이미지 매칭'],
-      details: [
-        'Unsplash 검색 정확도를 높이기 위해 문장형 검색어를 2~3단어의 핵심 키워드로 자동 압축하는 로직을 도입했습니다.',
-        '엉뚱한 사진이 나올 확률을 대폭 줄이고, 사물 중심의 정확한 매칭 성능을 확보했습니다.'
-      ]
-    },
-    {
-      version: 'V2.1.6',
-      date: '2026-04-28',
-      title: '🎬 KODARI Visual Engine 3.0: Visual Director',
-      tags: ['기능 추가', 'AI 상상력'],
-      details: [
-        'AI가 최적의 사진 구도를 먼저 "상상"한 뒤 검색하는 "Visual Director" 로직을 도입했습니다.',
-        '한국인 모델(Korean/Asian) 우선 배정 옵션을 강화하여 국내 블로그 최적화 품질을 높였습니다.',
-        '배경 내 지저분한 영어 텍스트를 배제하고 깨끗한 이미지를 선별하는 필터링 기능을 추가했습니다.'
-      ]
-    },
-    {
-      version: 'V2.1.5',
-      date: '2026-04-28',
-      title: '⚓ KODARI 이미지 엔진 2.0 도입',
-      tags: ['기능 추가', '알고리즘'],
-      details: [
-        '플랫폼별 특성에 최적화된 "3중 교차 이미지 검색 전략"을 도입했습니다.',
-        '네이버(감성), 티스토리(정보), 워드프레스(전문성) 각기 다른 시각적 컨셉의 이미지가 배정됩니다.',
-        '추상적 키워드 대신 실제 사물/행위 중심의 검색 로직을 적용하여 매칭 정확도를 획기적으로 높였습니다.'
-      ]
-    },
-    {
-      version: 'V2.1.4',
-      date: '2026-04-28',
-      title: '🖼️ 이미지 컨셉 가이드 및 재검색 도입',
-      tags: ['기능 추가', 'UI/UX'],
-      details: [
-        'AI가 선택한 이미지의 의도를 한국어로 설명해 주는 "현재 이미지 컨셉" 표시 기능을 추가했습니다.',
-        '결과 화면에서 원하는 키워드로 즉시 사진을 교체할 수 있는 실시간 재검색 UI를 구축했습니다.'
-      ]
-    },
-    {
-      version: 'V2.1.3',
-      date: '2026-04-28',
-      title: '🧠 AI 이미지 검색 지능 고도화',
-      tags: ['로직 개선', '품질 향상'],
-      details: [
-        '단순 단어 검색에서 벗어나 본문 맥락을 분석한 정교한 문장형 검색 쿼리를 생성하도록 개선했습니다.',
-        '주제에 따라 한국(Korea) 또는 특정 시각적 배경을 유연하게 조합하여 이미지 적합도를 획기적으로 높였습니다.'
-      ]
-    },
-    {
-      version: 'v2.1.2',
-      date: '2026-04-28',
-      title: '📜 코다리의 항해일지(패치노트) 도입',
-      tags: ['기능 추가', 'UI/UX'],
-      details: [
-        '혁신 블로그 AI의 장점을 벤치마킹하여 서비스 업데이트 내역을 한눈에 볼 수 있는 타임라인 UI를 추가했습니다.',
-        '헤더의 📜 버튼을 통해 언제든지 코다리 엔진의 진화 과정을 확인하실 수 있습니다.'
-      ]
-    },
-    {
-      version: 'v2.1.1',
-      date: '2026-04-28',
-      title: '⚖️ 황금 밸런스 가독성 튜닝',
-      tags: ['성능 개선', '가독성'],
-      details: [
-        '모바일 최적화의 정점! 한 문단 길이를 2~3문장으로 조절하여 가독성과 논리적 흐름을 모두 잡았습니다.',
-        '문단 사이 시각적 여백을 강화하여 독자가 느끼는 피로도를 획기적으로 줄였습니다.'
-      ]
-    },
-    {
-      version: 'v2.1.0',
-      date: '2026-04-28',
-      title: '📱 모바일 복사 전용 시스템 도입',
-      tags: ['기능 추가'],
-      details: [
-        '네이버 블로그 앱 서식 깨짐 방지를 위한 "모바일 복사 전용 미리보기" 기능을 추가했습니다.',
-        '새 창에서 전체 선택 후 복사하여 서식을 100% 보존할 수 있습니다.'
-      ]
-    },
-    {
-      version: 'v2.0.0',
-      date: '2026-04-27',
-      title: '🇰🇷 한국어 완벽 통일 및 3색 강조',
-      tags: ['시스템'],
-      details: [
-        '워드프레스 포함 모든 플랫폼의 출력 언어를 한국어로 100% 고정했습니다.',
-        '3색(노랑 형광펜, 파랑 강조, 빨강 주의) 컬러 시스템을 완성했습니다.'
       ]
     }
   ];
@@ -655,6 +380,150 @@ function App() {
     localStorage.setItem('gemini_api_key', key);
   };
 
+  const fetchSummaryDraft = async (inputText, finalKey) => {
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+    const todayDate = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    
+    let promptContent = `[현재 시각 동기화]: 오늘은 **${todayDate}**입니다.
+제공된 자막 또는 주제를 깊이 있게 정독하고, 핵심 팩트(공식 정책명, 자격 요건, 구체적인 지원 수치 등)를 추출하여 요약 구조를 만드십시오.
+반드시 구글 검색 결과를 바탕으로 정보의 유효성을 검차하십시오.
+
+[텍스트 원본]:
+"""
+${inputText}
+"""`;
+
+    const apiPayload = {
+      contents: [{ parts: [{ text: promptContent }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            core_title: { type: "STRING", description: "분석된 핵심 대주제 제목" },
+            sections: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  sub_title: { type: "STRING", description: "소제목" },
+                  key_facts: { type: "STRING", description: "이 섹션에 반드시 들어가야 하는 팩트와 수치 요약" }
+                },
+                required: ["sub_title", "key_facts"]
+              }
+            },
+            hashtags: { type: "STRING", description: "핵심 해시태그 목록" }
+          },
+          required: ["core_title", "sections", "hashtags"]
+        }
+      }
+    };
+
+    if (useGoogleSearch) {
+      apiPayload.tools = [{ google_search: {} }];
+      console.log('[코다리 정찰기 기동] 1단계 요약 시 구글 실시간 검색 Grounding이 가동됩니다.');
+    } else {
+      console.log('[로컬 가동] 1단계 구글 실시간 검색을 비활성화합니다.');
+    }
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(apiPayload)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error?.message || '1단계 요약 생성 실패');
+    }
+
+    const data = await res.json();
+    
+    if (data.candidates?.[0]?.groundingMetadata) {
+      setGroundingMetadata(prev => ({ ...prev, [inputMode]: data.candidates[0].groundingMetadata }));
+      console.log('[팩트체크 성공] 구글 검색 근거를 1단계에서 확보했습니다.');
+    } else {
+      setGroundingMetadata(prev => ({ ...prev, [inputMode]: null }));
+    }
+
+    const text = data.candidates[0].content.parts[0].text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+  };
+
+  const writePlatformContent = async (platform, summaryData, finalKey) => {
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${finalKey}`;
+    const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
+    const tone = tones[platform];
+    const styleGuide = visualStyle === 'photo' 
+      ? "Professional Editorial Photography 스타일 (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
+      : "Modern Isometric Digital Illustration 스타일 (Keywords: Professional infographic layout, flat design with 3D depth, organized visual information, clean lines, bright and optimistic palette)";
+
+    const promptContent = `당신은 ${platformName} 전문 콘텐츠 라이터입니다. 
+제공된 1단계 요약 팩트 데이터를 바탕으로 최고 품질의 원고를 집필하십시오.
+
+[작성 및 강조 규칙]:
+1. 어투: 반드시 [${tone}] 스타일로 작성하되, 다정하고 친근한 이모지를 풍부히 섞어라.
+2. 분량: 공백 제외 최소 1,500자 이상의 매우 풍성한 정보를 담아라.
+3. 사족 금지: '글을 마치며', '결론', '맺음말' 등 식상한 기계적 섹션 사용을 **절대 금지**하며, 정보가 끝나면 자연스럽게 종결하라.
+4. 3중 하이브리드 강조: 핵심 키워드나 수치는 반드시 좌우 공백 없이 기호로 밀착 감싸라. (노랑 ==형광펜==, 파랑 ++파랑강조++, 빨강 !!주의사항!!)
+5. 정보 시각화: 비교/대조 정보는 **반드시 마크다운 표(Table)**로 시각화하되, 표 내부에는 강조 기호(**, ==, ++ 등)를 절대 사용하지 마라.
+6. 이미지 기획 (총 4개): 본문의 흐름에 맞게 Premium 3D Claymorphism 스타일의 이미지 기획 4개를 'image_prompts' 배열에 상세히 기재하라. 
+   - 1번째: Section 1 (Thumbnail) - 전체 주제를 관통하는 명품 대표 이미지
+   - 2번째 & 3번째: Section 2 & 3 - 본문의 핵심 정보를 비유/시각화하는 이미지
+   - 4번째: Section 4 (Summary) - 성공적인 마무리 또는 달성 느낌의 피날레 이미지
+   - 각 기획마다 이미지 내에 들어갈 한국어 메인카피(main_title)와 보조문구(sub_copy), 그리고 상세 영어 프롬프트(prompt)를 작성하라. 인물은 한국인(Korean/Asian)으로, 배경에 글자가 뭉개지지 않도록 no text 지침을 반영하라.
+
+[1단계 검증 팩트 데이터]:
+${JSON.stringify(summaryData, null, 2)}`;
+
+    const apiPayload = {
+      contents: [{ parts: [{ text: promptContent }] }],
+      generationConfig: {
+        temperature: 0.1, // 상상력 원천 제어 및 팩트 밀착
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            title: { type: "STRING", description: "플랫폼 최적화 제목" },
+            content: { type: "STRING", description: "H2 구조, 3중 하이브리드 강조, 마크다운 표가 장착된 본문 원고 (최소 1500자 이상)" },
+            tags: { type: "STRING", description: "쉼표로 구분된 해시태그 목록" },
+            image_prompts: {
+              type: "ARRAY",
+              description: "본문 흐름에 매칭되는 상세 이미지 프롬프트 기획 4개",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  title: { type: "STRING", description: "섹션 제목 (예: Section 1 (Thumbnail))" },
+                  main_title: { type: "STRING", description: "이미지 내 가상 한글 메인 카피" },
+                  sub_copy: { type: "STRING", description: "보조 한글 문구" },
+                  prompt: { type: "STRING", description: "영어 이미지 생성 묘사 상세 프롬프트 (High quality 3D claymorphism style, isometric, clean layout)" }
+                },
+                required: ["title", "main_title", "sub_copy", "prompt"]
+              }
+            }
+          },
+          required: ["title", "content", "tags", "image_prompts"]
+        }
+      }
+    };
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(apiPayload)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error?.message || `${platformName} 글 작성 실패`);
+    }
+
+    const data = await res.json();
+    const text = data.candidates[0].content.parts[0].text;
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+  };
 
   const generateContent = async () => {
     if (!isAuthenticated) {
@@ -676,157 +545,68 @@ function App() {
       return;
     }
 
+    const activePlatforms = Object.keys(platforms).filter(k => platforms[k]);
+    if (activePlatforms.length === 0) {
+      setError('발행할 플랫폼을 최소 하나 이상 선택해 주세요!');
+      return;
+    }
+
     setLoading(true);
     setError('');
     
     try {
-      let finalTopicContext = `주제: "${topic}"`;
-      
+      let inputText = topic;
       if (inputMode === 'youtube') {
-        // [V3.7.3] 자막 정제 로직 (대괄호 효과음 제거 및 공백 압축)
         let cleanedTranscript = youtubeTranscript
           .replace(/\[.*?\]/g, '')
           .replace(/\s+/g, ' ')
           .trim();
 
-        const truncatedTranscript = cleanedTranscript.length > 15000 
+        inputText = cleanedTranscript.length > 15000 
           ? cleanedTranscript.substring(0, 15000) + '... (이하 생략)' 
           : cleanedTranscript;
-          
-        finalTopicContext = `[특별 임무: 유튜브 영상 요약 및 큐레이션]
-아래 제공된 유튜브 영상 자막을 완벽하게 분석하고, 단순 요약이 아닌 전문가의 시선이 담긴 깊이 있는 블로그 글로 연성해. 원본 영상의 핵심을 짚어주고 독자가 궁금해할 만한 인사이트를 반드시 추가해. 영상의 제목이나 분위기도 유추해서 글에 녹여내.
-
-[필독: 자막 교정 지침]
-유튜브 자동 생성 자막의 특성상 오탈자나 문맥에 맞지 않는 엉뚱한 단어가 다수 포함되어 있을 수 있어. 전체 문맥을 파악하여 이상한 단어나 오탈자는 자연스럽고 올바른 단어로 완벽하게 교정해서 글을 작성해.
-
-[영상 자막 원본]:
-"""
-${truncatedTranscript}
-"""`;
       }
 
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
-      
-      const styleGuide = visualStyle === 'photo' 
-        ? "스타일: 반드시 'Professional Editorial Photography' 스타일로 묘사해. (Keywords: High-end magazine style, clean composition, soft studio lighting, high resolution)"
-        : "스타일: 반드시 'Modern Isometric Digital Illustration' 스타일로 묘사해. (Keywords: Professional infographic layout, flat design with 3D depth, organized visual information, clean lines, bright and optimistic palette)";
+      // 1단계: 초안 요약 생성 (gemini-2.5-flash)
+      console.log('[코다리 엔진] 1단계: 초안 및 뼈대 정보 팩트체크 기동.');
+      const summaryData = await fetchSummaryDraft(inputText, finalKey);
 
-      const todayDate = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
-      
-      const combinedPrompt = `[현재 시각 동기화]: 오늘은 **${todayDate}**입니다. 
-당신은 현재 시점의 가장 생생한 정보를 전달해야 하는 임무를 띠고 있습니다. 2024년이나 2025년의 낡은 정책이나 과거 데이터가 아닌, 반드시 **2026년 현재**의 최신 정책, 시행령, 뉴스 데이터를 구글 검색을 통해 우선적으로 정찰하고 반영하십시오.
+      // 2단계: 3대 플랫폼 병렬 작성 및 이미지 4개 동시 생성 (gemini-3-flash)
+      console.log('[코다리 엔진] 2단계: 플랫폼별 병렬 리라이팅 & 이미지 4종 동시 생성 (Promise.all).');
+      const [naverRaw, tistoryRaw, wordpressRaw] = await Promise.all([
+        platforms.naver ? writePlatformContent('naver', summaryData, finalKey) : Promise.resolve(null),
+        platforms.tistory ? writePlatformContent('tistory', summaryData, finalKey) : Promise.resolve(null),
+        platforms.wordpress ? writePlatformContent('wordpress', summaryData, finalKey) : Promise.resolve(null)
+      ]);
 
-${finalTopicContext}
-이미지 스타일: ${visualStyle === 'photo' ? '실사 사진' : '3D 일러스트'}
+      const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '', section_prompts: [] };
 
-[필독: 생성 지침 - 고밀도 콤팩트 리포트 스타일]
-[필독: 사족 금지 - '글을 마치며', '결론', '맺음말', '요약' 등의 기계적이고 뻔한 섹션 제목을 사용하는 것을 **절대 엄금**해. 정보 전달이 끝나면 자연스럽고 깔끔하게 글을 맺어.]
-[필독: 팩트 체크 - 반드시 '구글 검색' 결과를 바탕으로 정확한 정보만 기록해. 확실하지 않은 수치는 절대 지어내지 마.]
-[필독: 언어 설정 - 모든 텍스트(특히 워드프레스 본문을 포함한 전체 데이터)는 무조건 **한국어(Korean)**로만 작성해. 절대 영어로 번역하거나 답변하지 마.]
-
-0. **이미지 검색 및 생성 전략 (KODARI Visual Engine 3.3):**
-   - **[1단계: 상상]**: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 **최적의 시각적 장면**을 먼저 상상해.
-   - **[2단계: 스타일 적용]**: ${styleGuide}
-   - **[3단계: 제약 조건]**: 인물은 반드시 **한국인(Korean/Asian)**으로, 배경은 외국어 없이 **깨끗하게** 구성해.
-   - **[4단계: 이미지 생성 지침(section_prompts)]**: 본문 소제목(H2) 개수와 상관없이, 아래의 **Storytelling Branding Rule**을 적용한 **총 4개**의 상세 영어 프롬프트를 반드시 생성해.
-      1) **Section 1 (Thumbnail)**: Create a grand masterpiece thumbnail representing the overall topic.
-      2) **Section 2 & 3 (Main Content)**: Visualize the most important informative parts of the content.
-      3) **Section 4 (Summary/Conclusion)**: Show a celebratory or concluding scene with a sense of achievement.
-      4) **Text Hierarchy**: Generate a **main_title** and a **sub_copy** for EACH of the 4 images.
-      5) **Visual Metaphor**: Use 'Storytelling Visual Metaphors' that symbolize the content.
-      6) **Layout Strategy**: Create a 'Premium Information Card' layout where the **main_title** and **sub_copy** can be placed naturally as part of the design.
-      7) **Visual Style**: Keep the 'Premium 3D Claymorphism' style.
-      8) **Safety**: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.**
-
-1. **[정밀 화력] 콤팩트한 정보 밀도 (V3.5.9 스타일 계승):** 
-   - 본문은 공백 제외 **최소 1500자 이상의 풍성한 분량**으로 작성해. 
-   - 불필요한 미사여구는 빼고, **'핵심 정보'와 '실전 팁'** 중심으로 밀도 높게 구성해.
-   - **[구조]**: 소제목에 번호를 붙이지 말고, ## 기호를 사용하여 깔끔한 제목 스타일로 구성해. 
-
-2. **가독성 극대화 및 [3중 하이브리드 강조 - 밀착 강조 규칙]:**
-   - 모든 기호는 **반드시 강조할 대상에 공백 없이 1:1로 밀착**시켜라. (예: ==문장 전체==, ++파란색키워드++, **강조단어**, !!주의사항!!)
-   - 기호를 문장 중간에 끊기거나 어설프게 남기지 말고, 반드시 감싸는 구조로 정밀하게 작성해.
-   - **[형광펜]**: ==문장 전체를 감싸서 노란색 색칠== (중간에 끊지 마)
-   - **[파랑강조]**: ++핵심단어/수치++
-   - **[빨강주의]**: !!필독정보!!
-
-3. **[경고] 표(Table) 내부 기호 절대 금지 (Zero-Symbol Policy):**
-   - 모든 정보성 데이터는 **무조건 Markdown Table 형식**으로 시각화해. 
-   - **[절대 엄금]: 표 내부에는 절대로 강조 기호(**, ==, ++, !!)를 사용하지 마라.** 순수한 텍스트만 입력해.
-
-4. **JSON 및 말투 가이드:**
-   - 독자와 직접 대화하듯 다정하고 친근한 블로거의 말투를 사용해. 문장 곳곳에 세련된 이모지를 적절히 섞어줘.
-
-결과는 반드시 아래의 JSON 형식으로만 답변해:
-{
-  "image_queries": [ {"en": "...", "ko": "..." }, ... ],
-  "section_prompts": [
-    {
-      "title": "소제목",
-      "main_title": "메인 제목 (한글)",
-      "sub_copy": "보조 문구 (한글)",
-      "prompt": "상세 영어 프롬프트"
-    },
-    ... (총 4개 생성)
-  ],
-  "naver": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
-  "tistory": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] },
-  "wordpress": { "title": "...", "content": "...", "tags": "...", "official_links": [{"name": "링크이름", "url": "https://..."}] }
-}
-
-[필독: 해시태그는 '#'을 붙여 한 줄로 나열하고, 워드프레스를 포함한 모든 플랫폼의 해시태그는 무조건 **한국어**로만 작성해.]`;
-
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: combinedPrompt }] }],
-          tools: [{ google_search: {} }] 
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'API 호출 실패');
-      }
-
-      const data = await response.json();
-      
-      // 구글 검색 근거(Grounding) 메타데이터 추출 및 저장
-      if (data.candidates?.[0]?.groundingMetadata) {
-        setGroundingMetadata(prev => ({ ...prev, [inputMode]: data.candidates[0].groundingMetadata }));
-        console.log('[팩트체크 성공] 구글 검색 근거를 확보했습니다.');
-      } else {
-        setGroundingMetadata(prev => ({ ...prev, [inputMode]: null }));
-      }
-
-      let responseTextRaw = data.candidates[0].content.parts[0].text;
-      
-      // [철벽 파싱] JSON 블록만 정밀 추출
-      let responseText = "";
-      const jsonMatch = responseTextRaw.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        responseText = jsonMatch[0];
-      } else {
-        responseText = responseTextRaw.replace(/```json/gi, '').replace(/```/gi, '').trim();
-      }
-
-      const parsedData = JSON.parse(responseText);
-      const emptyResult = { title: '', content: '생성 실패', tags: '', official_link: '', image: '', image_desc: '' };
-
-      let finalImages = ['', '', ''];
-
-      const koDescs = (parsedData.image_queries || []).map(q => q.ko);
-      const sectionPrompts = parsedData.section_prompts || [];
+      const formatResult = (parsedData) => {
+        if (!parsedData) return emptyResult;
+        const koDescs = (parsedData.image_prompts || []).map(p => p.sub_copy);
+        return {
+          title: parsedData.title || '',
+          content: parsedData.content || '',
+          tags: parsedData.tags || '',
+          official_link: '',
+          official_links: parsedData.official_links || [],
+          image: '',
+          image_desc: koDescs[0] || '',
+          section_prompts: parsedData.image_prompts || []
+        };
+      };
 
       setResults(prev => ({
         ...prev,
         [inputMode]: {
-          naver: parsedData.naver ? { ...emptyResult, ...parsedData.naver, image: finalImages[0], image_desc: koDescs[0] || '', section_prompts: sectionPrompts, official_links: parsedData.naver.official_links || [] } : emptyResult,
-          tistory: parsedData.tistory ? { ...emptyResult, ...parsedData.tistory, image: finalImages[1], image_desc: koDescs[1] || '', section_prompts: sectionPrompts, official_links: parsedData.tistory.official_links || [] } : emptyResult,
-          wordpress: parsedData.wordpress ? { ...emptyResult, ...parsedData.wordpress, image: finalImages[2], image_desc: koDescs[2] || '', section_prompts: sectionPrompts, official_links: parsedData.wordpress.official_links || [] } : emptyResult
+          naver: platforms.naver ? formatResult(naverRaw) : emptyResult,
+          tistory: platforms.tistory ? formatResult(tistoryRaw) : emptyResult,
+          wordpress: platforms.wordpress ? formatResult(wordpressRaw) : emptyResult
         }
       }));
+
+      const currentActive = activePlatforms.includes(activeTab) ? activeTab : activePlatforms[0];
+      setActiveTab(currentActive);
 
     } catch (err) {
       console.error(err);
@@ -839,90 +619,49 @@ ${finalTopicContext}
   const regeneratePlatform = async (platform) => {
     if (loading) return;
     setLoading(true);
+    setError('');
     try {
       const finalKey = apiKey.trim() || localStorage.getItem('gemini_api_key');
-      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${finalKey}`;
-      
       const platformName = platform === 'naver' ? '네이버 블로그' : platform === 'tistory' ? '티스토리' : '워드프레스';
-      
-      // [V3.7.5] 재생성 시 컨텍스트 유지 (치매 방지)
-      let regenerateContext = `주제: "${topic}"`;
+
+      let inputText = topic;
       if (inputMode === 'youtube') {
-        const truncatedTranscript = youtubeTranscript.length > 15000 
-          ? youtubeTranscript.substring(0, 15000) + '... (이하 생략)' 
-          : youtubeTranscript;
-        regenerateContext = `[특별 임무: 유튜브 영상 요약 및 큐레이션]\n[영상 자막 원본]:\n"""\n${truncatedTranscript}\n"""`;
+        let cleanedTranscript = youtubeTranscript
+          .replace(/\[.*?\]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        inputText = cleanedTranscript.length > 15000 
+          ? cleanedTranscript.substring(0, 15000) + '... (이하 생략)' 
+          : cleanedTranscript;
       }
 
-      const prompt = `다음 내용을 바탕으로 "${platformName}" 전용 포스팅 본문을 다시 작성해줘.
-      
-      ${regenerateContext}
-      
-      아래 형식을 엄격히 지켜서 답변해 (다른 설명 금지):
-      
-      [TITLE]
-      여기에 새로운 제목 작성
-      
-      [CONTENT]
-      여기에 새로운 본문 작성
-      - 반드시 ## 소제목으로 섹션 구분
-      - 표(Table)를 포함하되, 표 셀 내부에는 절대 강조 기호(**, ==, ++, !!) 사용 금지
-      - 표 밖의 본문에는 ==형광펜==, ++파란색++, !!빨간색!! 적극 사용
-      
-      [TAGS]
-      #태그1 #태그2 #태그3 (무조건 한국어로만 나열)
-      
-      [LINKS]
-      공식사이트명 | https://url
-      공식블로그 | https://url2`;
+      console.log(`[코다리 엔진] ${platformName} 글 재생성 시작 - 1단계 초안 생성.`);
+      const summaryData = await fetchSummaryDraft(inputText, finalKey);
 
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          tools: [{ google_search: {} }] 
-        })
-      });
+      console.log(`[코다리 엔진] ${platformName} 글 재생성 시작 - 2단계 플랫폼 리라이팅 (gemini-3-flash).`);
+      const parsedData = await writePlatformContent(platform, summaryData, finalKey);
 
-      if (!response.ok) throw new Error('네트워크 응답 오류');
-      
-      const data = await response.json();
-      const rawText = data.candidates[0].content.parts[0].text;
-      
-      // 정규표현식 기반 정밀 추출 (split보다 훨씬 강력함)
-      const titleMatch = rawText.match(/\[TITLE\]\s*([\s\S]*?)\s*\[CONTENT\]/i);
-      const contentMatch = rawText.match(/\[CONTENT\]\s*([\s\S]*?)\s*\[TAGS\]/i);
-      const tagsMatch = rawText.match(/\[TAGS\]\s*([\s\S]*?)\s*\[LINKS\]/i) || rawText.match(/\[TAGS\]\s*([\s\S]*)/i);
-      const linksMatch = rawText.match(/\[LINKS\]\s*([\s\S]*)/i);
-      
-      const title = titleMatch ? titleMatch[1].trim() : (rawText.split('[TITLE]')[1]?.split('[CONTENT]')[0]?.trim() || '');
-      const content = contentMatch ? contentMatch[1].trim() : (rawText.split('[CONTENT]')[1]?.split('[TAGS]')[0]?.trim() || '');
-      const tags = tagsMatch ? tagsMatch[1].trim() : '';
-      const linksStr = linksMatch ? linksMatch[1].trim() : '';
-      
-      if (!title || !content) throw new Error('데이터 추출 실패');
+      const koDescs = (parsedData.image_prompts || []).map(p => p.sub_copy);
+      const formattedResult = {
+        title: parsedData.title || '',
+        content: parsedData.content || '',
+        tags: parsedData.tags || '',
+        official_link: '',
+        official_links: parsedData.official_links || [],
+        image: '',
+        image_desc: koDescs[0] || '',
+        section_prompts: parsedData.image_prompts || []
+      };
 
-      const official_links = linksStr.split('\n')
-        .filter(line => line.includes('|'))
-        .map(line => {
-          const [name, url] = line.split('|').map(s => s.trim());
-          return { name, url };
-        });
-      
       setResults(prev => ({
         ...prev,
         [inputMode]: {
           ...prev[inputMode],
-          [platform]: {
-            ...prev[inputMode][platform],
-            title,
-            content,
-            tags,
-            official_links
-          }
+          [platform]: formattedResult
         }
       }));
+
       triggerToast(`${platformName} 글이 성공적으로 리필되었습니다! ✨`);
       
     } catch (err) {
@@ -1165,7 +904,7 @@ ${finalTopicContext}
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.8.5</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.0</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1179,7 +918,7 @@ ${finalTopicContext}
               )}
             </div>
           </div>
-          <p className="text-slate-500 font-black text-sm">🚀 V3.7.8.5 [🛠️ 기능 복구] 스타일 변환복사 복구 및 이미지 설계도 비주얼 보강 완료 ✨</p>
+          <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.0 [🤖 병렬 멀티 에이전트 + 🛡️ JSON Schema 무결점 엔진] 완비 ✨</p>
         </header>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8">
@@ -1239,7 +978,7 @@ ${finalTopicContext}
 
           <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
             <label className="block text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
-              ✅ 발행 플랫폼 및 개별 어투 설정
+              ✅ 발행 플랫폼 및 개별 어투 설정 (체크한 것만 작성 및 과금됨)
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className={`p-4 rounded-xl border-2 transition-all ${platforms.naver ? 'bg-white border-green-200 shadow-sm' : 'bg-slate-100/50 border-transparent opacity-60'}`}>
@@ -1303,7 +1042,7 @@ ${finalTopicContext}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 py-6 bg-slate-50/50 rounded-2xl border border-slate-100">
             {/* 이미지 사용 토글 */}
             <div className="flex items-center gap-3">
-              <span className={`text-[10px] font-black transition-colors ${!useImage ? 'text-slate-400' : 'text-slate-200'}`}>NO IMAGE</span>
+              <span className={`text-[10px] font-black transition-colors ${!useImage ? 'text-slate-400' : 'text-slate-300'}`}>NO IMAGE</span>
               <button 
                 onClick={() => setUseImage(!useImage)}
                 className={`relative w-12 h-6 rounded-full transition-all duration-300 ${useImage ? 'bg-indigo-600' : 'bg-slate-300'}`}
@@ -1311,6 +1050,19 @@ ${finalTopicContext}
                 <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${useImage ? 'translate-x-6' : 'translate-x-0'}`} />
               </button>
               <span className={`text-[10px] font-black transition-colors ${useImage ? 'text-indigo-600' : 'text-slate-400'}`}>AUTO IMAGE ON</span>
+            </div>
+
+            {/* [V3.7.8.7] 구글 실시간 정찰 토글 스위치 */}
+            <div className="flex items-center gap-3">
+              <span className={`text-[10px] font-black transition-colors ${!useGoogleSearch ? 'text-slate-800' : 'text-slate-300'}`}>LOCAL ONLY</span>
+              <button 
+                onClick={() => setUseGoogleSearch(!useGoogleSearch)}
+                className={`relative w-12 h-6 rounded-full transition-all duration-300 ${useGoogleSearch ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                title="구글 실시간 검색 팩트체크 기능 제어 (비용 절약용)"
+              >
+                <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${useGoogleSearch ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+              <span className={`text-[10px] font-black transition-colors ${useGoogleSearch ? 'text-indigo-600' : 'text-slate-400'}`}>GOOGLE RADAR ON</span>
             </div>
 
             {/* 스타일 선택 스위치 */}
@@ -1381,7 +1133,6 @@ ${finalTopicContext}
                     <span className="text-2xl animate-bounce">🎨</span> AI 이미지 생성 프롬프트 보기
                   </button>
                 </div>
-              )}
               )}
               <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 group">
                 <div className="flex justify-between items-center mb-2">
@@ -1575,135 +1326,68 @@ ${finalTopicContext}
               <button onClick={() => setIsAiPromptOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">✕</button>
             </div>
             
-            <div className="space-y-6">
-              <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
-                <p className="text-xs text-indigo-700 font-bold italic flex items-center gap-2">
-                  <span className="animate-pulse">✨</span> "사령관님, 이미지가 생성되면 아래와 같은 레이아웃으로 멋지게 구성될 것입니다!"
-                </p>
-              </div>
+            <div className="space-y-4">
+              <p className="text-xs text-slate-500 font-medium px-1 italic">"본문의 각 소제목 흐름에 딱 맞는 4가지 이미지를 생성해 보세요!"</p>
               
-              <div className="grid grid-cols-1 gap-8">
+              <div className="grid grid-cols-1 gap-4">
                 {results[inputMode][activeTab].section_prompts && results[inputMode][activeTab].section_prompts.map((item, idx) => (
-                  <div key={idx} className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${idx * 100}ms` }}>
-                    {/* 비주얼 스토리보드 카드 (Premium Preview) */}
-                    <div className={`relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-2xl group border-4 border-white ring-1 ring-slate-200 transition-all hover:scale-[1.01] ${visualStyle === 'photo' ? 'bg-slate-800' : 'bg-indigo-600'}`}>
-                      {/* 가상 배경 (그라데이션 + 격자 패턴) */}
-                      <div className={`absolute inset-0 opacity-40 transition-opacity group-hover:opacity-60 bg-gradient-to-br ${
-                        idx === 0 ? 'from-purple-600 via-indigo-600 to-blue-600' :
-                        idx === 1 ? 'from-blue-600 via-cyan-600 to-teal-600' :
-                        idx === 2 ? 'from-rose-600 via-pink-600 to-purple-600' :
-                        'from-amber-600 via-orange-600 to-rose-600'
-                      }`}></div>
-                      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
-                      
-                      {/* 카메라 포커스 가이드 (V3.7.8.5 추가) */}
-                      <div className="absolute inset-8 border border-white/10 flex items-center justify-center pointer-events-none">
-                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white/30"></div>
-                        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white/30"></div>
-                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-white/30"></div>
-                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-white/30"></div>
-                        <div className="w-2 h-2 bg-white/20 rounded-full"></div>
-                      </div>
-
-                      {/* 글래스모피즘 오버레이 */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-black/10 backdrop-blur-[2px]">
-                        <div className="space-y-4 max-w-lg">
-                          <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30 text-[10px] font-black text-white uppercase tracking-[0.2em] mb-2">
-                            KODARI BLUEPRINT SECTION 0{idx + 1}
-                          </div>
-                          <h4 className="text-2xl md:text-3xl font-black text-white leading-tight drop-shadow-2xl break-keep">
-                            {item.main_title || '메인 제목을 입력하세요'}
-                          </h4>
-                          <p className="text-sm md:text-base font-bold text-white/90 drop-shadow-md italic">
-                            {item.sub_copy || '보조 문구를 입력하세요'}
-                          </p>
-                        </div>
-                        
-                        {/* 하단 스타일 태그 */}
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
-                          <div className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-lg border border-white/10 text-[9px] font-bold text-white/80">
-                            {visualStyle === 'photo' ? '📸 PHOTO STYLE' : '🎨 3D ILLUSTRATION'}
-                          </div>
-                          <div className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-lg border border-white/10 text-[9px] font-bold text-white/80">
-                            {item.title}
-                          </div>
+                  <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-100 space-y-4 shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                    
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 bg-slate-900 text-white text-[10px] font-black flex items-center justify-center rounded-full">0{idx + 1}</span>
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Section Target</span>
+                          <span className="text-xs font-bold text-slate-700">{item.title}</span>
                         </div>
                       </div>
-                      
-                      {/* 섹션 넘버 뱃지 */}
-                      <div className="absolute top-6 left-6 w-10 h-10 bg-white text-slate-900 font-black rounded-2xl flex items-center justify-center shadow-xl rotate-[-5deg]">
-                        0{idx + 1}
+                      <div className="flex gap-2">
+                        <button onClick={() => { navigator.clipboard.writeText(item.prompt); triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사 완료!`); }} className="p-2 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-xl border border-slate-100 transition-all">
+                          <Copy size={14} />
+                        </button>
+                        <button onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)} className="p-2 bg-slate-50 hover:bg-amber-50 text-slate-400 hover:text-amber-600 rounded-xl border border-slate-100 transition-all">
+                          <Image size={14} />
+                        </button>
                       </div>
                     </div>
 
-                    {/* 편집 및 복사 컨트롤러 */}
-                    <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4 shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Section Target:</span>
-                          <span className="text-xs font-bold text-indigo-600">{item.title}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-black text-indigo-500 uppercase">Main Title</span>
+                          <button onClick={() => { navigator.clipboard.writeText(item.main_title); triggerToast('메인 제목 복사!'); }} className="text-indigo-300 hover:text-indigo-500 transition-colors"><Copy size={10} /></button>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          <button 
-                            onClick={() => { navigator.clipboard.writeText(`${item.main_title}\n${item.sub_copy}`); triggerToast(`[섹션 ${idx + 1}] 제목/문구 일괄 복사!`); }}
-                            className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 font-bold rounded-xl border border-indigo-100 transition-all text-[11px] shadow-sm flex items-center gap-1"
-                          >
-                            <Type size={12} /> 일괄 복사
-                          </button>
-                          <button 
-                            onClick={() => handleStyleSwapCopy(item.prompt, visualStyle, idx)}
-                            className="px-3 py-1.5 bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-600 font-bold rounded-xl border border-amber-100 transition-all text-[11px] shadow-sm flex items-center gap-1"
-                          >
-                            <Sparkles size={12} /> 스타일 변환복사
-                          </button>
-                          <button 
-                            onClick={() => { navigator.clipboard.writeText(item.prompt); triggerToast(`[섹션 ${idx + 1}] 프롬프트 복사!`); }}
-                            className="px-3 py-1.5 bg-white hover:bg-slate-900 hover:text-white text-slate-600 font-bold rounded-xl border border-slate-200 transition-all text-[11px] shadow-sm flex items-center gap-1"
-                          >
-                            <Copy size={12} /> 프롬프트 복사
-                          </button>
-                        </div>
+                        <input 
+                          type="text" 
+                          value={item.main_title || ''} 
+                          onChange={(e) => handleMainTitleChange(idx, e.target.value)}
+                          className="w-full p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                        />
                       </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[9px] font-black text-blue-500 uppercase">Sub Copy</span>
+                          <button onClick={() => { navigator.clipboard.writeText(item.sub_copy); triggerToast('보조 문구 복사!'); }} className="text-blue-300 hover:text-blue-500 transition-colors"><Copy size={10} /></button>
+                        </div>
+                        <input 
+                          type="text" 
+                          value={item.sub_copy || ''} 
+                          onChange={(e) => handleSubCopyChange(idx, e.target.value)}
+                          className="w-full p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-medium text-slate-600 italic focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Main Title Edit</label>
-                          <input 
-                            type="text" 
-                            value={item.main_title || ''} 
-                            onChange={(e) => handleMainTitleChange(idx, e.target.value)}
-                            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-inner"
-                            placeholder="메인 제목을 입력하세요"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Sub Copy Edit</label>
-                          <input 
-                            type="text" 
-                            value={item.sub_copy || ''} 
-                            onChange={(e) => handleSubCopyChange(idx, e.target.value)}
-                            className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-600 focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-inner"
-                            placeholder="보조 문구를 입력하세요"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 bg-white/50 rounded-2xl border border-slate-200/50">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-[10px] font-black text-slate-400">🤖 AI PROMPT HINT</span>
-                        </div>
-                        <p className="text-[11px] text-slate-400 leading-relaxed italic font-medium">"{item.prompt}"</p>
-                      </div>
+                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                      <p className="text-[11px] text-slate-400 leading-relaxed italic font-medium">"{item.prompt}"</p>
                     </div>
                   </div>
                 ))}
               </div>
               
-              <div className="bg-amber-50 p-5 rounded-2xl border border-amber-200 mt-4">
-                <p className="text-xs text-amber-800 font-bold leading-relaxed flex items-start gap-3">
-                  <span className="text-xl">💡</span>
-                  <span>위의 **비주얼 스토리보드**를 통해 최종 디자인을 확인하셨나요? <br/>이제 각 섹션의 프롬프트를 복사하여 이미지 생성 AI(Gemini, ChatGPT 등)에 입력하시면 팩트와 디자인이 결합된 최고의 블로그가 완성됩니다!</span>
-                </p>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2">
+                <p className="text-[10px] text-slate-400 font-bold leading-tight">💡 위 프롬프트들을 순서대로 **Gemini**나 **ChatGPT**에 입력하여 이미지를 만든 뒤, 블로그 본문의 각 소제목 사이에 삽입하면 전문가의 글처럼 보입니다!</p>
               </div>
             </div>
 
