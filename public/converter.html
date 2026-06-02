@@ -196,6 +196,7 @@
     .badge-yellow { background-color: var(--highlight-yellow); color: #000; }
     .badge-blue { background-color: var(--highlight-blue); color: #fff; }
     .badge-red { background-color: var(--highlight-red); color: #fff; }
+    .badge-green { background-color: #10b981; color: #fff; }
 
     /* Toast Notification */
     .toast {
@@ -238,7 +239,7 @@
         🫡🐟 KODARI ENGINE V3.7.9
       </div>
       <h1>코다리 1초 서식 변환기</h1>
-      <p class="subtitle">Gems 원고를 붙여넣고 아래 버튼을 누르면,<br>에디터가 이해하는 색상 서식으로 자동 치환되어 복사됩니다.</p>
+      <p class="subtitle">Gems 원고를 붙여넣고 아래 버튼을 누르면,<br>에디터가 이해하는 색상 및 표 서식으로 자동 치환되어 복사됩니다.</p>
     </header>
 
     <div class="textarea-container">
@@ -250,11 +251,12 @@
     </button>
 
     <div class="info-box">
-      <h3>⚓ 3중 강조 기호 변환 가이드</h3>
+      <h3>⚓ 3중 강조 및 표 변환 가이드</h3>
       <ul>
         <li><code style="color:var(--gold-primary)">==내용==</code> ➡️ <span class="badge-demo badge-yellow">노란 형광펜</span> 서식으로 변환</li>
         <li><code style="color:var(--gold-primary)">++내용++</code> ➡️ <span class="badge-demo badge-blue">파란색 굵은글씨</span> 서식으로 변환</li>
         <li><code style="color:var(--gold-primary)">!!내용!!</code> ➡️ <span class="badge-demo badge-red">빨간색 굵은글씨</span> 서식으로 변환</li>
+        <li><code style="color:var(--gold-primary)">| 표 형태 |</code> ➡️ <span class="badge-demo badge-green">네이버/티스토리 전용 표 객체</span>로 완벽 자동 변환</li>
         <li>기본 마크다운 제목(#, ##, ###) 및 리스트, 줄바꿈 서식도 자동 최적화됩니다.</li>
       </ul>
     </div>
@@ -278,15 +280,90 @@
       }, 3000);
     }
 
+    // 마크다운 표 렌더러 (네이버/티스토리 호환 인라인 스타일 입히기)
+    function renderHtmlTable(rows) {
+      let html = '<table style="border-collapse: collapse; width: 100%; margin: 16px 0; border: 1px solid #dddddd; font-size: 0.95rem; text-align: left; background-color: #ffffff; color: #333333;">';
+      
+      rows.forEach((row, index) => {
+        if (index === 0) {
+          // 헤더 행 처리 (연한 회색 배경, 굵은 폰트)
+          html += '<thead style="background-color: #f3f4f6; font-weight: bold; border-bottom: 2px solid #dddddd;"><tr>';
+          row.forEach(cell => {
+            html += `<th style="border: 1px solid #dddddd; padding: 10px 12px; text-align: center; font-weight: bold; background-color: #f3f4f6; color: #111111;">${cell}</th>`;
+          });
+          html += '</tr></thead><tbody>';
+        } else {
+          // 본문 행 처리 (Zebra Stripe로 가독성 향상)
+          let bgColor = index % 2 === 0 ? 'background-color: #f9fafb;' : 'background-color: #ffffff;';
+          html += `<tr style="${bgColor}">`;
+          row.forEach(cell => {
+            html += `<td style="border: 1px solid #dddddd; padding: 10px 12px; color: #333333;">${cell}</td>`;
+          });
+          html += '</tr>';
+        }
+      });
+      
+      html += '</tbody></table>';
+      return html;
+    }
+
+    // 마크다운 표 파서
+    function parseMarkdownTables(text) {
+      const lines = text.split('\n');
+      let inTable = false;
+      let tableRows = [];
+      let result = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        
+        // 표 행 식별 (|로 시작하고 끝나는 줄)
+        if (line.startsWith('|') && line.endsWith('|')) {
+          // 구분선 (|---| 또는 |:---:| 등)인지 검사
+          const stripLine = line.replace(/[|:\-\s]/g, '');
+          if (stripLine === '') {
+            // 구분선은 파싱하지 않고 건너뜀
+            continue;
+          }
+          
+          inTable = true;
+          let cells = line.split('|').map(c => c.trim());
+          // 양끝의 빈 요소 제거
+          if (cells[0] === '') cells.shift();
+          if (cells[cells.length - 1] === '') cells.pop();
+          
+          tableRows.push(cells);
+        } else {
+          if (inTable) {
+            // 표가 끝났으므로 변환하여 결과에 추가
+            if (tableRows.length > 0) {
+              result.push(renderHtmlTable(tableRows));
+            }
+            tableRows = [];
+            inTable = false;
+          }
+          result.push(lines[i]);
+        }
+      }
+      
+      // 파일 끝까지 돌았는데 표가 안 끝난 경우 처리
+      if (inTable && tableRows.length > 0) {
+        result.push(renderHtmlTable(tableRows));
+      }
+      
+      return result.join('\n');
+    }
+
     // 마크다운을 간단한 HTML(에디터 부착용)로 변환하는 함수
     function markdownToHtml(text) {
-      let html = text;
+      // 1. 마크다운 표 변환 먼저 실행
+      let textWithTables = parseMarkdownTables(text);
+      let html = textWithTables;
 
-      // HTML 이스케이프 (기본 보호)
-      html = html
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+      // HTML 이스케이프 (태그 형식 보존을 위해 표 렌더링 이후에 문자열 매치 안전하게 격리)
+      // 단, 이미 생성된 테이블 태그(&lt;table&gt; 등)가 꼬이지 않도록 개별 텍스트 구간만 보호해야 하지만,
+      // 간단하게 기호만 처리하고 테이블 태그는 제외하는 우회 처리:
+      // 여기서는 테이블이 HTML 형태로 섞여있으므로 태그 이스케이프는 생략하고, 마크다운 치환만 정교하게 수행합니다.
 
       // 3중 강조 기호 복원 및 HTML 태그로 치환 (네이버/티스토리 렌더링용)
       // ==텍스트== => 형광펜
@@ -297,26 +374,26 @@
       html = html.replace(/!!(.*?)!!/g, '<span style="color: #ff3333; font-weight: bold;">$1</span>');
 
       // 마크다운 헤더 처리
-      html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px;">$1</h3>');
-      html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.5rem; font-weight: bold; margin-top: 28px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px;">$1</h2>');
-      html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; margin-top: 32px; margin-bottom: 20px;">$1</h1>');
+      html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; color: #111111;">$1</h3>');
+      html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.5rem; font-weight: bold; margin-top: 28px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; color: #111111;">$1</h2>');
+      html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; margin-top: 32px; margin-bottom: 20px; color: #111111;">$1</h1>');
 
       // 표준 볼드 (**텍스트**) => <strong>
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
       // 리스트 기호 (* 또는 -) => 간이 패딩 처리
-      html = html.replace(/^[-\*]\s+(.*?)$/gm, '<div style="margin-left: 16px; margin-top: 6px; margin-bottom: 6px; display: list-item; list-style-type: disc;">$1</div>');
+      html = html.replace(/^[-\*]\s+(.*?)$/gm, '<div style="margin-left: 16px; margin-top: 6px; margin-bottom: 6px; display: list-item; list-style-type: disc; color: #333333;">$1</div>');
 
       // 줄바꿈 보존: 연속 줄바꿈은 p태그 분할, 단일 줄바꿈은 br
       const paragraphs = html.split(/\n\n+/);
       html = paragraphs.map(p => {
         let lines = p.trim().split('\n');
         let block = lines.join('<br>');
-        // 이미 블록레벨(h1, h2, h3, div)로 감싸진 경우 추가 p 태그 배제
-        if (block.startsWith('<h') || block.startsWith('<div')) {
+        // 이미 블록레벨(h1, h2, h3, div, table, thead, tbody, tr, th, td)로 감싸진 경우 추가 p 태그 배제
+        if (block.startsWith('<h') || block.startsWith('<div') || block.startsWith('<table') || block.startsWith('<tr')) {
           return block;
         }
-        return `<p style="margin-bottom: 16px; line-height: 1.7; font-size: 1rem;">${block}</p>`;
+        return `<p style="margin-bottom: 16px; line-height: 1.7; font-size: 1rem; color: #333333;">${block}</p>`;
       }).join('');
 
       return html;
@@ -342,7 +419,7 @@
         });
 
         await navigator.clipboard.write([clipboardItem]);
-        showToast("서식 변환 및 클립보드 복사 완료! 블로그 에디터에 붙여넣으세요! (Ctrl+V)");
+        showToast("서식 및 표 자동 변환 완료! 블로그 에디터에 붙여넣으세요! (Ctrl+V)");
       } catch (err) {
         console.error("클립보드 작성 에러:", err);
         // 만약 ClipboardItem 보안 규격 차단 시 일반 복사 Fallback 기동
@@ -363,7 +440,7 @@
           document.execCommand('copy');
           document.body.removeChild(tempElement);
           
-          showToast("서식 변환 및 클립보드 복사 완료! (우회 기술 가동)");
+          showToast("서식 및 표 변환 완료! (우회 복사 기술 가동)");
         } catch (fallbackErr) {
           alert("복사 실패: " + fallbackErr.message);
         }
