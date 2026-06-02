@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐟 코다리 1초 서식 변환기 (KODARI HTML Converter)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --panel-bg: rgba(20, 27, 45, 0.7);
+      --border-color: rgba(255, 215, 0, 0.2);
+      --gold-primary: #ffd700;
+      --gold-hover: #ffea70;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --highlight-yellow: #fff3a1;
+      --highlight-blue: #3b82f6;
+      --highlight-red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(255, 215, 0, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 750px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 8px 16px;
+      border-radius: 50px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: var(--gold-primary);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .textarea-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 250px;
+      background: rgba(10, 15, 25, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 18px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: inherit;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+    }
+
+    textarea::placeholder {
+      color: #4b5563;
+    }
+
+    .btn-convert {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold-primary) 0%, #e6be00 100%);
+      color: #0b0f19;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 24px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 10px 20px rgba(255, 215, 0, 0.15);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-convert:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 25px rgba(255, 215, 0, 0.25);
+      background: linear-gradient(135deg, var(--gold-hover) 0%, var(--gold-primary) 100%);
+    }
+
+    .btn-convert:active {
+      transform: translateY(0);
+    }
+
+    /* 💡 가이드 가독성 영역 */
+    .info-box {
+      margin-top: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 16px 20px;
+      border-left: 4px solid var(--gold-primary);
+    }
+
+    .info-box h3 {
+      font-size: 0.95rem;
+      color: var(--gold-primary);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .info-box ul {
+      list-style-type: none;
+    }
+
+    .info-box li {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-box li::before {
+      content: "⚓";
+      font-size: 0.8rem;
+    }
+
+    .badge-demo {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .badge-yellow { background-color: var(--highlight-yellow); color: #000; }
+    .badge-blue { background-color: var(--highlight-blue); color: #fff; }
+    .badge-red { background-color: var(--highlight-red); color: #fff; }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      background: #10b981;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.8rem;
+      color: #4b5563;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        🫡🐟 KODARI ENGINE V3.7.9
+      </div>
+      <h1>코다리 1초 서식 변환기</h1>
+      <p class="subtitle">Gems 원고를 붙여넣고 아래 버튼을 누르면,<br>에디터가 이해하는 색상 서식으로 자동 치환되어 복사됩니다.</p>
+    </header>
+
+    <div class="textarea-container">
+      <textarea id="inputText" placeholder="Gems 또는 GPTs가 써준 원고 전체를 여기에 붙여넣으세요 (Ctrl + V)"></textarea>
+    </div>
+
+    <button class="btn-convert" onclick="processAndCopy()">
+      🚀 1초 서식 변환 & 클립보드 복사
+    </button>
+
+    <div class="info-box">
+      <h3>⚓ 3중 강조 기호 변환 가이드</h3>
+      <ul>
+        <li><code style="color:var(--gold-primary)">==내용==</code> ➡️ <span class="badge-demo badge-yellow">노란 형광펜</span> 서식으로 변환</li>
+        <li><code style="color:var(--gold-primary)">++내용++</code> ➡️ <span class="badge-demo badge-blue">파란색 굵은글씨</span> 서식으로 변환</li>
+        <li><code style="color:var(--gold-primary)">!!내용!!</code> ➡️ <span class="badge-demo badge-red">빨간색 굵은글씨</span> 서식으로 변환</li>
+        <li>기본 마크다운 제목(#, ##, ###) 및 리스트, 줄바꿈 서식도 자동 최적화됩니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <span>✨</span> 서식 변환 및 클립보드 복사 완료! 블로그 에디터에 붙여넣으세요! (Ctrl+V)
+  </div>
+
+  <footer>
+    © 2026 코다리 개발부장 🫡🐟. All rights reserved.
+  </footer>
+
+  <script>
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      if (message) toast.querySelector('span').nextSibling.textContent = " " + message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // 마크다운을 간단한 HTML(에디터 부착용)로 변환하는 함수
+    function markdownToHtml(text) {
+      let html = text;
+
+      // HTML 이스케이프 (기본 보호)
+      html = html
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // 3중 강조 기호 복원 및 HTML 태그로 치환 (네이버/티스토리 렌더링용)
+      // ==텍스트== => 형광펜
+      html = html.replace(/==(.*?)==/g, '<span style="background-color: #ffe600; color: #000000; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>');
+      // ++텍스트++ => 파랑강조
+      html = html.replace(/\+\+(.*?)\+\+/g, '<span style="color: #0066ff; font-weight: bold;">$1</span>');
+      // !!텍스트!! => 빨강강조
+      html = html.replace(/!!(.*?)!!/g, '<span style="color: #ff3333; font-weight: bold;">$1</span>');
+
+      // 마크다운 헤더 처리
+      html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px;">$1</h3>');
+      html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.5rem; font-weight: bold; margin-top: 28px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px;">$1</h2>');
+      html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; margin-top: 32px; margin-bottom: 20px;">$1</h1>');
+
+      // 표준 볼드 (**텍스트**) => <strong>
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+      // 리스트 기호 (* 또는 -) => 간이 패딩 처리
+      html = html.replace(/^[-\*]\s+(.*?)$/gm, '<div style="margin-left: 16px; margin-top: 6px; margin-bottom: 6px; display: list-item; list-style-type: disc;">$1</div>');
+
+      // 줄바꿈 보존: 연속 줄바꿈은 p태그 분할, 단일 줄바꿈은 br
+      const paragraphs = html.split(/\n\n+/);
+      html = paragraphs.map(p => {
+        let lines = p.trim().split('\n');
+        let block = lines.join('<br>');
+        // 이미 블록레벨(h1, h2, h3, div)로 감싸진 경우 추가 p 태그 배제
+        if (block.startsWith('<h') || block.startsWith('<div')) {
+          return block;
+        }
+        return `<p style="margin-bottom: 16px; line-height: 1.7; font-size: 1rem;">${block}</p>`;
+      }).join('');
+
+      return html;
+    }
+
+    async function processAndCopy() {
+      const textInput = document.getElementById('inputText').value;
+      if (!textInput.trim()) {
+        alert("원고를 먼저 입력해 주세요!");
+        return;
+      }
+
+      try {
+        const convertedHtml = markdownToHtml(textInput);
+
+        // 클립보드에 HTML 형식을 직접 주입하는 명품 API 기동
+        const blobHtml = new Blob([convertedHtml], { type: 'text/html' });
+        const blobText = new Blob([textInput], { type: 'text/plain' });
+        
+        const clipboardItem = new ClipboardItem({
+          'text/html': blobHtml,
+          'text/plain': blobText
+        });
+
+        await navigator.clipboard.write([clipboardItem]);
+        showToast("서식 변환 및 클립보드 복사 완료! 블로그 에디터에 붙여넣으세요! (Ctrl+V)");
+      } catch (err) {
+        console.error("클립보드 작성 에러:", err);
+        // 만약 ClipboardItem 보안 규격 차단 시 일반 복사 Fallback 기동
+        try {
+          const tempElement = document.createElement('div');
+          tempElement.style.position = 'absolute';
+          tempElement.style.left = '-9999px';
+          tempElement.innerHTML = markdownToHtml(textInput);
+          document.body.appendChild(tempElement);
+          
+          // Selection API 활용
+          const range = document.createRange();
+          range.selectNodeContents(tempElement);
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          
+          document.execCommand('copy');
+          document.body.removeChild(tempElement);
+          
+          showToast("서식 변환 및 클립보드 복사 완료! (우회 기술 가동)");
+        } catch (fallbackErr) {
+          alert("복사 실패: " + fallbackErr.message);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
