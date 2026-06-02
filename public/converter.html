@@ -100,7 +100,7 @@
 
     textarea {
       width: 100%;
-      height: 250px;
+      height: 200px;
       background: rgba(10, 15, 25, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
@@ -149,6 +149,79 @@
 
     .btn-convert:active {
       transform: translateY(0);
+    }
+
+    /* 📝 변환 완료 미리보기 컨테이너 (네이버 에디터 뷰) */
+    .preview-container {
+      display: none;
+      margin-top: 24px;
+      background: #ffffff;
+      color: #333333;
+      border-radius: 16px;
+      padding: 20px;
+      border: 2px solid var(--gold-primary);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: left;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .preview-title {
+      font-weight: bold;
+      color: #111111;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-select {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-select:hover {
+      background: #2563eb;
+      transform: scale(1.05);
+    }
+
+    .preview-area {
+      min-height: 80px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #333333;
+      padding: 10px;
+      border: 1px dashed #cccccc;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .warning-text {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: #ef4444;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
     }
 
     /* 💡 가이드 가독성 영역 */
@@ -249,6 +322,20 @@
     <button class="btn-convert" onclick="processAndCopy()">
       🚀 1초 서식 변환 & 클립보드 복사
     </button>
+
+    <!-- 📝 모바일 강제 복사 우회 전용 [미리보기 영역] -->
+    <div id="previewContainer" class="preview-container">
+      <div class="preview-header">
+        <span class="preview-title">📝 변환 완료 미리보기 (에디터 뷰)</span>
+        <button class="btn-select" onclick="selectPreviewText()">💡 1초 전체선택</button>
+      </div>
+      <div id="previewArea" class="preview-area">
+        <!-- HTML 결과물이 여기에 실시간 렌더링됩니다 -->
+      </div>
+      <p class="warning-text">
+        ⚠️ [1초 전체선택] 터치 후, 화면에 뜨는 '복사'를 누르면<br>아이폰 모바일에서도 서식과 표가 100% 안전하게 클립보드에 복사됩니다!
+      </p>
+    </div>
 
     <div class="info-box">
       <h3>⚓ 3중 강조 및 표 변환 가이드</h3>
@@ -356,7 +443,6 @@
 
     // 마크다운을 간단한 HTML(에디터 부착용)로 변환하는 함수
     function markdownToHtml(text) {
-      // 1. 마크다운 표 변환 먼저 실행
       let textWithTables = parseMarkdownTables(text);
       let html = textWithTables;
 
@@ -390,6 +476,18 @@
       return html;
     }
 
+    // 미리보기 텍스트 전체 선택 (iOS 사파리 물리적 드래그 강제 복사 우회책)
+    function selectPreviewText() {
+      const previewArea = document.getElementById('previewArea');
+      const range = document.createRange();
+      range.selectNodeContents(previewArea);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      showToast("영역이 지정되었습니다! 상단의 '복사' 버튼을 눌러주세요! 🫡");
+    }
+
     // 아이폰 사파리 보안 필터를 100% 우회하는 마법의 동기 복사 함수
     function processAndCopy() {
       const textInput = document.getElementById('inputText').value;
@@ -399,6 +497,12 @@
       }
 
       const convertedHtml = markdownToHtml(textInput);
+      
+      // 📝 [보완 핵심] 미리보기 영역에 변환된 결과를 강제로 보여주고 활성화시킴
+      const previewArea = document.getElementById('previewArea');
+      previewArea.innerHTML = convertedHtml;
+      document.getElementById('previewContainer').style.display = 'block';
+
       // 모바일 OS가 온전한 서식(HTML) 데이터로 100% 인식하게 패키징 처리
       const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${convertedHtml}</body></html>`;
 
@@ -415,7 +519,7 @@
           });
 
           navigator.clipboard.write([clipboardItem]).then(function() {
-            showToast("서식 및 표 자동 변환 완료! 에디터에 붙여넣으세요! 🫡🐟");
+            showToast("서식 변환 및 1차 자동 복사 성공! 바로 에디터에 붙여넣어 보세요! 🫡🐟");
           }).catch(function(err) {
             console.warn("Promise Clipboard write 실패, Fallback 기동:", err);
             fallbackCopy(fullHtml, textInput);
@@ -434,7 +538,6 @@
     function fallbackCopy(htmlContent, plainText) {
       try {
         const tempElement = document.createElement('div');
-        // iOS에서 숨김 엘리먼트 복사 거부 버그 방지용 스타일링
         tempElement.style.position = 'fixed';
         tempElement.style.top = '0';
         tempElement.style.left = '0';
@@ -455,13 +558,14 @@
         selection.removeAllRanges();
 
         if (successful) {
-          showToast("서식 및 표 변환 완료! (우회 복사 성공) 🫡");
+          showToast("서식 변환 및 2차 우회 복사 성공! 🫡");
         } else {
           throw new Error("execCommand copy failed");
         }
       } catch (fallbackErr) {
         console.error("최종 복사 실패:", fallbackErr);
-        alert("죄송합니다. 이 브라우저/앱 환경에서는 클립보드 서식 쓰기가 제한되어 있습니다. 주소창 우측 버튼을 눌러 반드시 '사파리(Safari)' 또는 '크롬(Chrome)' 정식 브라우저 앱으로 열어 실행해 주세요!");
+        // 최종 실패 시 미리보기 복사 유도 메시지 추가
+        showToast("자동 복사가 제한되었습니다. 아래 미리보기에서 [1초 전체선택] 후 복사해 주세요!");
       }
     }
   </script>
