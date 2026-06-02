@@ -360,11 +360,6 @@
       let textWithTables = parseMarkdownTables(text);
       let html = textWithTables;
 
-      // HTML 이스케이프 (태그 형식 보존을 위해 표 렌더링 이후에 문자열 매치 안전하게 격리)
-      // 단, 이미 생성된 테이블 태그(&lt;table&gt; 등)가 꼬이지 않도록 개별 텍스트 구간만 보호해야 하지만,
-      // 간단하게 기호만 처리하고 테이블 태그는 제외하는 우회 처리:
-      // 여기서는 테이블이 HTML 형태로 섞여있으므로 태그 이스케이프는 생략하고, 마크다운 치환만 정교하게 수행합니다.
-
       // 3중 강조 기호 복원 및 HTML 태그로 치환 (네이버/티스토리 렌더링용)
       // ==텍스트== => 형광펜
       html = html.replace(/==(.*?)==/g, '<span style="background-color: #ffe600; color: #000000; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>');
@@ -399,51 +394,72 @@
       return html;
     }
 
-    async function processAndCopy() {
+    // 완전히 동기식으로 호출되는 사파리 안전 규격의 카피 함수
+    function processAndCopy() {
       const textInput = document.getElementById('inputText').value;
       if (!textInput.trim()) {
         alert("원고를 먼저 입력해 주세요!");
         return;
       }
 
-      try {
-        const convertedHtml = markdownToHtml(textInput);
+      const convertedHtml = markdownToHtml(textInput);
 
-        // 클립보드에 HTML 형식을 직접 주입하는 명품 API 기동
-        const blobHtml = new Blob([convertedHtml], { type: 'text/html' });
-        const blobText = new Blob([textInput], { type: 'text/plain' });
-        
-        const clipboardItem = new ClipboardItem({
-          'text/html': blobHtml,
-          'text/plain': blobText
-        });
-
-        await navigator.clipboard.write([clipboardItem]);
-        showToast("서식 및 표 자동 변환 완료! 블로그 에디터에 붙여넣으세요! (Ctrl+V)");
-      } catch (err) {
-        console.error("클립보드 작성 에러:", err);
-        // 만약 ClipboardItem 보안 규격 차단 시 일반 복사 Fallback 기동
+      // 1. 최신 브라우저 및 iOS Safari (전역 ClipboardItem API 직접 동기 호출)
+      if (navigator.clipboard && window.ClipboardItem) {
         try {
-          const tempElement = document.createElement('div');
-          tempElement.style.position = 'absolute';
-          tempElement.style.left = '-9999px';
-          tempElement.innerHTML = markdownToHtml(textInput);
-          document.body.appendChild(tempElement);
+          const blobHtml = new Blob([convertedHtml], { type: 'text/html' });
+          const blobText = new Blob([textInput], { type: 'text/plain' });
           
-          // Selection API 활용
-          const range = document.createRange();
-          range.selectNodeContents(tempElement);
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
-          
-          document.execCommand('copy');
-          document.body.removeChild(tempElement);
-          
-          showToast("서식 및 표 변환 완료! (우회 복사 기술 가동)");
-        } catch (fallbackErr) {
-          alert("복사 실패: " + fallbackErr.message);
+          const clipboardItem = new ClipboardItem({
+            'text/html': blobHtml,
+            'text/plain': blobText
+          });
+
+          navigator.clipboard.write([clipboardItem]);
+          showToast("서식 및 표 자동 변환 완료! 에디터에 붙여넣으세요! 🫡🐟");
+          return;
+        } catch (err) {
+          console.warn("Clipboard API 에러, Fallback 작동:", err);
         }
+      }
+
+      // 2. Fallback: iOS Safari 구형 단말 및 모바일 인앱 브라우저용 HTML 선택 복사 우회 기동
+      try {
+        const tempElement = document.createElement('div');
+        // iOS에서 숨겨진 div의 copy 차단을 완벽 방어하기 위한 최소 투명 레이아웃 배치
+        tempElement.style.position = 'fixed';
+        tempElement.style.top = '0';
+        tempElement.style.left = '0';
+        tempElement.style.width = '10px';
+        tempElement.style.height = '10px';
+        tempElement.style.padding = '0';
+        tempElement.style.border = 'none';
+        tempElement.style.outline = 'none';
+        tempElement.style.boxShadow = 'none';
+        tempElement.style.background = 'transparent';
+        tempElement.style.opacity = '0.01'; 
+        tempElement.innerHTML = convertedHtml;
+        document.body.appendChild(tempElement);
+        
+        // Selection API 강제 기동
+        const range = document.createRange();
+        range.selectNodeContents(tempElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(tempElement);
+        selection.removeAllRanges();
+
+        if (successful) {
+          showToast("서식 및 표 변환 완료! (사파리 우회 복사 성공) 🫡");
+        } else {
+          throw new Error("execCommand copy returned false");
+        }
+      } catch (fallbackErr) {
+        console.error("최종 복사 실패:", fallbackErr);
+        alert("죄송합니다. 이 브라우저에서는 클립보드 쓰기가 제한되어 있습니다. 주소창 우측 버튼을 눌러 '사파리(Safari)' 또는 '크롬(Chrome)' 정식 브라우저 앱으로 열어 실행해 주세요!");
       }
     }
   </script>
