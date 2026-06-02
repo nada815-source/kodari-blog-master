@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐟 코다리 1초 서식 변환기 (KODARI HTML Converter)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --panel-bg: rgba(20, 27, 45, 0.7);
+      --border-color: rgba(255, 215, 0, 0.2);
+      --gold-primary: #ffd700;
+      --gold-hover: #ffea70;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --highlight-yellow: #fff3a1;
+      --highlight-blue: #3b82f6;
+      --highlight-red: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(255, 215, 0, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 750px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      padding: 8px 16px;
+      border-radius: 50px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: var(--gold-primary);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 30%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .textarea-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: rgba(10, 15, 25, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 18px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: inherit;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+    }
+
+    textarea::placeholder {
+      color: #4b5563;
+    }
+
+    /* 🎛️ 듀얼 변환 버튼 영역 */
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-action {
+      border: none;
+      border-radius: 16px;
+      padding: 16px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-pc {
+      background: linear-gradient(135deg, var(--gold-primary) 0%, #e6be00 100%);
+      color: #0b0f19;
+      box-shadow: 0 8px 16px rgba(255, 215, 0, 0.15);
+    }
+
+    .btn-pc:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(255, 215, 0, 0.25);
+      background: linear-gradient(135deg, var(--gold-hover) 0%, var(--gold-primary) 100%);
+    }
+
+    .btn-mobile {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-mobile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(59, 130, 246, 0.25);
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    }
+
+    .btn-action:active {
+      transform: translateY(0);
+    }
+
+    /* 📝 변환 완료 미리보기 컨테이너 */
+    .preview-container {
+      display: none;
+      margin-top: 24px;
+      background: #ffffff;
+      color: #333333;
+      border-radius: 16px;
+      padding: 20px;
+      border: 2px solid var(--gold-primary);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      text-align: left;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .preview-title {
+      font-weight: bold;
+      color: #111111;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-select {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-select:hover {
+      background: #059669;
+      transform: scale(1.05);
+    }
+
+    .preview-area {
+      min-height: 80px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #333333;
+      padding: 10px;
+      border: 1px dashed #cccccc;
+      border-radius: 8px;
+      background: #ffffff;
+      white-space: pre-wrap;
+    }
+
+    .warning-text {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: #1e3a8a;
+      background-color: #eff6ff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* 💡 가이드 가독성 영역 (모바일 찌그러짐 차단 패치 완료) */
+    .info-box {
+      margin-top: 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--gold-primary);
+      text-align: left;
+    }
+
+    .info-box h3 {
+      font-size: 1rem;
+      color: var(--gold-primary);
+      margin-bottom: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-box ul {
+      list-style-type: none;
+    }
+
+    .info-box li {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+      position: relative;
+      padding-left: 22px; /* ⚓ 아이콘 자리에 맞게 간격 조절 */
+      display: block; /* 모바일 세로 찌그러짐 원천 방어 */
+    }
+
+    .info-box li::before {
+      content: "⚓";
+      position: absolute;
+      left: 0;
+      top: 1px;
+      font-size: 0.85rem;
+    }
+
+    .badge-demo {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      white-space: nowrap; /* 뱃지 텍스트 가로줄 유지 */
+      vertical-align: middle;
+      margin: 0 3px;
+    }
+
+    .badge-yellow { background-color: var(--highlight-yellow); color: #000; }
+    .badge-blue { background-color: var(--highlight-blue); color: #fff; }
+    .badge-red { background-color: var(--highlight-red); color: #fff; }
+    .badge-green { background-color: #10b981; color: #fff; }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      background: #10b981;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 0.8rem;
+      color: #4b5563;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="logo-container">
+        🫡🐟 KODARI ENGINE V3.7.9
+      </div>
+      <h1>코다리 1초 서식 변환기</h1>
+      <p class="subtitle">Gems 원고를 붙여넣고 아래 상황에 맞는 버튼을 누르시면,<br>가장 깔끔하게 클립보드에 자동 복사됩니다.</p>
+    </header>
+
+    <div class="textarea-container">
+      <textarea id="inputText" placeholder="Gems 또는 GPTs가 써준 원고 전체를 여기에 붙여넣으세요 (Ctrl + V)"></textarea>
+    </div>
+
+    <!-- 🎛️ PC 및 모바일 듀얼 버튼 제공 -->
+    <div class="button-group">
+      <button class="btn-action btn-pc" onclick="processPcFormat()">
+        💻 PC 에디터용 복사 (색상+표 자동변환)
+      </button>
+      <button class="btn-action btn-mobile" onclick="processMobileFormat()">
+        📱 모바일 에디터용 복사 (기호청소+표텍스트화)
+      </button>
+    </div>
+
+    <!-- 📝 모바일 강제 복사 우회 전용 [미리보기 영역] -->
+    <div id="previewContainer" class="preview-container">
+      <div class="preview-header">
+        <span class="preview-title" id="previewTitle">📝 변환 완료 미리보기</span>
+        <button class="btn-select" onclick="selectPreviewText()">💡 1초 전체선택</button>
+      </div>
+      <div id="previewArea" class="preview-area">
+        <!-- 결과물이 여기에 실시간 렌더링됩니다 -->
+      </div>
+      <p class="warning-text" id="warningText">
+        💡 바로 붙여넣기가 안 될 경우, 위 [1초 전체선택] 터치 후 화면에 뜨는 '복사'를 눌러 붙여넣으세요!
+      </p>
+    </div>
+
+    <!-- 💡 가이드 가독성 영역 (줄바꿈 찌그러짐 방지 패치) -->
+    <div class="info-box">
+      <h3>⚓ 듀얼 복사 시스템 안내</h3>
+      <ul>
+        <li>
+          <strong>💻 PC 에디터용 복사</strong>: 원고 내 강조 기호를 분석하여 형광펜(<span class="badge-demo badge-yellow">노란색</span>), 파란색, 빨간색 서식 및 에디터 전용 <span class="badge-demo badge-green">진짜 HTML 표 객체</span>로 완벽 치환하여 자동 복사합니다.
+        </li>
+        <li>
+          <strong>📱 모바일 에디터용 복사</strong>: 모바일 에디터의 서식 제한을 뚫기 위해 지저분한 기호(`==`, `++`, `!!`)를 전부 흔적 없이 지우고, 깨지는 표를 한눈에 들어오는 가독성 텍스트 포맷으로 자동 재구성하여 복사합니다.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <span>✨</span> 복사 완료! 블로그 에디터에 붙여넣으세요!
+  </div>
+
+  <footer>
+    © 2026 코다리 개발부장 🫡🐟. All rights reserved.
+  </footer>
+
+  <script>
+    let currentMode = 'pc';
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      if (message) toast.querySelector('span').nextSibling.textContent = " " + message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // 마크다운 표 렌더러 (HTML Table)
+    function renderHtmlTable(rows) {
+      let html = '<table style="border-collapse: collapse; width: 100%; margin: 16px 0; border: 1px solid #dddddd; font-size: 0.95rem; text-align: left; background-color: #ffffff; color: #333333;">';
+      
+      rows.forEach((row, index) => {
+        if (index === 0) {
+          html += '<thead style="background-color: #f3f4f6; font-weight: bold; border-bottom: 2px solid #dddddd;"><tr>';
+          row.forEach(cell => {
+            html += `<th style="border: 1px solid #dddddd; padding: 10px 12px; text-align: center; font-weight: bold; background-color: #f3f4f6; color: #111111;">${cell}</th>`;
+          });
+          html += '</tr></thead><tbody>';
+        } else {
+          let bgColor = index % 2 === 0 ? 'background-color: #f9fafb;' : 'background-color: #ffffff;';
+          html += `<tr style="${bgColor}">`;
+          row.forEach(cell => {
+            html += `<td style="border: 1px solid #dddddd; padding: 10px 12px; color: #333333;">${cell}</td>`;
+          });
+          html += '</tr>';
+        }
+      });
+      
+      html += '</tbody></table>';
+      return html;
+    }
+
+    // 마크다운 표 파서 (HTML 변환용)
+    function parseMarkdownTables(text) {
+      const lines = text.split('\n');
+      let inTable = false;
+      let tableRows = [];
+      let result = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith('|') && line.endsWith('|')) {
+          const stripLine = line.replace(/[|:\-\s]/g, '');
+          if (stripLine === '') continue;
+          
+          inTable = true;
+          let cells = line.split('|').map(c => c.trim());
+          if (cells[0] === '') cells.shift();
+          if (cells[cells.length - 1] === '') cells.pop();
+          tableRows.push(cells);
+        } else {
+          if (inTable) {
+            if (tableRows.length > 0) result.push(renderHtmlTable(tableRows));
+            tableRows = [];
+            inTable = false;
+          }
+          result.push(lines[i]);
+        }
+      }
+      if (inTable && tableRows.length > 0) result.push(renderHtmlTable(tableRows));
+      return result.join('\n');
+    }
+
+    // 마크다운 ➡️ HTML 변환 (PC용)
+    function markdownToHtml(text) {
+      let textWithTables = parseMarkdownTables(text);
+      let html = textWithTables;
+
+      html = html.replace(/==(.*?)==/g, '<span style="background-color: #ffe600; color: #000000; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>');
+      html = html.replace(/\+\+(.*?)\+\+/g, '<span style="color: #0066ff; font-weight: bold;">$1</span>');
+      html = html.replace(/!!(.*?)!!/g, '<span style="color: #ff3333; font-weight: bold;">$1</span>');
+
+      html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; color: #111111;">$1</h3>');
+      html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.5rem; font-weight: bold; margin-top: 28px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; color: #111111;">$1</h2>');
+      html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; margin-top: 32px; margin-bottom: 20px; color: #111111;">$1</h1>');
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/^[-\*]\s+(.*?)$/gm, '<div style="margin-left: 16px; margin-top: 6px; margin-bottom: 6px; display: list-item; list-style-type: disc; color: #333333;">$1</div>');
+
+      const paragraphs = html.split(/\n\n+/);
+      html = paragraphs.map(p => {
+        let lines = p.trim().split('\n');
+        let block = lines.join('<br>');
+        if (block.startsWith('<h') || block.startsWith('<div') || block.startsWith('<table') || block.startsWith('<tr')) return block;
+        return `<p style="margin-bottom: 16px; line-height: 1.7; font-size: 1rem; color: #333333;">${block}</p>`;
+      }).join('');
+
+      return html;
+    }
+
+    // 표 데이터를 모바일용 세로 리스트형 텍스트로 가공
+    function renderTableAsText(rows) {
+      let textResult = '\n📌 [표 요약 정보]\n';
+      const headers = rows[0];
+      
+      for (let index = 1; index < rows.length; index++) {
+        const row = rows[index];
+        textResult += `• ${row[0]} : ${row[1] || ''}`;
+        if (row[2]) {
+          textResult += ` (${headers[2] || '비고'}: ${row[2]})`;
+        }
+        textResult += '\n';
+      }
+      return textResult;
+    }
+
+    // 마크다운 표 ➡️ 텍스트화 파서
+    function parseMarkdownTablesToText(text) {
+      const lines = text.split('\n');
+      let inTable = false;
+      let tableRows = [];
+      let result = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith('|') && line.endsWith('|')) {
+          const stripLine = line.replace(/[|:\-\s]/g, '');
+          if (stripLine === '') continue;
+          
+          inTable = true;
+          let cells = line.split('|').map(c => c.trim());
+          if (cells[0] === '') cells.shift();
+          if (cells[cells.length - 1] === '') cells.pop();
+          tableRows.push(cells);
+        } else {
+          if (inTable) {
+            if (tableRows.length > 0) result.push(renderTableAsText(tableRows));
+            tableRows = [];
+            inTable = false;
+          }
+          result.push(lines[i]);
+        }
+      }
+      if (inTable && tableRows.length > 0) result.push(renderTableAsText(tableRows));
+      return result.join('\n');
+    }
+
+    // 마크다운 ➡️ 모바일 최적화 텍스트 변환 (기호 삭제 및 표 최적화)
+    function convertToMobilePlain(text) {
+      let textWithTables = parseMarkdownTablesToText(text);
+      let plain = textWithTables;
+
+      // 3중 강조 기호 흔적도 없이 삭제
+      plain = plain.replace(/==(.*?)==/g, '$1');
+      plain = plain.replace(/\+\+(.*?)\+\+/g, '$1');
+      plain = plain.replace(/!!(.*?)!!/g, '$1');
+
+      // 마크다운 볼드 및 제목 기호 깔끔히 텍스트 정돈
+      plain = plain.replace(/^\s*###\s+(.*?)$/gm, '\n[ $1 ]\n');
+      plain = plain.replace(/^\s*##\s+(.*?)$/gm, '\n■ $1\n');
+      plain = plain.replace(/^\s*#\s+(.*?)$/gm, '\n★ $1\n');
+      plain = plain.replace(/\*\*(.*?)\*\*/g, '$1');
+
+      return plain;
+    }
+
+    // 1초 전체 선택 실행 함수
+    function selectPreviewText() {
+      const previewArea = document.getElementById('previewArea');
+      
+      const range = document.createRange();
+      range.selectNodeContents(previewArea);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      if (currentMode === 'mobile') {
+        showToast("모바일 텍스트 지정 완료! 화면의 '복사'를 터치해 주세요! 🫡");
+      } else {
+        showToast("HTML 영역 지정 완료! 화면의 '복사'를 터치해 주세요! 🫡");
+      }
+    }
+
+    // [💻 PC용 복사 실행]
+    function processPcFormat() {
+      currentMode = 'pc';
+      const textInput = document.getElementById('inputText').value;
+      if (!textInput.trim()) {
+        alert("원고를 먼저 입력해 주세요!");
+        return;
+      }
+
+      const convertedHtml = markdownToHtml(textInput);
+      
+      // 미리보기 영역 설정
+      const previewArea = document.getElementById('previewArea');
+      previewArea.innerHTML = convertedHtml;
+      document.getElementById('previewContainer').style.display = 'block';
+      document.getElementById('previewTitle').innerHTML = '📝 변환 완료 미리보기 (PC 에디터용 HTML)';
+      document.getElementById('warningText').innerHTML = '💡 붙여넣기가 안 될 경우, 위 [1초 전체선택] 터치 후 복사를 눌러보세요!';
+
+      const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${convertedHtml}</body></html>`;
+
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          const clipboardItem = new ClipboardItem({
+            'text/html': new Promise(function(resolve) {
+              resolve(new Blob([fullHtml], { type: 'text/html' }));
+            }),
+            'text/plain': new Promise(function(resolve) {
+              resolve(new Blob([textInput], { type: 'text/plain' }));
+            })
+          });
+
+          navigator.clipboard.write([clipboardItem]).then(function() {
+            showToast("PC용 서식 및 표 자동 복사 성공! 🫡💻");
+          }).catch(function(err) {
+            console.warn("PC 복사 API 제한, Fallback 기동", err);
+            fallbackCopy(fullHtml, textInput);
+          });
+          return;
+        } catch (err) {
+          console.warn("ClipboardItem 제한", err);
+        }
+      }
+      fallbackCopy(fullHtml, textInput);
+    }
+
+    // [📱 모바일용 복사 실행]
+    function processMobileFormat() {
+      currentMode = 'mobile';
+      const textInput = document.getElementById('inputText').value;
+      if (!textInput.trim()) {
+        alert("원고를 먼저 입력해 주세요!");
+        return;
+      }
+
+      const mobileText = convertToMobilePlain(textInput);
+      
+      // 미리보기 영역 설정
+      const previewArea = document.getElementById('previewArea');
+      previewArea.textContent = mobileText;
+      document.getElementById('previewContainer').style.display = 'block';
+      document.getElementById('previewTitle').innerHTML = '📝 변환 완료 미리보기 (모바일 기호청소 완료)';
+      document.getElementById('warningText').innerHTML = '💡 모바일 네이버 블로그에 붙여넣으시면 기호와 표가 깨짐 없이 깔끔하게 들어갑니다!';
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(mobileText).then(function() {
+          showToast("모바일용 텍스트 복사 성공! 블로그 앱에 붙여넣으세요! 🫡📱");
+        }).catch(function(err) {
+          console.warn("writeText 에러, fallback 진행", err);
+          fallbackTextCopy(mobileText);
+        });
+      } else {
+        fallbackTextCopy(mobileText);
+      }
+    }
+
+    // HTML용 복사 Fallback
+    function fallbackCopy(htmlContent, plainText) {
+      try {
+        const tempElement = document.createElement('div');
+        tempElement.style.position = 'fixed';
+        tempElement.style.top = '0';
+        tempElement.style.left = '0';
+        tempElement.style.width = '10px';
+        tempElement.style.height = '10px';
+        tempElement.style.opacity = '0.01'; 
+        tempElement.innerHTML = htmlContent;
+        document.body.appendChild(tempElement);
+        
+        const range = document.createRange();
+        range.selectNodeContents(tempElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(tempElement);
+        selection.removeAllRanges();
+
+        if (successful) {
+          showToast("서식 자동 변환 및 임시 복사 완료! 🫡");
+        } else {
+          throw new Error("execCommand failed");
+        }
+      } catch (err) {
+        showToast("자동 복사 권한이 거부되었습니다. 아래 미리보기 영역을 복사해 주세요!");
+      }
+    }
+
+    // 텍스트용 복사 Fallback
+    function fallbackTextCopy(text) {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.width = '10px';
+        textArea.style.height = '10px';
+        textArea.style.opacity = '0.01';
+        document.body.appendChild(textArea);
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          showToast("모바일용 원고 우회 복사 성공! 🫡📱");
+        } else {
+          throw new Error("text copy failed");
+        }
+      } catch (err) {
+        showToast("복사 실패. 아래 미리보기 영역을 수동 복사해 주세요!");
+      }
+    }
+  </script>
+</body>
+</html>
