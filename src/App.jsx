@@ -55,6 +55,27 @@ const topicDatabase = {
   ]
 };
 
+const fetchWithRetry = async (url, options = {}, maxRetries = 2, delayMs = 2500) => {
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP 에러 ${res.status}`);
+      }
+      return res;
+    } catch (err) {
+      console.warn(`[네트워크 재시도] ${attempt}/${maxRetries} 실패: ${err.message}`);
+      lastError = err;
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  throw lastError;
+};
+
 function App() {
   const [inputMode, setInputMode] = useState('topic'); // 'topic' or 'youtube'
   const [youtubeTranscript, setYoutubeTranscript] = useState('');
@@ -410,16 +431,11 @@ ${inputText}
       console.log('[로컬 가동] 1단계 구글 실시간 검색을 비활성화합니다.');
     }
 
-    const res = await fetch(API_URL, {
+    const res = await fetchWithRetry(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(apiPayload)
-    });
-
-    if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.error?.message || '1단계 요약 생성 실패');
-    }
+    }, 2, 2500);
 
     const data = await res.json();
     
@@ -489,40 +505,24 @@ ${summaryData}`;
       }
     };
 
-    let lastError = null;
-    const maxRetries = 2;
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`[코다리 엔진] 2단계: ${platformName} 글 작성을 시도합니다. (시도 ${attempt}/${maxRetries})`);
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
+    try {
+      console.log(`[코다리 엔진] 2단계: ${platformName} 글 작성을 시도합니다.`);
+      const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`;
 
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(apiPayload)
-        });
+      const res = await fetchWithRetry(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(apiPayload)
+      }, 2, 2500);
 
-        if (!res.ok) {
-          const errData = await res.json();
-          const errMsg = errData.error?.message || '알 수 없는 오류';
-          throw new Error(errMsg);
-        }
-
-        const data = await res.json();
-        const text = data.candidates[0].content.parts[0].text;
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        return JSON.parse(jsonMatch ? jsonMatch[0] : text);
-
-      } catch (err) {
-        console.warn(`[엔진 예외 발생] 시도 ${attempt} 실패: ${err.message}`);
-        lastError = err;
-        if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1500));
-        }
-      }
+      const data = await res.json();
+      const text = data.candidates[0].content.parts[0].text;
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      return JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    } catch (err) {
+      console.error(`[엔진 예외 최종 발생] ${platformName} 작성 실패:`, err);
+      throw new Error(`${platformName} 최종 작성 실패: ${err.message}`);
     }
-
-    throw new Error(`${platformName} 최종 작성 실패: ${lastError?.message}`);
   };
 
   const generateContent = async () => {
@@ -572,6 +572,12 @@ ${summaryData}`;
       setStatusMessage('🔎 1단계: 실시간 구글 교차 검증 및 팩트 요약 중...');
       const summaryData = await fetchSummaryDraft(inputText, finalKey);
  
+      // 1단계 완료 후 2단계 진입 전 안전 쿨다운 (1초)
+      if (platforms.naver || platforms.tistory || platforms.wordpress) {
+        setStatusMessage('⏳ 1단계 요약 성공! 2단계 전이 전 1.0초 대기 중...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+ 
       // 2단계: 플랫폼별 순차적(릴레이) 작성
       let naverRaw = null;
       let tistoryRaw = null;
@@ -582,8 +588,8 @@ ${summaryData}`;
         naverRaw = await writePlatformContent('naver', summaryData, finalKey);
         
         if (platforms.tistory || platforms.wordpress) {
-          setStatusMessage('⏳ 구글 API 과부하 방지를 위해 1.2초 대기 중...');
-          await new Promise(resolve => setTimeout(resolve, 1200));
+          setStatusMessage('⏳ 구글 API 과부하 방지를 위해 2.2초 대기 중...');
+          await new Promise(resolve => setTimeout(resolve, 2200));
         }
       }
  
@@ -592,8 +598,8 @@ ${summaryData}`;
         tistoryRaw = await writePlatformContent('tistory', summaryData, finalKey);
  
         if (platforms.wordpress) {
-          setStatusMessage('⏳ 구글 API 과부하 방지를 위해 1.2초 대기 중...');
-          await new Promise(resolve => setTimeout(resolve, 1200));
+          setStatusMessage('⏳ 구글 API 과부하 방지를 위해 2.2초 대기 중...');
+          await new Promise(resolve => setTimeout(resolve, 2200));
         }
       }
  
