@@ -123,35 +123,63 @@
       color: #4b5563;
     }
 
-    .btn-convert {
-      width: 100%;
-      background: linear-gradient(135deg, var(--gold-primary) 0%, #e6be00 100%);
-      color: #0b0f19;
+    /* 🎛️ 듀얼 변환 버튼 영역 */
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 480px) {
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-action {
       border: none;
       border-radius: 16px;
-      padding: 16px 24px;
-      font-size: 1.05rem;
+      padding: 16px 20px;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 10px 20px rgba(255, 215, 0, 0.15);
+      gap: 6px;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .btn-convert:hover {
+    .btn-pc {
+      background: linear-gradient(135deg, var(--gold-primary) 0%, #e6be00 100%);
+      color: #0b0f19;
+      box-shadow: 0 8px 16px rgba(255, 215, 0, 0.15);
+    }
+
+    .btn-pc:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 25px rgba(255, 215, 0, 0.25);
+      box-shadow: 0 12px 20px rgba(255, 215, 0, 0.25);
       background: linear-gradient(135deg, var(--gold-hover) 0%, var(--gold-primary) 100%);
     }
 
-    .btn-convert:active {
+    .btn-mobile {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-mobile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px rgba(59, 130, 246, 0.25);
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    }
+
+    .btn-action:active {
       transform: translateY(0);
     }
 
-    /* 📝 변환 완료 미리보기 컨테이너 (네이버 에디터 뷰) */
+    /* 📝 변환 완료 미리보기 컨테이너 */
     .preview-container {
       display: none;
       margin-top: 24px;
@@ -184,7 +212,7 @@
     }
 
     .btn-select {
-      background: #3b82f6;
+      background: #10b981;
       color: white;
       border: none;
       padding: 6px 14px;
@@ -192,12 +220,12 @@
       font-size: 0.8rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
       transition: all 0.2s ease;
     }
 
     .btn-select:hover {
-      background: #2563eb;
+      background: #059669;
       transform: scale(1.05);
     }
 
@@ -213,12 +241,16 @@
       border: 1px dashed #cccccc;
       border-radius: 8px;
       background: #ffffff;
+      white-space: pre-wrap; /* 모바일용 일반 텍스트 포맷 줄바꿈 보존 */
     }
 
     .warning-text {
       margin-top: 10px;
       font-size: 0.82rem;
-      color: #ef4444;
+      color: #1e3a8a;
+      background-color: #eff6ff;
+      border-radius: 8px;
+      padding: 8px 12px;
       font-weight: 700;
       text-align: center;
       line-height: 1.4;
@@ -312,45 +344,48 @@
         🫡🐟 KODARI ENGINE V3.7.9
       </div>
       <h1>코다리 1초 서식 변환기</h1>
-      <p class="subtitle">Gems 원고를 붙여넣고 아래 버튼을 누르면,<br>에디터가 이해하는 색상 및 표 서식으로 자동 치환되어 복사됩니다.</p>
+      <p class="subtitle">Gems 원고를 붙여넣고 아래 상황에 맞는 버튼을 누르시면,<br>가장 깔끔하게 클립보드에 자동 복사됩니다.</p>
     </header>
 
     <div class="textarea-container">
       <textarea id="inputText" placeholder="Gems 또는 GPTs가 써준 원고 전체를 여기에 붙여넣으세요 (Ctrl + V)"></textarea>
     </div>
 
-    <button class="btn-convert" onclick="processAndCopy()">
-      🚀 1초 서식 변환 & 클립보드 복사
-    </button>
+    <!-- 🎛️ PC 및 모바일 듀얼 버튼 제공 -->
+    <div class="button-group">
+      <button class="btn-action btn-pc" onclick="processPcFormat()">
+        💻 PC 에디터용 복사 (색상+표 자동변환)
+      </button>
+      <button class="btn-action btn-mobile" onclick="processMobileFormat()">
+        📱 모바일 에디터용 복사 (기호청소+표텍스트화)
+      </button>
+    </div>
 
     <!-- 📝 모바일 강제 복사 우회 전용 [미리보기 영역] -->
     <div id="previewContainer" class="preview-container">
       <div class="preview-header">
-        <span class="preview-title">📝 변환 완료 미리보기 (에디터 뷰)</span>
+        <span class="preview-title" id="previewTitle">📝 변환 완료 미리보기</span>
         <button class="btn-select" onclick="selectPreviewText()">💡 1초 전체선택</button>
       </div>
       <div id="previewArea" class="preview-area">
-        <!-- HTML 결과물이 여기에 실시간 렌더링됩니다 -->
+        <!-- 결과물이 여기에 실시간 렌더링됩니다 -->
       </div>
-      <p class="warning-text">
-        ⚠️ [1초 전체선택] 터치 후, 화면에 뜨는 '복사'를 누르면<br>아이폰 모바일에서도 서식과 표가 100% 안전하게 클립보드에 복사됩니다!
+      <p class="warning-text" id="warningText">
+        💡 바로 붙여넣기가 안 될 경우, 위 [1초 전체선택] 터치 후 화면에 뜨는 '복사'를 눌러 붙여넣으세요!
       </p>
     </div>
 
     <div class="info-box">
-      <h3>⚓ 3중 강조 및 표 변환 가이드</h3>
+      <h3>⚓ 듀얼 복사 시스템 안내</h3>
       <ul>
-        <li><code style="color:var(--gold-primary)">==내용==</code> ➡️ <span class="badge-demo badge-yellow">노란 형광펜</span> 서식으로 변환</li>
-        <li><code style="color:var(--gold-primary)">++내용++</code> ➡️ <span class="badge-demo badge-blue">파란색 굵은글씨</span> 서식으로 변환</li>
-        <li><code style="color:var(--gold-primary)">!!내용!!</code> ➡️ <span class="badge-demo badge-red">빨간색 굵은글씨</span> 서식으로 변환</li>
-        <li><code style="color:var(--gold-primary)">| 표 형태 |</code> ➡️ <span class="badge-demo badge-green">네이버/티스토리 전용 표 객체</span>로 완벽 자동 변환</li>
-        <li>기본 마크다운 제목(#, ##, ###) 및 리스트, 줄바꿈 서식도 자동 최적화됩니다.</li>
+        <li><strong>💻 PC 에디터용</strong>: 형광펜(<span class="badge-demo badge-yellow">노란색</span>), 파란색, 빨간색 및 <span class="badge-demo badge-green">진짜 HTML 표 객체</span>로 변환하여 복사됩니다.</li>
+        <li><strong>📱 모바일 에디터용</strong>: 네이버 앱의 외부 HTML 차단 정책을 돌파하기 위해, 지저분한 특수기호(`==`, `++`, `!!`)를 전부 자동 제거하고 표를 초가독성 텍스트 포맷으로 자동 치환하여 깔끔하게 복사합니다.</li>
       </ul>
     </div>
   </div>
 
   <div id="toast" class="toast">
-    <span>✨</span> 서식 변환 및 클립보드 복사 완료! 블로그 에디터에 붙여넣으세요! (Ctrl+V)
+    <span>✨</span> 복사 완료! 블로그 에디터에 붙여넣으세요!
   </div>
 
   <footer>
@@ -358,6 +393,8 @@
   </footer>
 
   <script>
+    let currentMode = 'pc'; // 'pc' or 'mobile'
+
     function showToast(message) {
       const toast = document.getElementById('toast');
       if (message) toast.querySelector('span').nextSibling.textContent = " " + message;
@@ -367,20 +404,18 @@
       }, 3000);
     }
 
-    // 마크다운 표 렌더러 (네이버/티스토리 호환 인라인 스타일 입히기)
+    // 마크다운 표 렌더러 (HTML Table)
     function renderHtmlTable(rows) {
       let html = '<table style="border-collapse: collapse; width: 100%; margin: 16px 0; border: 1px solid #dddddd; font-size: 0.95rem; text-align: left; background-color: #ffffff; color: #333333;">';
       
       rows.forEach((row, index) => {
         if (index === 0) {
-          // 헤더 행 처리 (연한 회색 배경, 굵은 폰트)
           html += '<thead style="background-color: #f3f4f6; font-weight: bold; border-bottom: 2px solid #dddddd;"><tr>';
           row.forEach(cell => {
             html += `<th style="border: 1px solid #dddddd; padding: 10px 12px; text-align: center; font-weight: bold; background-color: #f3f4f6; color: #111111;">${cell}</th>`;
           });
           html += '</tr></thead><tbody>';
         } else {
-          // 본문 행 처리 (Zebra Stripe로 가독성 향상)
           let bgColor = index % 2 === 0 ? 'background-color: #f9fafb;' : 'background-color: #ffffff;';
           html += `<tr style="${bgColor}">`;
           row.forEach(cell => {
@@ -394,7 +429,7 @@
       return html;
     }
 
-    // 마크다운 표 파서
+    // 마크다운 표 파서 (HTML 변환용)
     function parseMarkdownTables(text) {
       const lines = text.split('\n');
       let inTable = false;
@@ -403,93 +438,146 @@
       
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
-        
-        // 표 행 식별 (|로 시작하고 끝나는 줄)
         if (line.startsWith('|') && line.endsWith('|')) {
-          // 구분선 (|---| 또는 |:---:| 등)인지 검사
           const stripLine = line.replace(/[|:\-\s]/g, '');
-          if (stripLine === '') {
-            // 구분선은 파싱하지 않고 건너뜀
-            continue;
-          }
+          if (stripLine === '') continue;
           
           inTable = true;
           let cells = line.split('|').map(c => c.trim());
-          // 양끝의 빈 요소 제거
           if (cells[0] === '') cells.shift();
           if (cells[cells.length - 1] === '') cells.pop();
-          
           tableRows.push(cells);
         } else {
           if (inTable) {
-            // 표가 끝났으므로 변환하여 결과에 추가
-            if (tableRows.length > 0) {
-              result.push(renderHtmlTable(tableRows));
-            }
+            if (tableRows.length > 0) result.push(renderHtmlTable(tableRows));
             tableRows = [];
             inTable = false;
           }
           result.push(lines[i]);
         }
       }
-      
-      // 파일 끝까지 돌았는데 표가 안 끝난 경우 처리
-      if (inTable && tableRows.length > 0) {
-        result.push(renderHtmlTable(tableRows));
-      }
-      
+      if (inTable && tableRows.length > 0) result.push(renderHtmlTable(tableRows));
       return result.join('\n');
     }
 
-    // 마크다운을 간단한 HTML(에디터 부착용)로 변환하는 함수
+    // 마크다운 ➡️ HTML 변환 (PC용)
     function markdownToHtml(text) {
       let textWithTables = parseMarkdownTables(text);
       let html = textWithTables;
 
-      // 3중 강조 기호 복원 및 HTML 태그로 치환 (네이버/티스토리 렌더링용)
       html = html.replace(/==(.*?)==/g, '<span style="background-color: #ffe600; color: #000000; font-weight: bold; padding: 2px 4px; border-radius: 3px;">$1</span>');
       html = html.replace(/\+\+(.*?)\+\+/g, '<span style="color: #0066ff; font-weight: bold;">$1</span>');
       html = html.replace(/!!(.*?)!!/g, '<span style="color: #ff3333; font-weight: bold;">$1</span>');
 
-      // 마크다운 헤더 처리
       html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; color: #111111;">$1</h3>');
       html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.5rem; font-weight: bold; margin-top: 28px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; color: #111111;">$1</h2>');
       html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; margin-top: 32px; margin-bottom: 20px; color: #111111;">$1</h1>');
-
-      // 표준 볼드 (**텍스트**) => <strong>
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-      // 리스트 기호 (* 또는 -) => 간이 패딩 처리
       html = html.replace(/^[-\*]\s+(.*?)$/gm, '<div style="margin-left: 16px; margin-top: 6px; margin-bottom: 6px; display: list-item; list-style-type: disc; color: #333333;">$1</div>');
 
-      // 줄바꿈 보존: 연속 줄바꿈은 p태그 분할, 단일 줄바꿈은 br
       const paragraphs = html.split(/\n\n+/);
       html = paragraphs.map(p => {
         let lines = p.trim().split('\n');
         let block = lines.join('<br>');
-        if (block.startsWith('<h') || block.startsWith('<div') || block.startsWith('<table') || block.startsWith('<tr')) {
-          return block;
-        }
+        if (block.startsWith('<h') || block.startsWith('<div') || block.startsWith('<table') || block.startsWith('<tr')) return block;
         return `<p style="margin-bottom: 16px; line-height: 1.7; font-size: 1rem; color: #333333;">${block}</p>`;
       }).join('');
 
       return html;
     }
 
-    // 미리보기 텍스트 전체 선택 (iOS 사파리 물리적 드래그 강제 복사 우회책)
-    function selectPreviewText() {
-      const previewArea = document.getElementById('previewArea');
-      const range = document.createRange();
-      range.selectNodeContents(previewArea);
-      const selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
+    // 표 데이터를 모바일용 세로 리스트형 텍스트로 가공
+    function renderTableAsText(rows) {
+      let textResult = '\n📌 [표 요약 정보]\n';
+      const headers = rows[0];
       
-      showToast("영역이 지정되었습니다! 상단의 '복사' 버튼을 눌러주세요! 🫡");
+      for (let index = 1; index < rows.length; index++) {
+        const row = rows[index];
+        textResult += `• ${row[0]} : ${row[1] || ''}`;
+        if (row[2]) {
+          textResult += ` (${headers[2] || '비고'}: ${row[2]})`;
+        }
+        textResult += '\n';
+      }
+      return textResult;
     }
 
-    // 아이폰 사파리 보안 필터를 100% 우회하는 마법의 동기 복사 함수
-    function processAndCopy() {
+    // 마크다운 표 ➡️ 텍스트화 파서
+    function parseMarkdownTablesToText(text) {
+      const lines = text.split('\n');
+      let inTable = false;
+      let tableRows = [];
+      let result = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith('|') && line.endsWith('|')) {
+          const stripLine = line.replace(/[|:\-\s]/g, '');
+          if (stripLine === '') continue;
+          
+          inTable = true;
+          let cells = line.split('|').map(c => c.trim());
+          if (cells[0] === '') cells.shift();
+          if (cells[cells.length - 1] === '') cells.pop();
+          tableRows.push(cells);
+        } else {
+          if (inTable) {
+            if (tableRows.length > 0) result.push(renderTableAsText(tableRows));
+            tableRows = [];
+            inTable = false;
+          }
+          result.push(lines[i]);
+        }
+      }
+      if (inTable && tableRows.length > 0) result.push(renderTableAsText(tableRows));
+      return result.join('\n');
+    }
+
+    // 마크다운 ➡️ 모바일 최적화 텍스트 변환 (기호 삭제 및 표 최적화)
+    function convertToMobilePlain(text) {
+      let textWithTables = parseMarkdownTablesToText(text);
+      let plain = textWithTables;
+
+      // 3중 강조 기호 흔적도 없이 삭제
+      plain = plain.replace(/==(.*?)==/g, '$1');
+      plain = plain.replace(/\+\+(.*?)\+\+/g, '$1');
+      plain = plain.replace(/!!(.*?)!!/g, '$1');
+
+      // 마크다운 볼드 및 제목 기호 깔끔히 텍스트 정돈
+      plain = plain.replace(/^\s*###\s+(.*?)$/gm, '\n[ $1 ]\n');
+      plain = plain.replace(/^\s*##\s+(.*?)$/gm, '\n■ $1\n');
+      plain = plain.replace(/^\s*#\s+(.*?)$/gm, '\n★ $1\n');
+      plain = plain.replace(/\*\*(.*?)\*\*/g, '$1');
+
+      return plain;
+    }
+
+    // 1초 전체 선택 실행 함수
+    function selectPreviewText() {
+      const previewArea = document.getElementById('previewArea');
+      
+      // 모바일 모드(일반 텍스트)인 경우 selection 방식 다변화
+      if (currentMode === 'mobile') {
+        const range = document.createRange();
+        range.selectNodeContents(previewArea);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        showToast("모바일 텍스트 지정 완료! 화면의 '복사'를 터치해 주세요! 🫡");
+      } else {
+        // PC 모드 (HTML)
+        const range = document.createRange();
+        range.selectNodeContents(previewArea);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        showToast("HTML 영역 지정 완료! 화면의 '복사'를 터치해 주세요! 🫡");
+      }
+    }
+
+    // [💻 PC용 복사 실행]
+    function processPcFormat() {
+      currentMode = 'pc';
       const textInput = document.getElementById('inputText').value;
       if (!textInput.trim()) {
         alert("원고를 먼저 입력해 주세요!");
@@ -498,15 +586,15 @@
 
       const convertedHtml = markdownToHtml(textInput);
       
-      // 📝 [보완 핵심] 미리보기 영역에 변환된 결과를 강제로 보여주고 활성화시킴
+      // 미리보기 영역 설정
       const previewArea = document.getElementById('previewArea');
       previewArea.innerHTML = convertedHtml;
       document.getElementById('previewContainer').style.display = 'block';
+      document.getElementById('previewTitle').innerHTML = '📝 변환 완료 미리보기 (PC 에디터용 HTML)';
+      document.getElementById('warningText').innerHTML = '💡 붙여넣기가 안 될 경우, 위 [1초 전체선택] 터치 후 복사를 눌러보세요!';
 
-      // 모바일 OS가 온전한 서식(HTML) 데이터로 100% 인식하게 패키징 처리
       const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${convertedHtml}</body></html>`;
 
-      // 1. iOS 사파리 / 크롬 표준: Promise를 ClipboardItem 내부에 심는 완벽 우회 기법
       if (navigator.clipboard && window.ClipboardItem) {
         try {
           const clipboardItem = new ClipboardItem({
@@ -519,22 +607,52 @@
           });
 
           navigator.clipboard.write([clipboardItem]).then(function() {
-            showToast("서식 변환 및 1차 자동 복사 성공! 바로 에디터에 붙여넣어 보세요! 🫡🐟");
+            showToast("PC용 서식 및 표 자동 복사 성공! 🫡💻");
           }).catch(function(err) {
-            console.warn("Promise Clipboard write 실패, Fallback 기동:", err);
+            console.warn("PC 복사 API 제한, Fallback 기동", err);
             fallbackCopy(fullHtml, textInput);
           });
           return;
         } catch (err) {
-          console.warn("ClipboardItem 비정상 작동, Fallback 기동:", err);
+          console.warn("ClipboardItem 제한", err);
         }
       }
-
-      // API 미지원 브라우저 우회
       fallbackCopy(fullHtml, textInput);
     }
 
-    // 모바일 구형/인앱 브라우저용 HTML 강제 선택 복사 Fallback
+    // [📱 모바일용 복사 실행]
+    function processMobileFormat() {
+      currentMode = 'mobile';
+      const textInput = document.getElementById('inputText').value;
+      if (!textInput.trim()) {
+        alert("원고를 먼저 입력해 주세요!");
+        return;
+      }
+
+      // 기호 제거 및 표 텍스트 리스트화 처리
+      const mobileText = convertToMobilePlain(textInput);
+      
+      // 미리보기 영역 설정 (text만 안전하게 삽입)
+      const previewArea = document.getElementById('previewArea');
+      previewArea.textContent = mobileText;
+      document.getElementById('previewContainer').style.display = 'block';
+      document.getElementById('previewTitle').innerHTML = '📝 변환 완료 미리보기 (모바일 기호청소 완료)';
+      document.getElementById('warningText').innerHTML = '💡 모바일 네이버 블로그에 붙여넣으시면 기호와 표가 깨짐 없이 깔끔하게 들어갑니다!';
+
+      // 모바일 텍스트 카피는 writeText API를 통해 백발백중 성공함
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(mobileText).then(function() {
+          showToast("모바일용 텍스트 복사 성공! 블로그 앱에 붙여넣으세요! 🫡📱");
+        }).catch(function(err) {
+          console.warn("writeText 에러, fallback 진행", err);
+          fallbackTextCopy(mobileText);
+        });
+      } else {
+        fallbackTextCopy(mobileText);
+      }
+    }
+
+    // HTML용 복사 Fallback
     function fallbackCopy(htmlContent, plainText) {
       try {
         const tempElement = document.createElement('div');
@@ -558,14 +676,37 @@
         selection.removeAllRanges();
 
         if (successful) {
-          showToast("서식 변환 및 2차 우회 복사 성공! 🫡");
+          showToast("서식 자동 변환 및 임시 복사 완료! 🫡");
         } else {
-          throw new Error("execCommand copy failed");
+          throw new Error("execCommand failed");
         }
-      } catch (fallbackErr) {
-        console.error("최종 복사 실패:", fallbackErr);
-        // 최종 실패 시 미리보기 복사 유도 메시지 추가
-        showToast("자동 복사가 제한되었습니다. 아래 미리보기에서 [1초 전체선택] 후 복사해 주세요!");
+      } catch (err) {
+        showToast("자동 복사 권한이 거부되었습니다. 아래 미리보기 영역을 복사해 주세요!");
+      }
+    }
+
+    // 텍스트용 복사 Fallback
+    function fallbackTextCopy(text) {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.width = '10px';
+        textArea.style.height = '10px';
+        textArea.style.opacity = '0.01';
+        document.body.appendChild(textArea);
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) {
+          showToast("모바일용 원고 우회 복사 성공! 🫡📱");
+        } else {
+          throw new Error("text copy failed");
+        }
+      } catch (err) {
+        showToast("복사 실패. 아래 미리보기 영역을 수동 복사해 주세요!");
       }
     }
   </script>
