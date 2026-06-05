@@ -48,8 +48,8 @@
 
 ---
 
-## ⚙️ 5. 기술적 고정 가이드 (KODARI ENGINE SPEC V3.9.0)
-- **표준 API 모델명**: 반드시 **`gemini-2.5-flash`**를 사용한다. (V3.8.1/V3.9.0에서 검증된 유일한 안정 모델)
+## ⚙️ 5. 기술적 고정 가이드 (KODARI ENGINE SPEC V3.7.9.1)
+- **표준 API 모델명**: 반드시 **`gemini-2.5-flash`**를 사용한다. (V3.8.1/V3.9.0 및 V3.7.9.1에서 검증된 유일한 안정 모델)
 - **절대 금지**: `gemini-1.5-pro-latest`나 구형 모델명을 사용하지 않는다. (API 키 호환성 문제 발생 방지)
 - **표준 API URL**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`
 - **API 버전**: 반드시 `v1beta` 엔드포인트를 사용한다.
@@ -74,6 +74,8 @@
 ---
 
 ## 📜 8. 항해 기록 (Version History)
+- 2026.06.05:
+    - [V3.7.9.1] 모바일 오토세이브 엔진 탑재. 로컬 스토리지 기반 임시 백업 및 탭 상태 복원, 24시간 자동 파기 보호막 구축. `kodari-v3791.vercel.app` 정식 항로 개설.
 - 2026.05.31:
     - [V3.7.8.7] 비용 통제 밸브 시스템 탑재. 동적 플랫폼 빌드 스키마 및 GOOGLE RADAR 온오프 스위치 구현. `kodari-v3787-1.vercel.app` 정식 항로 개설.
 - 2026.05.10:

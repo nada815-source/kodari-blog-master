@@ -99,6 +99,58 @@ function App() {
   const [error, setError] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
 
+  // 💾 [V3.7.9.1] 로컬 스토리지 백업 및 복원 헬퍼 함수
+  const saveCurrentSession = (updatedResults, updatedActiveTab, updatedInputMode, updatedTopic, updatedYoutube) => {
+    try {
+      const sessionData = {
+        timestamp: Date.now(),
+        results: updatedResults,
+        activeTab: updatedActiveTab,
+        inputMode: updatedInputMode,
+        topic: updatedTopic,
+        youtubeTranscript: updatedYoutube
+      };
+      localStorage.setItem('kodari_saved_session', JSON.stringify(sessionData));
+    } catch (e) {
+      console.warn('[코다리 엔진] 자동 백업 저장 실패 (시크릿 모드 가능성):', e);
+    }
+  };
+
+  // 💾 [V3.7.9.1] 컴포넌트 최초 마운트 시 세션 복구 및 24시간 만료 체크
+  useEffect(() => {
+    const savedSessionRaw = localStorage.getItem('kodari_saved_session');
+    if (savedSessionRaw) {
+      try {
+        const session = JSON.parse(savedSessionRaw);
+        const now = Date.now();
+        const expiryLimit = 24 * 60 * 60 * 1000; // 24시간
+        
+        if (now - session.timestamp < expiryLimit) {
+          if (session.results) setResults(session.results);
+          if (session.activeTab) setActiveTab(session.activeTab);
+          if (session.inputMode) setInputMode(session.inputMode);
+          if (session.topic) setTopic(session.topic);
+          if (session.youtubeTranscript) setYoutubeTranscript(session.youtubeTranscript);
+          console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료! 🫡');
+        } else {
+          localStorage.removeItem('kodari_saved_session');
+          console.log('[코다리 엔진] 24시간이 경과한 임시 백업 세션을 자동 파기했습니다. 🧹');
+        }
+      } catch (e) {
+        console.error('[코다리 엔진] 백업 세션 복구 실패:', e);
+        localStorage.removeItem('kodari_saved_session');
+      }
+    }
+  }, []);
+
+  // 💾 [V3.7.9.1] 활성화 탭(activeTab) 변경 시 백업 정보 실시간 갱신
+  useEffect(() => {
+    const hasData = Object.values(results[inputMode]).some(val => val.content);
+    if (hasData) {
+      saveCurrentSession(results, activeTab, inputMode, topic, youtubeTranscript);
+    }
+  }, [activeTab]);
+
   const [useImage, setUseImage] = useState(true);
   const [useGoogleSearch, setUseGoogleSearch] = useState(true); // [V3.7.8.7] 구글 검색 팩트체크 온오프 상태 추가
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -123,6 +175,18 @@ function App() {
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
 
   const patchNotes = [
+    {
+      version: 'V3.7.9.1',
+      date: '2026-06-05',
+      title: '💾 모바일 자동 백업(Auto-Save) 및 24시간 파기 보호막 장착',
+      tags: ['모바일최적화', '보안강화', '자동백업'],
+      details: [
+        '모바일 브라우저의 백그라운드 메모리 해제로 인한 강제 새로고침 시 데이터 소실을 방지하는 [로컬 스토리지 자동 백업] 엔진을 탑재했습니다.',
+        '마지막 확인 중이던 플랫폼 탭 상태(Active Tab)까지 그대로 복원시켜 주는 탭 박제 기능을 이식했습니다.',
+        '보안 및 캐시 청결을 위해 생성 후 24시간이 지난 데이터는 다음 접속 시 흔적 없이 클리닝하는 [24시간 자동 파기] 시스템을 구축했습니다.',
+        '결과 창에 [🔄 전체 초기화] 버튼을 신설하여, 언제든 간편하게 모든 데이터를 수동으로 청소할 수 있게 개선했습니다.'
+      ]
+    },
     {
       version: 'V3.7.9.0',
       date: '2026-06-01',
@@ -627,17 +691,26 @@ ${summaryData}`;
         };
       };
 
-      setResults(prev => ({
-        ...prev,
+      const formattedNaver = platforms.naver ? formatResult(naverRaw) : emptyResult;
+      const formattedTistory = platforms.tistory ? formatResult(tistoryRaw) : emptyResult;
+      const formattedWordpress = platforms.wordpress ? formatResult(wordpressRaw) : emptyResult;
+
+      const newResults = {
+        ...results,
         [inputMode]: {
-          naver: platforms.naver ? formatResult(naverRaw) : emptyResult,
-          tistory: platforms.tistory ? formatResult(tistoryRaw) : emptyResult,
-          wordpress: platforms.wordpress ? formatResult(wordpressRaw) : emptyResult
+          naver: formattedNaver,
+          tistory: formattedTistory,
+          wordpress: formattedWordpress
         }
-      }));
+      };
+
+      setResults(newResults);
 
       const currentActive = activePlatforms.includes(activeTab) ? activeTab : activePlatforms[0];
       setActiveTab(currentActive);
+
+      // 💾 [V3.7.9.1] 포스팅 생성 완료 즉시 로컬 백업 저장
+      saveCurrentSession(newResults, currentActive, inputMode, topic, youtubeTranscript);
 
     } catch (err) {
       console.error(err);
@@ -687,15 +760,20 @@ ${summaryData}`;
         section_prompts: parsedData.image_prompts || []
       };
 
-      setResults(prev => ({
-        ...prev,
+      const newResults = {
+        ...results,
         [inputMode]: {
-          ...prev[inputMode],
+          ...results[inputMode],
           [platform]: formattedResult
         }
-      }));
+      };
+
+      setResults(newResults);
 
       triggerToast(`${platformName} 글이 성공적으로 리필되었습니다! ✨`);
+
+      // 💾 [V3.7.9.1] 일부 플랫폼 재생성 완료 시 백업 갱신
+      saveCurrentSession(newResults, activeTab, inputMode, topic, youtubeTranscript);
       
     } catch (err) {
       console.error('재생성 상세 오류:', err);
@@ -930,6 +1008,21 @@ ${summaryData}`;
     }
   };
 
+  // 💾 [V3.7.9.1] 모바일 전체 초기화 및 백업 삭제 함수
+  const handleReset = () => {
+    if (window.confirm('정말 현재 생성된 모든 글과 입력을 초기화하시겠습니까? 🌊')) {
+      const resetResults = {
+        topic: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
+        youtube: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult }
+      };
+      setResults(resetResults);
+      setTopic('');
+      setYoutubeTranscript('');
+      localStorage.removeItem('kodari_saved_session');
+      triggerToast('모든 세션 데이터가 맑게 청소되었습니다! 🧹✨');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900">
       <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
@@ -937,7 +1030,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.0</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -952,7 +1045,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.0 [🤖 병렬 멀티 에이전트 + 🛡️ JSON Schema 무결점 엔진] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.1 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
@@ -1159,20 +1252,29 @@ ${summaryData}`;
 
         {Object.values(results[inputMode]).some(val => val.content) && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="flex border-b border-slate-100 bg-slate-50/50">
-              {['naver', 'tistory', 'wordpress'].filter(tab => platforms[tab]).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-4 font-bold text-sm transition-all ${
-                    activeTab === tab 
-                    ? 'text-blue-600 bg-white border-b-2 border-blue-600' 
-                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  {tab === 'naver' ? '🟢 네이버 블로그' : tab === 'tistory' ? '🟠 티스토리' : '🔵 워드프레스'}
-                </button>
-              ))}
+            <div className="flex justify-between items-center border-b border-slate-100 bg-slate-50/50 pr-4">
+              <div className="flex flex-1">
+                {['naver', 'tistory', 'wordpress'].filter(tab => platforms[tab]).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 py-4 font-bold text-sm transition-all ${
+                      activeTab === tab 
+                      ? 'text-blue-600 bg-white border-b-2 border-blue-600' 
+                      : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {tab === 'naver' ? '🟢 네이버' : tab === 'tistory' ? '🟠 티스토리' : '🔵 워드프레스'}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={handleReset} 
+                className="px-3.5 py-1.5 bg-slate-200 hover:bg-red-50 hover:text-red-600 rounded-lg text-xs font-black text-slate-500 transition-all flex items-center gap-1 active:scale-95"
+                title="화면 및 백업 데이터 전체 초기화"
+              >
+                🔄 전체 초기화
+              </button>
             </div>
 
             <div className="p-6 space-y-6">
