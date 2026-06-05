@@ -143,13 +143,13 @@ function App() {
     }
   }, []);
 
-  // 💾 [V3.7.9.1] 활성화 탭(activeTab) 변경 시 백업 정보 실시간 갱신
+  // 💾 [V3.7.9.3] 결과, 활성화 탭, 입력 모드, 키워드가 변경될 때마다 오토세이브 실시간 갱신 (전수 감시)
   useEffect(() => {
     const hasData = Object.values(results[inputMode]).some(val => val.content);
     if (hasData) {
       saveCurrentSession(results, activeTab, inputMode, topic, youtubeTranscript);
     }
-  }, [activeTab]);
+  }, [results, activeTab, inputMode, topic, youtubeTranscript]);
 
   const [useImage, setUseImage] = useState(true);
   const [useGoogleSearch, setUseGoogleSearch] = useState(true); // [V3.7.8.7] 구글 검색 팩트체크 온오프 상태 추가
@@ -175,6 +175,17 @@ function App() {
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
 
   const patchNotes = [
+    {
+      version: 'V3.7.9.3',
+      date: '2026-06-06',
+      title: '💾 오토세이브 철통 보강 (실시간 전수 감시 및 자동 복원 픽스)',
+      tags: ['버그수정', '자동백업', '편의성'],
+      details: [
+        '기존 오토세이브 엔진이 탭(Platform Tab)을 전환할 때만 한정적으로 백업되던 누락 버그를 긴급 수정했습니다.',
+        '이제 글 작성이 완료되거나, 키워드 타이핑 도중, 그리고 입력 모드가 변경될 때도 실시간으로 모든 데이터가 전수 자동 백업됩니다.',
+        '버전 상향에 맞춰 전용 독립 도메인(kodari-v3793.vercel.app) 항로를 신규 개설 및 배포했습니다.'
+      ]
+    },
     {
       version: 'V3.7.9.2',
       date: '2026-06-05',
@@ -1065,7 +1076,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.2</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.3</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1080,7 +1091,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.2 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.3 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
