@@ -176,6 +176,16 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.7.9.2',
+      date: '2026-06-05',
+      title: '🛡️ IT 본문 소스코드 강제 차단 및 해시태그 쉼표 제거 정제',
+      tags: ['품질개선', '편의성', '보안강화'],
+      details: [
+        'IT/기술 정보성 원고 작성 시 실제 프로그래밍 코드(Javascript, HTML 등)가 본문에 불필요하게 섞여 나오는 것을 원천 차단하는 [IT 소스코드 방어 지침]을 이식했습니다.',
+        '해시태그 끝자락에 붙던 쉼표(,)를 깨끗하게 제거하고, 띄어쓰기로만 구분되게 정제하여 가독성을 개선하고 복사 붙여넣기 편의성을 높였습니다.'
+      ]
+    },
+    {
       version: 'V3.7.9.1',
       date: '2026-06-05',
       title: '💾 모바일 자동 백업(Auto-Save) 및 24시간 파기 보호막 장착',
@@ -534,6 +544,7 @@ ${inputText}
    - 2번째 & 3번째: Section 2 & 3 - 본문의 핵심 정보를 비유/시각화하는 이미지
    - 4번째: Section 4 (Summary) - 성공적인 마무리 또는 달성 느낌의 피날레 이미지
    - 각 기획마다 이미지 내에 들어갈 한국어 메인카피(main_title)와 보조문구(sub_copy), 그리고 상세 영어 프롬프트(prompt)를 작성하라. 인물은 한국인(Korean/Asian)으로, 배경에 글자가 뭉개지지 않도록 no text 지침을 반영하라.
+7. 소스코드 노출 절대 금지: 본문 내에 실제 작동하는 프로그래밍 소스 코드(예: Javascript, HTML 태그 등)를 기재하거나 노출하는 것을 엄격히 금지하며, 개발자 관점의 코드 예시 대신 일반 대중이 이해하기 쉬운 한글 텍스트 설명으로 풀어써라.
 
 [1단계 검증 팩트 데이터]:
 ${summaryData}`;
@@ -1023,6 +1034,21 @@ ${summaryData}`;
     }
   };
 
+  // 🏷️ [V3.7.9.2] 해시태그 쉼표 제거 및 공백 구분 포맷팅 헬퍼 함수
+  const getCleanTags = (tagsStr) => {
+    if (!tagsStr) return '';
+    return tagsStr
+      .split(',')
+      .map(tag => {
+        let t = tag.trim();
+        if (!t) return '';
+        if (!t.startsWith('#')) t = '#' + t;
+        return t;
+      })
+      .filter(Boolean)
+      .join(' ');
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900">
       <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
@@ -1030,7 +1056,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.1</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1045,7 +1071,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.1 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.2 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
@@ -1349,9 +1375,9 @@ ${summaryData}`;
               <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 group">
                 <div className="flex justify-between items-center mb-2">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider">Hashtags</label>
-                  <button onClick={() => copyToClipboard(results[inputMode][activeTab].tags)} className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 태그 복사</button>
+                  <button onClick={() => copyToClipboard(getCleanTags(results[inputMode][activeTab].tags))} className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-600 font-bold rounded-lg text-xs transition-all shadow-sm border border-slate-200 flex items-center gap-1">📋 태그 복사</button>
                 </div>
-                <p className="text-blue-600 font-medium">{results[inputMode][activeTab].tags || '#해시태그'}</p>
+                <p className="text-blue-600 font-medium">{getCleanTags(results[inputMode][activeTab].tags) || '#해시태그'}</p>
               </div>
             </div>
           </div>
