@@ -176,6 +176,17 @@ function App() {
 
   const patchNotes = [
     {
+      version: 'V3.7.9.2',
+      date: '2026-06-05',
+      title: '🎨 KODARI Visual Engine 3.3 복원 탑재 (V2.7.3 비주얼 회귀)',
+      tags: ['비주얼개선', '레이아웃', '디자인'],
+      details: [
+        '대표님의 명품 시각 디자인 선호를 반영하여, 이미지 내에 타이포디자인과 스토리텔링 비유가 풍성히 담기던 V2.7.3의 [KODARI Visual Engine 3.3]을 복원 탑재했습니다.',
+        '단조롭던 무텍스트(no text) 방식에서 탈피하여, 이미지 내부에 가상 한글 카피가 자연스럽게 렌더링되도록 돕는 Information Card Layout과 STRICTLY RENDER THE EXACT KOREAN CHARACTERS 규칙을 복원 적용했습니다.',
+        '버전 상향에 맞춰 전용 독립 도메인(kodari-v3792.vercel.app) 항로를 신규 개설 및 배포했습니다.'
+      ]
+    },
+    {
       version: 'V3.7.9.1',
       date: '2026-06-05',
       title: '💾 모바일 자동 백업 및 쉼표 제거/IT 소스코드 방어막 완비',
@@ -529,11 +540,19 @@ ${inputText}
 3. 사족 금지: '글을 마치며', '결론', '맺음말' 등 식상한 기계적 섹션 사용을 **절대 금지**하며, 정보가 끝나면 자연스럽게 종결하라.
 4. 3중 하이브리드 강조: 핵심 키워드나 수치는 반드시 좌우 공백 없이 기호로 밀착 감싸라. (노랑 ==형광펜==, 파랑 ++파랑강조++, 빨강 !!주의사항!!)
 5. 정보 시각화: 비교/대조 정보는 **반드시 마크다운 표(Table)**로 시각화하되, 표 내부에는 강조 기호(**, ==, ++ 등)를 절대 사용하지 마라.
-6. 이미지 기획 (총 4개): 본문의 흐름에 맞게 Premium 3D Claymorphism 스타일의 이미지 기획 4개를 'image_prompts' 배열에 상세히 기재하라. 
-   - 1번째: Section 1 (Thumbnail) - 전체 주제를 관통하는 명품 대표 이미지
-   - 2번째 & 3번째: Section 2 & 3 - 본문의 핵심 정보를 비유/시각화하는 이미지
-   - 4번째: Section 4 (Summary) - 성공적인 마무리 또는 달성 느낌의 피날레 이미지
-   - 각 기획마다 이미지 내에 들어갈 한국어 메인카피(main_title)와 보조문구(sub_copy), 그리고 상세 영어 프롬프트(prompt)를 작성하라. 인물은 한국인(Korean/Asian)으로, 배경에 글자가 뭉개지지 않도록 no text 지침을 반영하라.
+6. 이미지 기획 (총 4개, KODARI Visual Engine 3.3 복원): 본문의 흐름에 맞게 아래의 지침을 완벽히 적용하여 'image_prompts' 배열에 상세히 기재하라.
+   - [1단계: 상상]: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 최적의 시각적 장면을 상상해라.
+   - [2단계: 스타일 적용]: ${styleGuide}
+   - [3단계: 제약 조건]: 인물은 반드시 한국인(Korean/Asian)으로, 배경은 외국어 없이 깨끗하게 구성해라.
+   - [4단계: 이미지 생성 지침 (Storytelling Branding Rule)]:
+     1) 1번째: Section 1 (Thumbnail) - Create a grand masterpiece thumbnail representing the overall topic.
+     2) 2번째 & 3번째: Section 2 & 3 - Visualize the most important informative parts of the content.
+     3) 4번째: Section 4 (Summary) - Show a celebratory or concluding scene with a sense of achievement.
+     4) 각 이미지마다 한국어 메인카피(main_title)와 보조문구(sub_copy)를 반드시 생성해라.
+     5) Visual Metaphor: 본문 주제를 상징하는 스토리텔링형 시각적 비유(Metaphor)를 적용해라.
+     6) Layout Strategy: 글씨가 이미지 안에 디자인의 일부처럼 자연스럽게 얹어질 수 있는 'Premium Information Card' 레이아웃으로 영어 프롬프트를 설계해라.
+     7) Visual Style: Keep the 'Premium 3D Claymorphism' style.
+     8) Safety & Typography: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.** 이미지 내부에 가상의 메인카피와 서브카피 한글이 직접 렌더링되어 박히도록 영어 프롬프트 묘사에 기재해라.
 7. 소스코드 노출 절대 금지: 본문 내에 실제 작동하는 프로그래밍 소스 코드(예: Javascript, HTML 태그 등)를 기재하거나 노출하는 것을 엄격히 금지하며, 개발자 관점의 코드 예시 대신 일반 대중이 이해하기 쉬운 한글 텍스트 설명으로 풀어써라.
 
 [1단계 검증 팩트 데이터]:
@@ -1046,7 +1065,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.1</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.2</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1061,7 +1080,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.1 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.2 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
