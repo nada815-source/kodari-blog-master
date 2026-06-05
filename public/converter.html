@@ -352,7 +352,7 @@
   <div class="container">
     <header>
       <div class="logo-container">
-        🫡🐟 KODARI ENGINE V3.7.9
+        🫡🐟 KODARI ENGINE V3.8.0 (개행패치완료)
       </div>
       <h1>코다리 1초 서식 변환기</h1>
       <p class="subtitle">Gems 원고를 붙여넣고 아래 상황에 맞는 버튼을 누르시면,<br>가장 깔끔하게 클립보드에 자동 복사됩니다.</p>
@@ -476,7 +476,7 @@
       return result.join('\n');
     }
 
-    // 마크다운 ➡️ HTML 변환 (PC용)
+    // 마크다운 ➡️ HTML 변환 (PC용 - 네이버 에디터 강제 개행 패치 버전)
     function markdownToHtml(text) {
       let textWithTables = parseMarkdownTables(text);
       let html = textWithTables;
@@ -485,9 +485,10 @@
       html = html.replace(/\+\+(.*?)\+\+/g, '<span style="color: #0066ff; font-weight: bold;">$1</span>');
       html = html.replace(/!!(.*?)!!/g, '<span style="color: #ff3333; font-weight: bold;">$1</span>');
 
-      html = html.replace(/^### (.*?)$/gm, '<h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 24px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; color: #111111;">$1</h3>');
-      html = html.replace(/^## (.*?)$/gm, '<h2 style="font-size: 1.5rem; font-weight: bold; margin-top: 28px; margin-bottom: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; color: #111111;">$1</h2>');
-      html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; margin-top: 32px; margin-bottom: 20px; color: #111111;">$1</h1>');
+      // 네이버 파싱을 위해 소제목 앞뒤에 강제 공백 태그 주입
+      html = html.replace(/^### (.*?)$/gm, '<p><br></p><h3 style="font-size: 1.25rem; font-weight: bold; color: #111111;">$1</h3><p><br></p>');
+      html = html.replace(/^## (.*?)$/gm, '<p><br></p><h2 style="font-size: 1.5rem; font-weight: bold; color: #111111;">$1</h2><p><br></p>');
+      html = html.replace(/^# (.*?)$/gm, '<h1 style="font-size: 1.8rem; font-weight: 800; color: #111111;">$1</h1><p><br></p>');
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       html = html.replace(/^[-\*]\s+(.*?)$/gm, '<div style="margin-left: 16px; margin-top: 6px; margin-bottom: 6px; display: list-item; list-style-type: disc; color: #333333;">$1</div>');
 
@@ -495,9 +496,17 @@
       html = paragraphs.map(p => {
         let lines = p.trim().split('\n');
         let block = lines.join('<br>');
-        if (block.startsWith('<h') || block.startsWith('<div') || block.startsWith('<table') || block.startsWith('<tr')) return block;
-        return `<p style="margin-bottom: 16px; line-height: 1.7; font-size: 1rem; color: #333333;">${block}</p>`;
+        if (block.startsWith('<h') || block.startsWith('<div') || block.startsWith('<table') || block.startsWith('<tr') || block.startsWith('<p><br></p>')) return block;
+        // 일반 문단 간 개행 확보를 위해 뒤에 명시적인 빈 문단 태그(<p><br></p>)를 추가합니다.
+        return `<p style="line-height: 1.7; font-size: 1rem; color: #333333;">${block}</p><p><br></p>`;
       }).join('');
+
+      // 표(Table) 태그 앞뒤에도 강제 개행 주입
+      html = html.replace(/<table/g, '<p><br></p><table');
+      html = html.replace(/<\/table>/g, '</table><p><br></p>');
+      
+      // 혹시 중복으로 빈 줄이 세 개 이상 들어가지 않도록 정돈
+      html = html.replace(/(<p><br><\/p>){3,}/g, '<p><br></p><p><br></p>');
 
       return html;
     }
@@ -588,7 +597,7 @@
     // [💻 PC용 복사 실행]
     function processPcFormat() {
       currentMode = 'pc';
-      const textInput = document.getElementById('inputText').value;
+      let textInput = document.getElementById('inputText').value;
       if (!textInput.trim()) {
         alert("원고를 먼저 입력해 주세요!");
         return;
@@ -633,7 +642,7 @@
     // [📱 모바일용 복사 실행]
     function processMobileFormat() {
       currentMode = 'mobile';
-      const textInput = document.getElementById('inputText').value;
+      let textInput = document.getElementById('inputText').value;
       if (!textInput.trim()) {
         alert("원고를 먼저 입력해 주세요!");
         return;
