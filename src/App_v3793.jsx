@@ -178,12 +178,12 @@ function App() {
     {
       version: 'V3.7.9.3',
       date: '2026-06-06',
-      title: '💾 오토세이브 철통 보강 (실시간 전수 감시 및 자동 복원 픽스)',
-      tags: ['버그수정', '자동백업', '편의성'],
+      title: '💾 실시간 오토세이브 보강 & 🎨 하이브리드 비주얼 밸브 개조',
+      tags: ['주요업데이트', '버그수정', '비주얼개선', '편의성'],
       details: [
-        '기존 오토세이브 엔진이 탭(Platform Tab)을 전환할 때만 한정적으로 백업되던 누락 버그를 긴급 수정했습니다.',
-        '이제 글 작성이 완료되거나, 키워드 타이핑 도중, 그리고 입력 모드가 변경될 때도 실시간으로 모든 데이터가 전수 자동 백업됩니다.',
-        '버전 상향에 맞춰 전용 독립 도메인(kodari-v3793.vercel.app) 항로를 신규 개설 및 배포했습니다.'
+        '기존 오토세이브 엔진이 탭을 전환할 때만 한정적으로 백업되던 누락 버그를 긴급 수정하여, 글 작성 완료, 키워드 입력 시 실시간 전수 백업되게 보강했습니다.',
+        'KODARI Visual Engine 3.3 하이브리드 튜닝을 통해 1번(썸네일) 및 4번(요약)에는 한국인 캐릭터를 강제 주입하고, 2번/3번 본문 이미지에는 인물을 완전 배제(NO PEOPLE)하여 정보형 차트/사물만 깔끔하게 나오도록 비주얼 밸브를 개조했습니다.',
+        '버전에 정합하여 웹앱 로고, package.json, KODARI_PERSONA 명세를 V3.7.9.3으로 정렬하고 전용 독립 도메인(kodari-v3793.vercel.app)에 최종 배포했습니다.'
       ]
     },
     {
@@ -551,14 +551,16 @@ ${inputText}
 3. 사족 금지: '글을 마치며', '결론', '맺음말' 등 식상한 기계적 섹션 사용을 **절대 금지**하며, 정보가 끝나면 자연스럽게 종결하라.
 4. 3중 하이브리드 강조: 핵심 키워드나 수치는 반드시 좌우 공백 없이 기호로 밀착 감싸라. (노랑 ==형광펜==, 파랑 ++파랑강조++, 빨강 !!주의사항!!)
 5. 정보 시각화: 비교/대조 정보는 **반드시 마크다운 표(Table)**로 시각화하되, 표 내부에는 강조 기호(**, ==, ++ 등)를 절대 사용하지 마라.
-6. 이미지 기획 (총 4개, KODARI Visual Engine 3.3 복원): 본문의 흐름에 맞게 아래의 지침을 완벽히 적용하여 'image_prompts' 배열에 상세히 기재하라.
+6. 이미지 기획 (총 4개, KODARI Visual Engine 3.3 하이브리드 개조판): 본문의 흐름에 맞게 아래의 지침을 완벽히 적용하여 'image_prompts' 배열에 상세히 기재하라.
    - [1단계: 상상]: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 최적의 시각적 장면을 상상해라.
    - [2단계: 스타일 적용]: ${styleGuide}
-   - [3단계: 제약 조건]: 인물은 반드시 한국인(Korean/Asian)으로, 배경은 외국어 없이 깨끗하게 구성해라.
+   - [3단계: 인물 배치 규칙 (하이브리드 밸브)]:
+     - **1번째 이미지(Section 1 (Thumbnail)) 및 4번째 이미지(Section 4 (Summary))**: 주제를 대표하고 성공적인 분위기(celebratory)를 보여주기 위해, 반드시 **한국인 인물 캐릭터(A friendly Korean person / Korean people)**를 이미지 중심부에 배치하여 친근하고 성취감 있는 무드로 기획해라.
+     - **2번째 및 3번째 이미지(Section 2 & 3)**: 정보의 명확성과 가독성이 중요하므로, **인물을 절대로 그리지 말고(NO PEOPLE/NO HUMAN)**, 주제를 상징하는 **사물, 데이터 정보기기(차트, 태블릿, 달력, 스마트폰, 아이콘, 소품 등)**만을 배치하여 깨끗하게 시각화해라.
    - [4단계: 이미지 생성 지침 (Storytelling Branding Rule)]:
-     1) 1번째: Section 1 (Thumbnail) - Create a grand masterpiece thumbnail representing the overall topic.
-     2) 2번째 & 3번째: Section 2 & 3 - Visualize the most important informative parts of the content.
-     3) 4번째: Section 4 (Summary) - Show a celebratory or concluding scene with a sense of achievement.
+     1) 1번째: Section 1 (Thumbnail) - Create a grand masterpiece thumbnail representing the overall topic. (Must include Korean character)
+     2) 2번째 & 3번째: Section 2 & 3 - Visualize the most important informative parts of the content. (Strictly objects and devices only, NO human figures)
+     3) 4번째: Section 4 (Summary) - Show a celebratory or concluding scene with a sense of achievement. (Must include Korean character)
      4) 각 이미지마다 한국어 메인카피(main_title)와 보조문구(sub_copy)를 반드시 생성해라.
      5) Visual Metaphor: 본문 주제를 상징하는 스토리텔링형 시각적 비유(Metaphor)를 적용해라.
      6) Layout Strategy: 글씨가 이미지 안에 디자인의 일부처럼 자연스럽게 얹어질 수 있는 'Premium Information Card' 레이아웃으로 영어 프롬프트를 설계해라.
@@ -1091,7 +1093,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.3 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.3 [🤖 병렬 에이전트 + 💾 오토세이브 & 🎨 하이브리드 비주얼 밸브] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
