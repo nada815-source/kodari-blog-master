@@ -176,25 +176,15 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.9.2',
-      date: '2026-06-05',
-      title: '🛡️ IT 본문 소스코드 강제 차단 및 해시태그 쉼표 제거 정제',
-      tags: ['품질개선', '편의성', '보안강화'],
-      details: [
-        'IT/기술 정보성 원고 작성 시 실제 프로그래밍 코드(Javascript, HTML 등)가 본문에 불필요하게 섞여 나오는 것을 원천 차단하는 [IT 소스코드 방어 지침]을 이식했습니다.',
-        '해시태그 끝자락에 붙던 쉼표(,)를 깨끗하게 제거하고, 띄어쓰기로만 구분되게 정제하여 가독성을 개선하고 복사 붙여넣기 편의성을 높였습니다.'
-      ]
-    },
-    {
       version: 'V3.7.9.1',
       date: '2026-06-05',
-      title: '💾 모바일 자동 백업(Auto-Save) 및 24시간 파기 보호막 장착',
-      tags: ['모바일최적화', '보안강화', '자동백업'],
+      title: '💾 모바일 자동 백업 및 쉼표 제거/IT 소스코드 방어막 완비',
+      tags: ['자동백업', '보안강화', '품질개선', '편의성'],
       details: [
-        '모바일 브라우저의 백그라운드 메모리 해제로 인한 강제 새로고침 시 데이터 소실을 방지하는 [로컬 스토리지 자동 백업] 엔진을 탑재했습니다.',
-        '마지막 확인 중이던 플랫폼 탭 상태(Active Tab)까지 그대로 복원시켜 주는 탭 박제 기능을 이식했습니다.',
-        '보안 및 캐시 청결을 위해 생성 후 24시간이 지난 데이터는 다음 접속 시 흔적 없이 클리닝하는 [24시간 자동 파기] 시스템을 구축했습니다.',
-        '결과 창에 [🔄 전체 초기화] 버튼을 신설하여, 언제든 간편하게 모든 데이터를 수동으로 청소할 수 있게 개선했습니다.'
+        '모바일 브라우저의 백그라운드 메모리 해제로 인한 강제 새로고침 시 데이터 소실을 방지하는 [로컬 스토리지 자동 백업] 엔진 및 24시간 자동 파기 시스템을 구축했습니다.',
+        '결과 창에 [🔄 전체 초기화] 버튼을 신설하여, 언제든 간편하게 모든 데이터를 수동으로 청소할 수 있게 개선했습니다.',
+        'IT/기술 원고 작성 시 실제 프로그래밍 코드(Javascript, HTML 등)가 본문에 불필요하게 섞여 나오는 것을 원천 차단하는 [IT 소스코드 방어 지침]을 이식했습니다.',
+        '해시태그 끝자락에 붙던 쉼표(,)를 깨끗하게 제거하고, 띄어쓰기로만 구분되게 정제하여 가독성을 극대화했습니다.'
       ]
     },
     {
@@ -1056,7 +1046,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.2</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.1</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1071,7 +1061,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.2 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.1 [🤖 병렬 멀티 에이전트 + 💾 모바일 오토세이브 엔진] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
