@@ -100,7 +100,17 @@ function App() {
   const [showApiKey, setShowApiKey] = useState(false);
 
   // 💾 [V3.7.9.1] 로컬 스토리지 백업 및 복원 헬퍼 함수
-  const saveCurrentSession = (updatedResults, updatedActiveTab, updatedInputMode, updatedTopic, updatedYoutube) => {
+  const saveCurrentSession = (
+    updatedResults, 
+    updatedActiveTab, 
+    updatedInputMode, 
+    updatedTopic, 
+    updatedYoutube,
+    // [V3.7.9.5] 소재연구소 상태 변수 기본 매칭
+    updatedCategory = selectedCategory,
+    updatedDynamic = dynamicTopics,
+    updatedStatic = displayedStaticTopics
+  ) => {
     try {
       const sessionData = {
         timestamp: Date.now(),
@@ -108,7 +118,11 @@ function App() {
         activeTab: updatedActiveTab,
         inputMode: updatedInputMode,
         topic: updatedTopic,
-        youtubeTranscript: updatedYoutube
+        youtubeTranscript: updatedYoutube,
+        // [V3.7.9.5] 소재연구소 데이터 백업 추가
+        selectedCategory: updatedCategory,
+        dynamicTopics: updatedDynamic,
+        displayedStaticTopics: updatedStatic
       };
       localStorage.setItem('kodari_saved_session', JSON.stringify(sessionData));
     } catch (e) {
@@ -131,6 +145,12 @@ function App() {
           if (session.inputMode) setInputMode(session.inputMode);
           if (session.topic) setTopic(session.topic);
           if (session.youtubeTranscript) setYoutubeTranscript(session.youtubeTranscript);
+          
+          // [V3.7.9.5] 소재연구소 상태 복원 추가
+          if (session.selectedCategory) setSelectedCategory(session.selectedCategory);
+          if (session.dynamicTopics) setDynamicTopics(session.dynamicTopics);
+          if (session.displayedStaticTopics) setDisplayedStaticTopics(session.displayedStaticTopics);
+          
           console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료! 🫡');
         } else {
           localStorage.removeItem('kodari_saved_session');
@@ -143,13 +163,26 @@ function App() {
     }
   }, []);
 
-  // 💾 [V3.7.9.3] 결과, 활성화 탭, 입력 모드, 키워드가 변경될 때마다 오토세이브 실시간 갱신 (전수 감시)
+  // 💾 [V3.7.9.5] 결과, 활성화 탭, 입력 모드, 키워드 및 [소재연구소 데이터] 변경 시 오토세이브 실시간 갱신 (전수 감시)
   useEffect(() => {
-    const hasData = Object.values(results[inputMode]).some(val => val.content);
+    const hasData = Object.values(results[inputMode]).some(val => val.content) || 
+                    topic.trim() || 
+                    youtubeTranscript.trim() || 
+                    dynamicTopics || 
+                    Object.keys(displayedStaticTopics).length > 0;
     if (hasData) {
-      saveCurrentSession(results, activeTab, inputMode, topic, youtubeTranscript);
+      saveCurrentSession(
+        results, 
+        activeTab, 
+        inputMode, 
+        topic, 
+        youtubeTranscript,
+        selectedCategory,
+        dynamicTopics,
+        displayedStaticTopics
+      );
     }
-  }, [results, activeTab, inputMode, topic, youtubeTranscript]);
+  }, [results, activeTab, inputMode, topic, youtubeTranscript, selectedCategory, dynamicTopics, displayedStaticTopics]);
 
   const [useImage, setUseImage] = useState(true);
   const [useGoogleSearch, setUseGoogleSearch] = useState(true); // [V3.7.8.7] 구글 검색 팩트체크 온오프 상태 추가
@@ -176,14 +209,15 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.9.3',
+      version: 'V3.7.9.4',
       date: '2026-06-06',
-      title: '💾 실시간 오토세이브 보강 & 🎨 하이브리드 비주얼 밸브 개조',
-      tags: ['주요업데이트', '버그수정', '비주얼개선', '편의성'],
+      title: '🏛️ 소재연구소 로컬 보관소 연동 & 🎨 하이브리드 비주얼 밸브 개조',
+      tags: ['주요업데이트', '자동백업', '비주얼개선', '편의성'],
       details: [
-        '기존 오토세이브 엔진이 탭을 전환할 때만 한정적으로 백업되던 누락 버그를 긴급 수정하여, 글 작성 완료, 키워드 입력 시 실시간 전수 백업되게 보강했습니다.',
-        'KODARI Visual Engine 3.3 하이브리드 튜닝을 통해 1번(썸네일) 및 4번(요약)에는 한국인 캐릭터를 강제 주입하고, 2번/3번 본문 이미지에는 인물을 완전 배제(NO PEOPLE)하여 정보형 차트/사물만 깔끔하게 나오도록 비주얼 밸브를 개조했습니다.',
-        '버전에 정합하여 웹앱 로고, package.json, KODARI_PERSONA 명세를 V3.7.9.3으로 정렬하고 전용 독립 도메인(kodari-v3793.vercel.app)에 최종 배포했습니다.'
+        '소재연구소의 AI 실시간 핫이슈 주제(dynamicTopics) 및 카테고리 상태를 로컬 보관소에 자동 연동하여 새로고침 시에도 소중한 분석 데이터가 완벽히 보존되게 보강했습니다.',
+        '전체 초기화(Reset) 시 본문 입력창만 청소하고, 애써 도출한 소재연구소 추천 목록은 안전하게 보호하도록 밸런스를 튜닝했습니다.',
+        'KODARI Visual Engine 3.3 하이브리드 튜닝을 통해 1번(썸네일) 및 4번(요약)에는 한국인 캐릭터를 강제 배치하고, 2번/3번 본문용 이미지에는 인물을 원천 배제(NO PEOPLE)하여 정보형 차트/기기만 깔끔하게 시각화했습니다.',
+        '웹앱 로고, package.json, KODARI_PERSONA 명세 및 브랜치 사양을 V3.7.9.4로 통일하여 kodari-v3794.vercel.app 경로로 정식 릴리즈 배포를 완료했습니다.'
       ]
     },
     {
@@ -1041,7 +1075,7 @@ ${summaryData}`;
     }
   };
 
-  // 💾 [V3.7.9.1] 모바일 전체 초기화 및 백업 삭제 함수
+  // 💾 [V3.7.9.5] 모바일 전체 초기화 및 백업 삭제 함수 (소재연구소 데이터는 대표님의 편리함을 위해 보존)
   const handleReset = () => {
     if (window.confirm('정말 현재 생성된 모든 글과 입력을 초기화하시겠습니까? 🌊')) {
       const resetResults = {
@@ -1051,8 +1085,20 @@ ${summaryData}`;
       setResults(resetResults);
       setTopic('');
       setYoutubeTranscript('');
-      localStorage.removeItem('kodari_saved_session');
-      triggerToast('모든 세션 데이터가 맑게 청소되었습니다! 🧹✨');
+      
+      // 리셋 시 본문 작성 세션 데이터만 부분 리셋하여 오토세이브 금고에 갱신
+      saveCurrentSession(
+        resetResults, 
+        activeTab, 
+        inputMode, 
+        '', 
+        '', 
+        selectedCategory, 
+        dynamicTopics, 
+        displayedStaticTopics
+      );
+      
+      triggerToast('본문 데이터가 맑게 청소되었습니다! 소재연구소 추천은 보존됩니다. 🧹✨');
     }
   };
 
@@ -1078,7 +1124,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.3</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.4</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1093,7 +1139,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.3 [🤖 병렬 에이전트 + 💾 오토세이브 & 🎨 하이브리드 비주얼 밸브] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.4 [🤖 병렬 에이전트 + 💾 오토세이브 & 🏛️ 소재연구소 보관소] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 

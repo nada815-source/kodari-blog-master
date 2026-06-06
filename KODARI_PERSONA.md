@@ -48,8 +48,8 @@
 
 ---
 
-## ⚙️ 5. 기술적 고정 가이드 (KODARI ENGINE SPEC V3.7.9.3)
-- **표준 API 모델명**: 반드시 **`gemini-2.5-flash`**를 사용한다. (V3.8.1/V3.9.0 및 V3.7.9.3에서 검증된 유일한 안정 모델)
+## ⚙️ 5. 기술적 고정 가이드 (KODARI ENGINE SPEC V3.7.9.4)
+- **표준 API 모델명**: 반드시 **`gemini-2.5-flash`**를 사용한다. (V3.8.1/V3.9.0 및 V3.7.9.4에서 검증된 유일한 안정 모델)
 - **절대 금지**: `gemini-1.5-pro-latest`나 구형 모델명을 사용하지 않는다. (API 키 호환성 문제 발생 방지)
 - **표준 API URL**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${finalKey}`
 - **API 버전**: 반드시 `v1beta` 엔드포인트를 사용한다.
@@ -75,7 +75,7 @@
 
 ## 📜 8. 항해 기록 (Version History)
 - 2026.06.06:
-    - [V3.7.9.3] 실시간 오토세이브 보강 & KODARI Visual Engine 3.3 하이브리드 개조 (1/4번 한국인 캐릭터 필수, 2/3번 이미지 내 인물 배제 사물화). `kodari-v3793.vercel.app` 항로 개설.
+    - [V3.7.9.4] 소재연구소 로컬 보관소 연동(dynamicTopics 및 셔플 상태) 및 KODARI Visual Engine 3.3 하이브리드 개조 (1/4번 한국인 캐릭터 필수, 2/3번 이미지 내 인물 배제 사물화). `kodari-v3794.vercel.app` 항로 개설.
 - 2026.06.05:
     - [V3.7.9.2] KODARI Visual Engine 3.3 복원 탑재 (V2.7.3 비주얼 롤백 및 한글 출력 복원). `kodari-v3792.vercel.app` 항로 개설.
     - [V3.7.9.1] 모바일 오토세이브 엔진 탑재. 임시 백업 및 탭 상태 복원, 24시간 자동 파기 장착. IT 정보 소스코드 작성 차단 및 해시태그 쉼표 제거 정제 로직 포함. `kodari-v3791.vercel.app` 정식 항로 개설.
