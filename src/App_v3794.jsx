@@ -214,10 +214,11 @@ function App() {
     {
       version: 'V3.7.9.4',
       date: '2026-06-06',
-      title: '🏛️ 소재연구소 로컬 보관소 연동 & 🎨 하이브리드 비주얼 밸브 개조',
-      tags: ['주요업데이트', '자동백업', '비주얼개선', '편의성'],
+      title: '🏛️ 소재연구소 로컬 보관소 연동 & 🎨 하이브리드 비주얼 밸브 개조 (📱 모바일 가독성 강화)',
+      tags: ['주요업데이트', '자동백업', '비주얼개선', '편의성', '모바일최적화'],
       details: [
         '소재연구소의 AI 실시간 핫이슈 주제(dynamicTopics) 및 카테고리 상태를 로컬 보관소에 자동 연동하여 새로고침 시에도 소중한 분석 데이터가 완벽히 보존되게 보강했습니다.',
+        '소재연구소 모바일 가독성 강화: 추천 키워드 최대 2줄 줄바꿈 지원(line-clamp-2) 및 스크롤 영역 높이 2배(max-h-[460px]) 확장으로 모바일 화면 가시성을 시원하게 확보했습니다.',
         '전체 초기화(Reset) 시 본문 입력창만 청소하고, 애써 도출한 소재연구소 추천 목록은 안전하게 보호하도록 밸런스를 튜닝했습니다.',
         'KODARI Visual Engine 3.3 하이브리드 튜닝을 통해 1번(썸네일) 및 4번(요약)에는 한국인 캐릭터를 강제 배치하고, 2번/3번 본문용 이미지에는 인물을 원천 배제(NO PEOPLE)하여 정보형 차트/기기만 깔끔하게 시각화했습니다.',
         '웹앱 로고, package.json, KODARI_PERSONA 명세 및 브랜치 사양을 V3.7.9.4로 통일하여 kodari-v3794.vercel.app 경로로 정식 릴리즈 배포를 완료했습니다.'
@@ -1142,7 +1143,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.4 [🤖 병렬 에이전트 + 💾 오토세이브 & 🏛️ 소재연구소 보관소] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.4 [🤖 병렬 에이전트 + 💾 오토세이브 & 🏛️ 소재연구소 보관소 + 📱 모바일 가독성 강화] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
@@ -1759,7 +1760,7 @@ ${summaryData}`;
                 
                 {/* 1. 실시간 트렌드 카드 */}
                 {(labFilter === 'all' || labFilter === 'realtime') && (
-                  <div className="bg-slate-900 rounded-[30px] p-6 shadow-xl border border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="bg-slate-900 rounded-[30px] py-8 px-6 shadow-xl border border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <div className="flex justify-between items-center">
                       <h3 className="text-white font-black text-sm flex items-center gap-2">
                         ⚡ 실시간 주제
@@ -1773,10 +1774,10 @@ ${summaryData}`;
                         {isLiveLoading ? '분석 중...' : '새로고침 🔄'}
                       </button>
                     </div>
-                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
                       {dynamicTopics ? (
                         dynamicTopics.map((t, i) => (
-                          <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 truncate">
+                          <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 whitespace-normal break-keep line-clamp-2 leading-relaxed">
                             {i+1}. {t}
                           </button>
                         ))
@@ -1789,10 +1790,10 @@ ${summaryData}`;
                     </div>
                   </div>
                 )}
-
+ 
                 {/* 2. 이번 달 주제 카드 */}
                 {(labFilter === 'all' || labFilter === 'monthly') && (
-                  <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="flex justify-between items-center">
                       <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
                         🗓️ 이번 달 주제
@@ -1800,19 +1801,19 @@ ${summaryData}`;
                       </h3>
                       <button onClick={() => refreshStaticSection(selectedCategory, 'monthly')} className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors">새로고침 🔄</button>
                     </div>
-                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
                       {(displayedStaticTopics[`${selectedCategory}_monthly`] || []).map((t, i) => (
-                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
                           {t}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
-
+ 
                 {/* 3. 연간 주제 카드 */}
                 {(labFilter === 'all' || labFilter === 'annual') && (
-                  <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="flex justify-between items-center">
                       <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
                         📅 연간 주제
@@ -1820,19 +1821,19 @@ ${summaryData}`;
                       </h3>
                       <button onClick={() => refreshStaticSection(selectedCategory, 'annual')} className="text-[10px] font-bold text-slate-400 hover:text-amber-600 transition-colors">새로고침 🔄</button>
                     </div>
-                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
                       {(displayedStaticTopics[`${selectedCategory}_annual`] || []).map((t, i) => (
-                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
                           {t}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
-
+ 
                 {/* 4. 황금 키워드 카드 */}
                 {(labFilter === 'all' || labFilter === 'gold') && (
-                  <div className="bg-white rounded-[30px] p-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                  <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
                     <div className="flex justify-between items-center">
                       <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
                         💎 황금 키워드
@@ -1840,9 +1841,9 @@ ${summaryData}`;
                       </h3>
                       <button onClick={() => refreshStaticSection(selectedCategory, 'gold')} className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">새로고침 🔄</button>
                     </div>
-                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-red-scrollbar">
+                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
                       {(displayedStaticTopics[`${selectedCategory}_gold`] || []).map((t, i) => (
-                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 truncate">
+                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
                           {t}
                         </button>
                       ))}
