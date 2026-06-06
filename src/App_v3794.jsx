@@ -80,6 +80,13 @@ function App() {
   const [inputMode, setInputMode] = useState('topic'); // 'topic' or 'youtube'
   const [youtubeTranscript, setYoutubeTranscript] = useState('');
   const [topic, setTopic] = useState('');
+  
+  // [V3.7.9.4] TDZ 호이스팅 오류 해결을 위해 소재연구소 상태 변수 선언부를 상단으로 긴급 인양
+  const [isLiveLoading, setIsLiveLoading] = useState(false);
+  const [dynamicTopics, setDynamicTopics] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
+  const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
+
   const [tones, setTones] = useState({
     naver: '기본 블로거',
     tistory: '기본 블로거',
@@ -200,10 +207,6 @@ function App() {
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
   const [labFilter, setLabFilter] = useState('all');
-  const [isLiveLoading, setIsLiveLoading] = useState(false);
-  const [dynamicTopics, setDynamicTopics] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
-  const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
   const [isFactCheckOpen, setIsFactCheckOpen] = useState(false);
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
 
