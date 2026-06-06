@@ -83,7 +83,7 @@ function App() {
   
   // [V3.7.9.4] TDZ 호이스팅 오류 해결을 위해 소재연구소 상태 변수 선언부를 상단으로 긴급 인양
   const [isLiveLoading, setIsLiveLoading] = useState(false);
-  const [dynamicTopics, setDynamicTopics] = useState(null);
+  const [dynamicTopics, setDynamicTopics] = useState({}); // [V3.7.9.4] 카테고리별 개별 독립 서랍 구조로 리팩토링 ({ '🏛️ 정부정책': [...] })
   const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
   const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
 
@@ -153,9 +153,17 @@ function App() {
           if (session.topic) setTopic(session.topic);
           if (session.youtubeTranscript) setYoutubeTranscript(session.youtubeTranscript);
           
-          // [V3.7.9.5] 소재연구소 상태 복원 추가
+          // [V3.7.9.5] 소재연구소 상태 복원 추가 (V3.7.9.4 카테고리별 실시간 데이터 배열/객체 호환 방어 장착)
           if (session.selectedCategory) setSelectedCategory(session.selectedCategory);
-          if (session.dynamicTopics) setDynamicTopics(session.dynamicTopics);
+          if (session.dynamicTopics) {
+            if (Array.isArray(session.dynamicTopics)) {
+              // 구버전 배열 데이터인 경우, 복원 시 현재 카테고리 키의 객체로 안전하게 랩핑하여 마이그레이션
+              const initCat = session.selectedCategory || '🏛️ 정부정책';
+              setDynamicTopics({ [initCat]: session.dynamicTopics });
+            } else {
+              setDynamicTopics(session.dynamicTopics);
+            }
+          }
           if (session.displayedStaticTopics) setDisplayedStaticTopics(session.displayedStaticTopics);
           
           console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료! 🫡');
@@ -172,10 +180,11 @@ function App() {
 
   // 💾 [V3.7.9.5] 결과, 활성화 탭, 입력 모드, 키워드 및 [소재연구소 데이터] 변경 시 오토세이브 실시간 갱신 (전수 감시)
   useEffect(() => {
+    const hasDynamicData = dynamicTopics && Object.keys(dynamicTopics).length > 0;
     const hasData = Object.values(results[inputMode]).some(val => val.content) || 
                     topic.trim() || 
                     youtubeTranscript.trim() || 
-                    dynamicTopics || 
+                    hasDynamicData || 
                     Object.keys(displayedStaticTopics).length > 0;
     if (hasData) {
       saveCurrentSession(
@@ -946,7 +955,13 @@ ${summaryData}`;
       if (liveSection) {
         const lines = liveSection.trim().split('\n').filter(l => l.trim() !== '').slice(0, 10);
         const processedTopics = lines.map(t => t.replace(/^\d+\.\s*|^- \s*/, '').trim());
-        setDynamicTopics(processedTopics);
+        
+        // [V3.7.9.4] 통째로 덮어쓰지 않고, 현재 카테고리 키에 맞추어 개별적으로 실시간 서랍장에 누적 보관
+        setDynamicTopics(prev => ({
+          ...prev,
+          [selectedCategory]: processedTopics
+        }));
+        
         triggerToast(`✨ [${selectedCategory}] 실시간 트렌드 분석 완료!`);
       }
     } catch (err) {
@@ -1717,12 +1732,11 @@ ${summaryData}`;
             </div>
 
             <div className="space-y-6">
-              {/* 카테고리 탭 네비게이션 */}
               <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-3xl">
                 {topicDatabase.categories.map((cat, i) => (
                   <button
                     key={i}
-                    onClick={() => { setSelectedCategory(cat.name); setDynamicTopics(null); }}
+                    onClick={() => { setSelectedCategory(cat.name); }}
                     className={`px-5 py-3 rounded-2xl font-black text-xs transition-all ${
                       selectedCategory === cat.name 
                       ? 'bg-white text-indigo-600 shadow-md scale-105' 
@@ -1775,8 +1789,8 @@ ${summaryData}`;
                       </button>
                     </div>
                     <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
-                      {dynamicTopics ? (
-                        dynamicTopics.map((t, i) => (
+                      {dynamicTopics[selectedCategory] ? (
+                        dynamicTopics[selectedCategory].map((t, i) => (
                           <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 whitespace-normal break-keep line-clamp-2 leading-relaxed">
                             {i+1}. {t}
                           </button>
