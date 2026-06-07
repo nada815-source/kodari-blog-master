@@ -326,26 +326,17 @@ function App() {
 
   const patchNotes = [
     {
-      version: 'V3.7.9.8',
-      date: '2026-06-07',
-      title: '📋 외부 팩트 직접 입력(1단계 스킵) 기능 신설 & 📡 GOOGLE RADAR 상태 뱃지 낙인 시스템 적용',
-      tags: ['팩트직접입력', '1단계스킵', '레이더상태뱃지', '비용절감', 'UX개선'],
-      details: [
-        '📋 [📋 팩트 직접 입력] 신규 포스팅 소스 탑재: 다른 AI(제미나이, GPT 등)에서 미리 팩트체크가 완료된 텍스트 기획서를 그대로 가져와 뼈대로 사용할 수 있는 전용 3번째 입력 모드를 추가했습니다.',
-        '⚡ 1단계 정찰 요약 완전 건너뛰기: 팩트 직접 입력 모드로 작동 시 구글 실시간 검색 및 요약 API를 전면 스킵하여 대기 시간 0초 실현 및 API 과금 비용을 제로화(0원)시켰습니다.',
-        '📡 GOOGLE RADAR ON/OFF 뱃지 실시간 낙인: 1단계 기획서 텍스트 자체에 레이더 작동 상태를 마크다운 인용구 형태로 박제하고, 🔍 팩트 검증 탭 상단에 초록색 [📡 GOOGLE RADAR: ON] 또는 회색 [💾 GOOGLE RADAR: OFF] 뱃지로 가시화했습니다.',
-        '📋 [📋 EXTERNAL FACT] 뱃지 탑재: 팩트 직접 입력 모드를 사용했거나 외부에서 팩트를 주입한 경우, 에메랄드색 [📋 EXTERNAL FACT] 뱃지로 영리하게 분석하여 대표님께 직관적으로 표시해 줍니다.'
-      ]
-    },
-    {
       version: 'V3.7.9.7',
       date: '2026-06-07',
-      title: '🔍 1단계 팩트 검증 탭 탑재 & ⏱️ 실시간 부분 누적 저장 및 에러 격리 시스템 완비',
-      tags: ['이중안전벨트', '비용최적화', '부분저장', '에러격리', '상황인지버튼'],
+      title: '🔍 1단계 팩트 검증 탭 & ⏱️ 실시간 부분 누적 저장 및 📋 팩트 직접 입력 모드 완비',
+      tags: ['이중안전벨트', '비용최적화', '부분저장', '팩트직접입력', '상황인지버튼'],
       details: [
-        '🔍 [팩트 검증 데이터] 전용 탭 신설: 구글 레이더의 ON/OFF 유무와 관계없이 1단계가 완료되면 팩트 기획서 데이터(summaryData)를 탭에 실시간 렌더링하고 즉각 로컬 저장소에 1차 오토세이브합니다. 2단계 도중 에러가 터져도 비싼 구글 검색/기획 데이터를 완전 보존합니다.',
-        '⏱️ 플랫폼별 실시간 부분 저장 (Partial Update) & 에러 격리: 3개 플랫폼이 다 집필될 때까지 기다리지 않고, 네이버/티스토리/워드프레스 중 작성이 완료되는 플랫폼 순서대로 화면에 즉시 원고를 뿌리고 누적 세이브를 실행합니다. 하나의 플랫폼이 폭발해도 성공한 플랫폼 원고는 100% 온전히 보존됩니다.',
-        '⚡ 상황 인지형 스마트 실행 버튼 구현: 일부 플랫폼 작성이 실패했거나 누락되어 로컬에 1단계 팩트만 남았을 경우, 실행 버튼이 [⚡ 수집된 팩트로 원고만 이어서 작성하기] 주황색 버튼으로 자동 변환됩니다. 클릭 시 1단계를 초속 스킵하고 에러 난 플랫폼만 쏙 골라 이어씁니다.',
+        '🔍 [팩트 검증 데이터] 전용 탭 신설: 1단계가 완료되면 팩트 기획서 데이터(summaryData)를 탭에 실시간 렌더링하고 즉각 로컬 저장소에 1차 오토세이브합니다. 2단계 도중 에러가 터져도 비싼 구글 검색 데이터를 완전 보존합니다.',
+        '📋 [📋 팩트 직접 입력] 신규 포스팅 소스 탑재: 다른 AI(제미나이, GPT 등)에서 미리 팩트체크가 완료된 텍스트 기획서를 그대로 가져와 뼈대로 사용할 수 있는 전용 3번째 입력 모드를 추가했습니다.',
+        '⚡ 1단계 정찰 요약 완전 건너뛰기: 팩트 직접 입력 모드로 작동 시 구글 실시간 검색 및 요약 API를 전면 스킵하여 대기 시간 0초 실현 및 API 과금 비용을 제로화(0원)시켰습니다.',
+        '📡 GOOGLE RADAR ON/OFF 뱃지 실시간 낙인: 1단계 기획서 텍스트 자체에 레이더 작동 상태를 마크다운 인용구 형태로 박제하고, 🔍 팩트 검증 탭 상단에 초록색 [📡 GOOGLE RADAR: ON] 또는 회색 [💾 GOOGLE RADAR: OFF] 뱃지로 가시화했습니다. 외부 팩트 주입 시에는 [📋 EXTERNAL FACT] 뱃지가 표시됩니다.',
+        '⏱️ 플랫폼별 실시간 부분 저장 (Partial Update) & 에러 격리: 3개 플랫폼이 다 집필될 때까지 기다리지 않고, 네이버/티스토리/워드프레스 중 작성이 완료되는 플랫폼 순서대로 화면에 즉시 원고를 뿌리고 누적 세이브를 실행합니다.',
+        '⚡ 상황 인지형 스마트 실행 버튼 구현: 일부 플랫폼 작성이 실패했거나 누락되어 로컬에 1단계 팩트만 남았을 경우, 실행 버튼이 [⚡ 수집된 팩트로 원고만 이어서 작성하기] 주황색 버튼으로 자동 변환됩니다.',
         '🔄 처음부터 다시 검색 버튼 신설: 1단계 팩트 캐시 상태를 무시하고 구글 레이더를 켜서 1단계부터 완전히 새 판을 짜고 싶을 때 누르는 독립적인 리셋 기능을 버튼 우측에 배치했습니다.'
       ]
     },
@@ -1144,7 +1135,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.8</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.7</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1159,7 +1150,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.8 [📋 팩트 직접 입력 ⇄ 📡 레이더 뱃지 낙인] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.7 [🔍 팩트 검증 탭 ⇄ ⏱️ 실시간 부분 누적 저장 ⇄ 📋 팩트 직접 입력] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
