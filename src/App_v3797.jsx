@@ -151,12 +151,29 @@ function App() {
         const expiryLimit = 24 * 60 * 60 * 1000; // 24시간
         
         if (now - session.timestamp < expiryLimit) {
-          if (session.results) setResults(session.results);
+          if (session.results) {
+            setResults({
+              topic: session.results.topic || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
+              youtube: session.results.youtube || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
+              fact: session.results.fact || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult }
+            });
+          }
           if (session.activeTab) setActiveTab(session.activeTab);
           if (session.inputMode) setInputMode(session.inputMode);
           if (session.topic) setTopic(session.topic);
           if (session.youtubeTranscript) setYoutubeTranscript(session.youtubeTranscript);
-          if (session.summaryData) setSummaryData(session.summaryData); // 🔍 [V3.7.9.7] 1단계 팩트체크 자료 복원
+          
+          if (session.summaryData) {
+            if (typeof session.summaryData === 'string') {
+              setSummaryData({ topic: '', youtube: session.summaryData, fact: '' });
+            } else {
+              setSummaryData({
+                topic: session.summaryData.topic || '',
+                youtube: session.summaryData.youtube || '',
+                fact: session.summaryData.fact || ''
+              });
+            }
+          }
           
           if (session.selectedCategory) setSelectedCategory(session.selectedCategory);
           if (session.dynamicTopics) {
@@ -169,7 +186,7 @@ function App() {
           }
           if (session.displayedStaticTopics) setDisplayedStaticTopics(session.displayedStaticTopics);
           
-          console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료! 🫡');
+          console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료 (이중 호환 보정 적용)! 🫡');
         } else {
           localStorage.removeItem('kodari_saved_session');
           console.log('[코다리 엔진] 24시간이 경과한 임시 백업 세션을 자동 파기했습니다. 🧹');
@@ -184,10 +201,15 @@ function App() {
   // 💾 [V3.7.9.5] 결과, 활성화 탭, 입력 모드, 키워드 및 [소재연구소/팩트 데이터] 변경 시 오토세이브 실시간 갱신 (전수 감시)
   useEffect(() => {
     const hasDynamicData = dynamicTopics && Object.keys(dynamicTopics).length > 0;
-    const hasData = Object.values(results[inputMode]).some(val => val.content) || 
+    
+    // 🛡️ 호환성 안전 장치: results[inputMode]가 복구 과정에서 누락되어 undefined가 된 경우 방어
+    const currentModeResults = results[inputMode] || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult };
+    const currentModeSummary = summaryData[inputMode] || '';
+
+    const hasData = Object.values(currentModeResults).some(val => val.content) || 
                     topic.trim() || 
                     youtubeTranscript.trim() || 
-                    summaryData[inputMode] ||
+                    currentModeSummary ||
                     hasDynamicData || 
                     Object.keys(displayedStaticTopics).length > 0;
     if (hasData) {
@@ -285,13 +307,29 @@ function App() {
       const backupObj = JSON.parse(jsonStr);
       
       // 상태 복원
-      if (backupObj.results) setResults(backupObj.results);
+      if (backupObj.results) {
+        setResults({
+          topic: backupObj.results.topic || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
+          youtube: backupObj.results.youtube || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
+          fact: backupObj.results.fact || { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult }
+        });
+      }
       if (backupObj.activeTab) setActiveTab(backupObj.activeTab);
       if (backupObj.inputMode) setInputMode(backupObj.inputMode);
       if (backupObj.topic) setTopic(backupObj.topic);
       if (backupObj.youtubeTranscript) setYoutubeTranscript(backupObj.youtubeTranscript);
       if (backupObj.selectedCategory) setSelectedCategory(backupObj.selectedCategory);
-      if (backupObj.summaryData) setSummaryData(backupObj.summaryData); // 🔍 [V3.7.9.7] 1단계 복구
+      if (backupObj.summaryData) {
+        if (typeof backupObj.summaryData === 'string') {
+          setSummaryData({ topic: '', youtube: backupObj.summaryData, fact: '' });
+        } else {
+          setSummaryData({
+            topic: backupObj.summaryData.topic || '',
+            youtube: backupObj.summaryData.youtube || '',
+            fact: backupObj.summaryData.fact || ''
+          });
+        }
+      }
       
       if (backupObj.dynamicTopics) {
         if (Array.isArray(backupObj.dynamicTopics)) {
