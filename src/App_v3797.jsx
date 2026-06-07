@@ -484,7 +484,12 @@ ${inputText}
       setGroundingMetadata(prev => ({ ...prev, [inputMode]: null }));
     }
 
-    return data.candidates[0].content.parts[0].text;
+    const rawText = data.candidates[0].content.parts[0].text;
+    const badgeText = useGoogleSearch 
+      ? `> 📡 **GOOGLE RADAR: ON** (실시간 구글 검색으로 교차 검증 및 최신 팩트 반영 완료)\n\n`
+      : `> 💾 **GOOGLE RADAR: OFF** (입력된 원본 데이터 기반 팩트 요약 완료)\n\n`;
+    
+    return badgeText + rawText;
   };
 
   const writePlatformContent = async (platform, summaryData, finalKey) => {
@@ -1389,8 +1394,13 @@ ${summaryData}`;
               <div className="p-6 space-y-6">
                 <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 flex justify-between items-center">
                   <div>
-                    <h3 className="text-sm font-black text-indigo-900 flex items-center gap-1.5">
+                    <h3 className="text-sm font-black text-indigo-900 flex items-center gap-1.5 flex-wrap">
                       <span>🔍</span> 팩트 검증 및 기획서 데이터
+                      {summaryData[inputMode]?.includes('GOOGLE RADAR: ON') ? (
+                        <span className="text-[9px] md:text-[10px] bg-green-100 text-green-800 border border-green-200 px-2 py-0.5 rounded-full font-black ml-1.5">📡 GOOGLE RADAR: ON</span>
+                      ) : summaryData[inputMode]?.includes('GOOGLE RADAR: OFF') ? (
+                        <span className="text-[9px] md:text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-full font-black ml-1.5">💾 GOOGLE RADAR: OFF</span>
+                      ) : null}
                     </h3>
                     <p className="text-[11px] text-indigo-600 font-bold mt-0.5">이 팩트 데이터는 로컬 보관소에 영구 보존되어 원고 작성의 기반이 됩니다.</p>
                   </div>
