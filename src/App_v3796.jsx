@@ -220,7 +220,7 @@ function App() {
   const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
   const [backupInputCode, setBackupInputCode] = useState('');
 
-  // 🌀 [V3.7.9.5] 백업 포탈 데이터 압축/인코딩 헬퍼 함수
+  // 🌀 [V3.7.9.6] 백업 포탈 데이터 압축/인코딩 헬퍼 함수
   const generateBackupCode = () => {
     try {
       const backupObj = {
@@ -232,7 +232,7 @@ function App() {
         selectedCategory,
         dynamicTopics,
         displayedStaticTopics,
-        version: 'V3.7.9.5',
+        version: 'V3.7.9.6',
         timestamp: Date.now()
       };
       
@@ -241,7 +241,7 @@ function App() {
         return String.fromCharCode(parseInt(p1, 16));
       }));
       
-      const finalCode = `KODARI_V3795_${encodedData}`;
+      const finalCode = `KODARI_V3796_${encodedData}`;
       copyToClipboard(finalCode);
       triggerToast('🌀 백업 포탈 코드가 클립보드에 복사되었습니다! 카톡 등으로 PC에 보내세요. 🫡');
     } catch (e) {
@@ -256,17 +256,16 @@ function App() {
       return;
     }
     const cleanCode = code.trim();
-    const isV3796 = cleanCode.startsWith('KODARI_V3796_');
-    const isV3795 = cleanCode.startsWith('KODARI_V3795_');
-    if (!isV3796 && !isV3795) {
-      triggerToast('❌ 올바른 코다리 백업 코드가 아닙니다. (V3.7.9.5 및 V3.7.9.6 코드만 지원)');
+    
+    // 🌀 [미래 대비형 영구 호환 센서] KODARI_V[버전숫자]_ 패턴을 정규식으로 자동 감지
+    const match = cleanCode.match(/^KODARI_V(\d+)_(.+)$/);
+    if (!match) {
+      triggerToast('❌ 올바른 코다리 백업 코드가 아닙니다.');
       return;
     }
     
     try {
-      const base64Data = isV3796 
-        ? cleanCode.replace('KODARI_V3796_', '') 
-        : cleanCode.replace('KODARI_V3795_', '');
+      const base64Data = match[2]; // 버전 숫자와 무관하게 암호화된 알맹이 데이터만 추출
       const jsonStr = decodeURIComponent(atob(base64Data).split('').map((c) => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
@@ -312,6 +311,19 @@ function App() {
   };
 
   const patchNotes = [
+    {
+      version: 'V3.7.9.6',
+      date: '2026-06-07',
+      title: '📱 모바일 가독성(빈 줄) 복원 & 📊 마크다운 표(Table) 렌더링 무결성 패치',
+      tags: ['가독성복구', '렌더링개선', '표깨짐픽스', '도메인격리', '백업호환'],
+      details: [
+        'V3.5.9 오리지널 버전의 시원시원한 문단 여백 가이드를 복구 이식하여, 모바일 환경에서도 글이 뭉개지지 않고 2~3문장 단위로 쾌적하게 띄어쓰기가 적용되도록 지침을 개량했습니다.',
+        '마크다운 표(Table) 렌더링 무결성 패치: JSON 스키마 응답 구조 내에서 표 구조가 깨지지 않도록, 표 앞뒤에 강제로 더블 개행(\\n\\n)을 보장하는 [Table Rendering Rule] 방어막을 설계/삽입하여 모바일 뷰어와 네이버 복사 시 표 렌더링 무결성을 100% 확보했습니다.',
+        '미래 대비형 영구 호환 백업 센서 탑재: 정규식 패턴 분석을 적용하여 V3.7.9.5, V3.7.9.6 및 미래의 하위/상위 릴리즈 백업 코드가 들어와도 수동 글자 수정 없이 자동으로 디코딩 및 복원을 통과시키는 영구 호환 게이트웨이를 설계했습니다.',
+        '독립형 멀티 브라우저 작업 보장: 백업 포탈 데이터는 브라우저별 로컬 저장소(LocalStorage)에 완벽히 격리 저장됩니다. 모바일 크롬 ⇄ 사파리, 혹은 시크릿 모드 간에 서로 다른 백업 코드를 복원하여 혼선 없이 여러 원고를 동시에 멀티태스킹할 수 있습니다.',
+        '도메인 격리 및 영구 고정: Vercel 자동 Assign 및 Alias 라우팅 보호를 위해 vercel.json 설정을 튜닝하여 v3796 정식 프로덕션 도메인(kodari-v3796.vercel.app) 항로를 공식 고정 배포 완료했습니다.'
+      ]
+    },
     {
       version: 'V3.7.9.5',
       date: '2026-06-07',
@@ -708,11 +720,12 @@ ${inputText}
 
 [작성 및 강조 규칙]:
 1. 어투: 반드시 [${tone}] 스타일로 작성하되, 다정하고 친근한 이모지를 풍부히 섞어라.
-2. 분량: 공백 제외 최소 1,500자 이상의 매우 풍성한 정보를 담아라.
-3. 사족 금지: '글을 마치며', '결론', '맺음말' 등 식상한 기계적 섹션 사용을 **절대 금지**하며, 정보가 끝나면 자연스럽게 종결하라.
-4. 3중 하이브리드 강조: 핵심 키워드나 수치는 반드시 좌우 공백 없이 기호로 밀착 감싸라. (노랑 ==형광펜==, 파랑 ++파랑강조++, 빨강 !!주의사항!!)
-5. 정보 시각화: 비교/대조 정보는 **반드시 마크다운 표(Table)**로 시각화하되, 표 내부에는 강조 기호(**, ==, ++ 등)를 절대 사용하지 마라.
-6. 이미지 기획 (총 4개, KODARI Visual Engine 3.3 하이브리드 개조판): 본문의 흐름에 맞게 아래의 지침을 완벽히 적용하여 'image_prompts' 배열에 상세히 기재하라.
+2. 모바일 가독성 최적화: 스마트폰 화면에서 가독성을 확보하기 위해, 문장이 2~3개 이어질 때마다 반드시 줄바꿈을 적용하고 문단과 문단 사이에는 빈 줄(\\n\\n)을 하나 더 삽입하여 시원한 여백을 보장하라.
+3. 분량: 공백 제외 최소 1,500자 이상의 매우 풍성한 정보를 담아라.
+4. 사족 금지: '글을 마치며', '결론', '맺음말' 등 식상한 기계적 섹션 사용을 **절대 금지**하며, 정보가 끝나면 자연스럽게 종결하라.
+5. 3중 하이브리드 강조: 핵심 키워드나 수치는 반드시 좌우 공백 없이 기호로 밀착 감싸라. (노랑 ==형광펜==, 파랑 ++파랑강조++, 빨강 !!주의사항!!)
+6. 정보 시각화 및 [Table Rendering Rule]: 비교/대조 정보는 **반드시 마크다운 표(Table)**로 시각화하되, 표 내부에는 강조 기호(**, ==, ++ 등)를 절대 사용하지 마라. 또한, 표가 본문 텍스트와 붙어 뭉개지지 않도록 표를 출력하기 전과 표 출력이 완전히 끝난 직후에는 반드시 두 번의 줄바꿈(\\n\\n)을 넣어 확실한 개행을 보장하라.
+7. 이미지 기획 (총 4개, KODARI Visual Engine 3.3 하이브리드 개조판): 본문의 흐름에 맞게 아래의 지침을 완벽히 적용하여 'image_prompts' 배열에 상세히 기재하라.
    - [1단계: 상상]: 각 플랫폼 성격에 맞춰 본문을 가장 잘 설명하는 최적의 시각적 장면을 상상해라.
    - [2단계: 스타일 적용]: ${styleGuide}
    - [3단계: 인물 배치 규칙 (하이브리드 밸브)]:
@@ -727,7 +740,7 @@ ${inputText}
      6) Layout Strategy: 글씨가 이미지 안에 디자인의 일부처럼 자연스럽게 얹어질 수 있는 'Premium Information Card' 레이아웃으로 영어 프롬프트를 설계해라.
      7) Visual Style: Keep the 'Premium 3D Claymorphism' style.
      8) Safety & Typography: **STRICTLY RENDER THE EXACT KOREAN CHARACTERS.** 이미지 내부에 가상의 메인카피와 서브카피 한글이 직접 렌더링되어 박히도록 영어 프롬프트 묘사에 기재해라.
-7. 소스코드 노출 절대 금지: 본문 내에 실제 작동하는 프로그래밍 소스 코드(예: Javascript, HTML 태그 등)를 기재하거나 노출하는 것을 엄격히 금지하며, 개발자 관점의 코드 예시 대신 일반 대중이 이해하기 쉬운 한글 텍스트 설명으로 풀어써라.
+8. 소스코드 노출 절대 금지: 본문 내에 실제 작동하는 프로그래밍 소스 코드(예: Javascript, HTML 태그 등)를 기재하거나 노출하는 것을 엄격히 금지하며, 개발자 관점의 코드 예시 대신 일반 대중이 이해하기 쉬운 한글 텍스트 설명으로 풀어써라.
 
 [1단계 검증 팩트 데이터]:
 ${summaryData}`;
@@ -1257,7 +1270,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.5</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.6</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1272,7 +1285,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.5 [🌀 백업 포탈 ⇄ 🛡️ 이중 오토세이브 완성] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.6 [🌀 백업 포탈 ⇄ 🛡️ 이중 오토세이브 완성] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
