@@ -100,11 +100,12 @@ function App() {
   const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
     topic: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
-    youtube: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult }
+    youtube: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
+    fact: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult }
   });
   
   // 🔍 [V3.7.9.7] 1단계 팩트 검증/기획 데이터 상태 추가
-  const [summaryData, setSummaryData] = useState({ topic: '', youtube: '' });
+  const [summaryData, setSummaryData] = useState({ topic: '', youtube: '', fact: '' });
   const [activeTab, setActiveTab] = useState('naver');
   const [error, setError] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
@@ -221,7 +222,7 @@ function App() {
   const [isTopicLabOpen, setIsTopicLabOpen] = useState(false);
   const [labFilter, setLabFilter] = useState('all');
   const [isFactCheckOpen, setIsFactCheckOpen] = useState(false);
-  const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null });
+  const [groundingMetadata, setGroundingMetadata] = useState({ topic: null, youtube: null, fact: null });
   const [backupInputCode, setBackupInputCode] = useState('');
 
   // 🔍 [V3.7.9.7] 상태 감지: 1단계 팩트가 수확되었고, 체크된 플랫폼 중 비어있거나 실패한 글이 있는지 감지
@@ -324,6 +325,18 @@ function App() {
   };
 
   const patchNotes = [
+    {
+      version: 'V3.7.9.8',
+      date: '2026-06-07',
+      title: '📋 외부 팩트 직접 입력(1단계 스킵) 기능 신설 & 📡 GOOGLE RADAR 상태 뱃지 낙인 시스템 적용',
+      tags: ['팩트직접입력', '1단계스킵', '레이더상태뱃지', '비용절감', 'UX개선'],
+      details: [
+        '📋 [📋 팩트 직접 입력] 신규 포스팅 소스 탑재: 다른 AI(제미나이, GPT 등)에서 미리 팩트체크가 완료된 텍스트 기획서를 그대로 가져와 뼈대로 사용할 수 있는 전용 3번째 입력 모드를 추가했습니다.',
+        '⚡ 1단계 정찰 요약 완전 건너뛰기: 팩트 직접 입력 모드로 작동 시 구글 실시간 검색 및 요약 API를 전면 스킵하여 대기 시간 0초 실현 및 API 과금 비용을 제로화(0원)시켰습니다.',
+        '📡 GOOGLE RADAR ON/OFF 뱃지 실시간 낙인: 1단계 기획서 텍스트 자체에 레이더 작동 상태를 마크다운 인용구 형태로 박제하고, 🔍 팩트 검증 탭 상단에 초록색 [📡 GOOGLE RADAR: ON] 또는 회색 [💾 GOOGLE RADAR: OFF] 뱃지로 가시화했습니다.',
+        '📋 [📋 EXTERNAL FACT] 뱃지 탑재: 팩트 직접 입력 모드를 사용했거나 외부에서 팩트를 주입한 경우, 에메랄드색 [📋 EXTERNAL FACT] 뱃지로 영리하게 분석하여 대표님께 직관적으로 표시해 줍니다.'
+      ]
+    },
     {
       version: 'V3.7.9.7',
       date: '2026-06-07',
@@ -615,6 +628,10 @@ ${summaryData}`;
       setError('유튜브 자막 텍스트를 붙여넣어 주세요!');
       return;
     }
+    if (inputMode === 'fact' && !summaryData.fact.trim()) {
+      setError('다른 AI에서 검증 완료한 팩트 텍스트를 입력해 주세요!');
+      return;
+    }
 
     const activePlatforms = Object.keys(platforms).filter(k => platforms[k]);
     if (activePlatforms.length === 0) {
@@ -641,7 +658,14 @@ ${summaryData}`;
       // 🔍 1단계: 초안/기획 요약 결정 (강제 리셋이거나 이어서 쓰기가 불가능한 경우에만 신규 요약 기동)
       let summary = summaryData[inputMode];
       
-      if (forceRestart || !isPartialState || !summary) {
+      if (inputMode === 'fact') {
+        summary = summaryData.fact;
+        if (!summary.includes('EXTERNAL FACT') && !summary.includes('GOOGLE RADAR')) {
+          summary = `> 📋 **EXTERNAL FACT** (외부 검증 완료된 팩트 데이터 직접 주입)\n\n` + summary;
+          setSummaryData(prev => ({ ...prev, fact: summary }));
+        }
+        setActiveTab('factcheck');
+      } else if (forceRestart || !isPartialState || !summary) {
         console.log('[코다리 엔진] 1단계: 초안 및 뼈대 정보 팩트체크 신규 기동.');
         setStatusMessage('🔎 1단계: 실시간 구글 교차 검증 및 팩트 요약 중...');
         summary = await fetchSummaryDraft(inputText, finalKey);
@@ -789,6 +813,11 @@ ${summaryData}`;
       
       // 1단계 요약이 아예 없거나 완전히 빈 상태이면 재생성을 위해 1단계 빌드
       if (!summary) {
+        if (inputMode === 'fact') {
+          setError('입력된 외부 팩트 데이터가 없습니다. 팩트를 먼저 입력해 주세요.');
+          setLoading(false);
+          return;
+        }
         let inputText = topic;
         if (inputMode === 'youtube') {
           let cleanedTranscript = youtubeTranscript
@@ -1115,7 +1144,7 @@ ${summaryData}`;
         <header className="text-center space-y-4">
           <div className="flex justify-between items-center mb-4">
             <div className="w-10"></div>
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.7</h1>
+            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-indigo-400 tracking-tighter uppercase">KODARI BLOG AI V3.7.9.8</h1>
             <div className="flex gap-2">
               <button onClick={() => setIsPatchNotesOpen(true)} className="p-2.5 rounded-full bg-white shadow-sm border border-slate-200 hover:bg-indigo-50 transition-all flex items-center gap-1 group">
                 <span className="text-lg group-hover:scale-110 transition-transform">📜</span>
@@ -1130,7 +1159,7 @@ ${summaryData}`;
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
-            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.7 [🔍 팩트 검증 탭 ⇄ ⏱️ 실시간 부분 누적 저장] 완비 ✨</p>
+            <p className="text-slate-500 font-black text-sm">🚀 V3.7.9.8 [📋 팩트 직접 입력 ⇄ 📡 레이더 뱃지 낙인] 완비 ✨</p>
             <a 
               href="/converter.html" 
               target="_blank" 
@@ -1147,9 +1176,10 @@ ${summaryData}`;
             <div className="flex justify-between items-end mb-1">
               <div className="flex gap-4 items-center">
                 <label className="block text-sm font-bold text-slate-700">✍️ 포스팅 소스</label>
-                <div className="flex bg-slate-100 rounded-lg p-1">
-                  <button onClick={() => setInputMode('topic')} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${inputMode === 'topic' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}>일반 주제</button>
-                  <button onClick={() => setInputMode('youtube')} className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${inputMode === 'youtube' ? 'bg-white shadow-sm text-red-600' : 'text-slate-500 hover:text-slate-700'}`}>유튜브 자막</button>
+                <div className="flex bg-slate-100 rounded-lg p-1 gap-1">
+                  <button onClick={() => setInputMode('topic')} className={`px-2.5 py-1.5 text-xs font-black rounded-md transition-all ${inputMode === 'topic' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-750'}`}>일반 주제</button>
+                  <button onClick={() => setInputMode('youtube')} className={`px-2.5 py-1.5 text-xs font-black rounded-md transition-all ${inputMode === 'youtube' ? 'bg-white shadow-sm text-red-600' : 'text-slate-500 hover:text-slate-750'}`}>유튜브 자막</button>
+                  <button onClick={() => setInputMode('fact')} className={`px-2.5 py-1.5 text-xs font-black rounded-md transition-all ${inputMode === 'fact' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500 hover:text-slate-750'}`}>📋 팩트 직접 입력</button>
                 </div>
               </div>
               <button 
@@ -1160,7 +1190,7 @@ ${summaryData}`;
               </button>
             </div>
             <div className="flex gap-3">
-              <div className={`relative flex-1 group ${inputMode === 'youtube' ? 'flex flex-col' : ''}`}>
+              <div className={`relative flex-1 group ${inputMode !== 'topic' ? 'flex flex-col' : ''}`}>
                 {inputMode === 'topic' ? (
                   <>
                     <input 
@@ -1173,7 +1203,7 @@ ${summaryData}`;
                     />
                     <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-xl md:text-2xl group-focus-within:scale-110 transition-transform">✨</span>
                   </>
-                ) : (
+                ) : inputMode === 'youtube' ? (
                   <>
                     <textarea 
                       value={youtubeTranscript}
@@ -1183,6 +1213,18 @@ ${summaryData}`;
                     />
                     <div className="absolute top-2 right-4 text-xs font-bold text-red-400">
                       📺 복사된 자막 텍스트
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <textarea 
+                      value={summaryData.fact || ''}
+                      onChange={(e) => setSummaryData(prev => ({ ...prev, fact: e.target.value }))}
+                      placeholder="다른 AI(제미나이, GPT 등)에서 검증을 마친 팩트체크 기획서 마크다운 텍스트를 여기에 붙여넣어 주세요..."
+                      className="w-full h-48 p-4 md:p-5 rounded-2xl border-2 border-emerald-100 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-sm md:text-base font-normal transition-all shadow-sm resize-y"
+                    />
+                    <div className="absolute top-2 right-4 text-xs font-black text-emerald-600">
+                      📋 외부 팩트 데이터 주입창
                     </div>
                   </>
                 )}
@@ -1400,6 +1442,8 @@ ${summaryData}`;
                         <span className="text-[9px] md:text-[10px] bg-green-100 text-green-800 border border-green-200 px-2 py-0.5 rounded-full font-black ml-1.5">📡 GOOGLE RADAR: ON</span>
                       ) : summaryData[inputMode]?.includes('GOOGLE RADAR: OFF') ? (
                         <span className="text-[9px] md:text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded-full font-black ml-1.5">💾 GOOGLE RADAR: OFF</span>
+                      ) : summaryData[inputMode]?.includes('EXTERNAL FACT') || inputMode === 'fact' ? (
+                        <span className="text-[9px] md:text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-black ml-1.5">📋 EXTERNAL FACT</span>
                       ) : null}
                     </h3>
                     <p className="text-[11px] text-indigo-600 font-bold mt-0.5">이 팩트 데이터는 로컬 보관소에 영구 보존되어 원고 작성의 기반이 됩니다.</p>
