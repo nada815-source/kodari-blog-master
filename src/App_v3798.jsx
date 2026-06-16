@@ -130,9 +130,9 @@ function App() {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  // 🧭 [V3.7.9.8] 소재연구소 새 창(팝업 탭) 띄우기 함수
+  // 🧭 [V3.7.9.8] 소재연구소 새 창(새 탭) 띄우기 함수
   const handleOpenTopicLab = () => {
-    window.open('/?mode=lab', 'kodari_topic_lab', 'width=1000,height=850,resizable=yes,scrollbars=yes');
+    window.open('/?mode=lab', '_blank');
   };
   const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
