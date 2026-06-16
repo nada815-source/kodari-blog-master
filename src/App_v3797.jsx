@@ -84,6 +84,7 @@ function App() {
   // [V3.7.9.4] TDZ 호이스팅 오류 해결을 위해 소재연구소 상태 변수 선언부를 상단으로 긴급 인양
   const [isLiveLoading, setIsLiveLoading] = useState(false);
   const [dynamicTopics, setDynamicTopics] = useState({}); // [V3.7.9.4] 카테고리별 개별 독립 서랍 구조로 리팩토링 ({ '🏛️ 정부정책': [...] })
+  const [dynamicTopicsTimestamps, setDynamicTopicsTimestamps] = useState({}); // ⏱️ [V3.7.9.7] 카테고리별 실시간 주제 수집 시간 기록 ({ '🏛️ 경제/재테크': '2026-06-16 22:15' })
   const [selectedCategory, setSelectedCategory] = useState('🏛️ 정부정책');
   const [displayedStaticTopics, setDisplayedStaticTopics] = useState({});
 
@@ -120,7 +121,8 @@ function App() {
     updatedCategory = selectedCategory,
     updatedDynamic = dynamicTopics,
     updatedStatic = displayedStaticTopics,
-    updatedSummary = summaryData
+    updatedSummary = summaryData,
+    updatedTimestamps = dynamicTopicsTimestamps
   ) => {
     try {
       const sessionData = {
@@ -133,7 +135,8 @@ function App() {
         selectedCategory: updatedCategory,
         dynamicTopics: updatedDynamic,
         displayedStaticTopics: updatedStatic,
-        summaryData: updatedSummary // 🔍 [V3.7.9.7] 1단계 팩트체크 기획서 데이터 백업 추가
+        summaryData: updatedSummary, // 🔍 [V3.7.9.7] 1단계 팩트체크 기획서 데이터 백업 추가
+        dynamicTopicsTimestamps: updatedTimestamps // ⏱️ [V3.7.9.7] 실시간 주제 수집 시간 기록 추가
       };
       localStorage.setItem('kodari_saved_session', JSON.stringify(sessionData));
     } catch (e) {
@@ -184,9 +187,10 @@ function App() {
               setDynamicTopics(session.dynamicTopics);
             }
           }
+          if (session.dynamicTopicsTimestamps) setDynamicTopicsTimestamps(session.dynamicTopicsTimestamps);
           if (session.displayedStaticTopics) setDisplayedStaticTopics(session.displayedStaticTopics);
           
-          console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료 (이중 호환 보정 적용)! 🫡');
+          console.log('[코다리 엔진] 24시간 이내 백업 세션 복구 완료 (이중 호환 보정 및 수집시각 복원 적용)! 🫡');
         } else {
           localStorage.removeItem('kodari_saved_session');
           console.log('[코다리 엔진] 24시간이 경과한 임시 백업 세션을 자동 파기했습니다. 🧹');
@@ -222,10 +226,11 @@ function App() {
         selectedCategory,
         dynamicTopics,
         displayedStaticTopics,
-        summaryData
+        summaryData,
+        dynamicTopicsTimestamps
       );
     }
-  }, [results, activeTab, inputMode, topic, youtubeTranscript, selectedCategory, dynamicTopics, displayedStaticTopics, summaryData]);
+  }, [results, activeTab, inputMode, topic, youtubeTranscript, selectedCategory, dynamicTopics, displayedStaticTopics, summaryData, dynamicTopicsTimestamps]);
 
   const [useImage, setUseImage] = useState(true);
   const [useGoogleSearch, setUseGoogleSearch] = useState(true); // [V3.7.8.7] 구글 검색 팩트체크 온오프 상태 추가
@@ -264,6 +269,7 @@ function App() {
         youtubeTranscript,
         selectedCategory,
         dynamicTopics,
+        dynamicTopicsTimestamps, // ⏱️ [V3.7.9.7] 실시간 주제 수집 시간 기록 백업 추가
         displayedStaticTopics,
         summaryData, // 🔍 [V3.7.9.7] 1단계 팩트 데이터 패키징 포함
         version: 'V3.7.9.7',
@@ -339,6 +345,7 @@ function App() {
           setDynamicTopics(backupObj.dynamicTopics);
         }
       }
+      if (backupObj.dynamicTopicsTimestamps) setDynamicTopicsTimestamps(backupObj.dynamicTopicsTimestamps);
       if (backupObj.displayedStaticTopics) setDisplayedStaticTopics(backupObj.displayedStaticTopics);
       
       // 즉각적인 세션 세이브 동기화 가동
@@ -351,7 +358,8 @@ function App() {
         backupObj.selectedCategory,
         backupObj.dynamicTopics,
         backupObj.displayedStaticTopics,
-        backupObj.summaryData || summaryData
+        backupObj.summaryData || summaryData,
+        backupObj.dynamicTopicsTimestamps || dynamicTopicsTimestamps
       );
       
       setBackupInputCode(''); // 입력창 청소
@@ -988,6 +996,14 @@ ${summaryData}`;
           [selectedCategory]: processedTopics
         }));
         
+        // ⏱️ 현재 시간 포맷팅 기록 (YYYY-MM-DD HH:MM)
+        const now = new Date();
+        const formattedTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        setDynamicTopicsTimestamps(prev => ({
+          ...prev,
+          [selectedCategory]: formattedTime
+        }));
+        
         triggerToast(`✨ [${selectedCategory}] 실시간 트렌드 분석 완료!`);
       }
     } catch (err) {
@@ -1144,7 +1160,8 @@ ${summaryData}`;
         selectedCategory, 
         dynamicTopics, 
         displayedStaticTopics,
-        resetSummary
+        resetSummary,
+        dynamicTopicsTimestamps
       );
       
       triggerToast('본문 데이터가 맑게 청소되었습니다! 소재연구소 추천은 보존됩니다. 🧹✨');
@@ -1927,6 +1944,11 @@ ${summaryData}`;
                       <h3 className="text-white font-black text-sm flex items-center gap-2">
                         ⚡ 실시간 주제
                         <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                        {dynamicTopicsTimestamps[selectedCategory] && (
+                          <span className="text-[10px] font-bold text-slate-400">
+                            ({dynamicTopicsTimestamps[selectedCategory]} 검색)
+                          </span>
+                        )}
                       </h3>
                       <button 
                         onClick={refreshLiveTrends}
