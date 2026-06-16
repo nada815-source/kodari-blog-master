@@ -321,7 +321,7 @@ function App() {
       const now = new Date();
       const formattedDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
-      const finalCode = `KODARI_V3798_${formattedDate}_${encodedData}`;
+      const finalCode = `${formattedDate}_KODARI_V3798_${encodedData}`;
       copyToClipboard(finalCode);
       triggerToast('🌀 백업 포탈 코드가 클립보드에 복사되었습니다! 카톡 등으로 PC에 보내세요. 🫡');
     } catch (e) {
@@ -337,16 +337,16 @@ function App() {
     }
     const cleanCode = code.trim();
     
-    // 🌀 [미래 대비형 영구 호환 센서] KODARI_V[버전숫자]_[선택적날짜시간_]?[알맹이] 구조를 유연하게 자동 감지 (하위호환 유지)
-    const match = cleanCode.match(/^KODARI_V(\d+)(?:_(\d{8}_\d{4}))?_(.+)$/);
+    // 🌀 [미래 대비형 영구 호환 센서] 날짜시간 접두사가 맨 앞인 구조 및 날짜가 생략된 구버전 구조 모두 안전하게 자동 매치
+    const match = cleanCode.match(/(?:^|_)KODARI_V(\d+)_(.+)$/);
     if (!match) {
       triggerToast('❌ 올바른 코다리 백업 코드가 아닙니다.');
       return;
     }
     
     try {
-      // match[3]은 날짜시간 주입 여부에 관계없이 항상 순수한 암호화 Base64 데이터만 골라냅니다.
-      const base64Data = match[3]; 
+      // match[2]는 날짜의 유무와 관계없이 항상 순수한 암호화 Base64 데이터만 골라냅니다.
+      const base64Data = match[2]; 
       const jsonStr = decodeURIComponent(atob(base64Data).split('').map((c) => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
