@@ -317,7 +317,11 @@ function App() {
         return String.fromCharCode(parseInt(p1, 16));
       }));
       
-      const finalCode = `KODARI_V3797_${encodedData}`;
+      // ⏱️ [V3.7.9.8] 백업코드 생성 시점 날짜와 시간 포맷팅 (YYYYMMDD_HHMM)
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      const finalCode = `KODARI_V3798_${formattedDate}_${encodedData}`;
       copyToClipboard(finalCode);
       triggerToast('🌀 백업 포탈 코드가 클립보드에 복사되었습니다! 카톡 등으로 PC에 보내세요. 🫡');
     } catch (e) {
@@ -333,15 +337,16 @@ function App() {
     }
     const cleanCode = code.trim();
     
-    // 🌀 [미래 대비형 영구 호환 센서] KODARI_V[버전숫자]_ 패턴을 정규식으로 자동 감지
-    const match = cleanCode.match(/^KODARI_V(\d+)_(.+)$/);
+    // 🌀 [미래 대비형 영구 호환 센서] KODARI_V[버전숫자]_[선택적날짜시간_]?[알맹이] 구조를 유연하게 자동 감지 (하위호환 유지)
+    const match = cleanCode.match(/^KODARI_V(\d+)(?:_(\d{8}_\d{4}))?_(.+)$/);
     if (!match) {
       triggerToast('❌ 올바른 코다리 백업 코드가 아닙니다.');
       return;
     }
     
     try {
-      const base64Data = match[2]; // 버전 숫자와 무관하게 암호화된 알맹이 데이터만 추출
+      // match[3]은 날짜시간 주입 여부에 관계없이 항상 순수한 암호화 Base64 데이터만 골라냅니다.
+      const base64Data = match[3]; 
       const jsonStr = decodeURIComponent(atob(base64Data).split('').map((c) => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
