@@ -1492,15 +1492,19 @@ ${summaryData}`;
               <div className={`relative flex-1 group ${inputMode !== 'topic' ? 'flex flex-col' : ''}`}>
                 {inputMode === 'topic' ? (
                   <>
-                    <input 
-                      type="text" 
+                    <textarea 
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && generateContent(false)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          generateContent(false);
+                        }
+                      }}
                       placeholder="예: 2026 경기 컬처패스 사용처 및 유효기간"
-                      className="w-full p-4 md:p-5 pl-12 md:pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-base md:text-lg font-bold transition-all shadow-sm"
+                      className="w-full h-20 p-4 md:p-5 pl-12 md:pl-14 rounded-2xl border-2 border-slate-100 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-base md:text-lg font-bold transition-all shadow-sm resize-none custom-red-scrollbar"
                     />
-                    <span className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-xl md:text-2xl group-focus-within:scale-110 transition-transform">✨</span>
+                    <span className="absolute left-4 md:left-5 top-5 text-xl md:text-2xl group-focus-within:scale-110 transition-transform">✨</span>
                   </>
                 ) : inputMode === 'youtube' ? (
                   <>
