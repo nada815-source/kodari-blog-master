@@ -98,6 +98,42 @@ function App() {
 
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+
+  // 🧭 [V3.7.9.8] 독립형 소재연구소(Standalone Lab Mode) 판단 및 쿼리 주입 로직
+  const queryParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  const isStandaloneLab = queryParams.get('mode') === 'lab';
+
+  // 🧭 [V3.7.9.8] URL 파라미터 topic 주입 및 postMessage 리스너 가동
+  useEffect(() => {
+    // 1. 주소창 ?topic= 값 주입
+    const paramTopic = queryParams.get('topic');
+    if (paramTopic) {
+      setTopic(decodeURIComponent(paramTopic));
+      setInputMode('topic');
+      // 브라우저 주소창 청소 (새로고침 시 중복 주입 방지)
+      try {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    // 2. postMessage 수신 리스너 (자식 소재연구소 탭에서 주제 주입)
+    const handleMessage = (e) => {
+      if (e.data && e.data.type === 'KODARI_SELECT_TOPIC') {
+        setTopic(e.data.topic);
+        setInputMode('topic');
+        triggerToast(`💡 '${e.data.topic}' 주제가 소재연구소에서 주입되었습니다! ✨`);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  // 🧭 [V3.7.9.8] 소재연구소 새 창(팝업 탭) 띄우기 함수
+  const handleOpenTopicLab = () => {
+    window.open('/?mode=lab', 'kodari_topic_lab', 'width=1000,height=850,resizable=yes,scrollbars=yes');
+  };
   const emptyPlatformResult = { title: '', content: '', tags: '', official_links: [], image: '', image_desc: '', section_prompts: [] };
   const [results, setResults] = useState({
     topic: { naver: emptyPlatformResult, tistory: emptyPlatformResult, wordpress: emptyPlatformResult },
@@ -945,9 +981,44 @@ ${summaryData}`;
   };
 
   const handleSelectTopic = (selectedTopic) => {
-    setTopic(selectedTopic);
-    setIsTopicLabOpen(false);
-    triggerToast(`💡 '${selectedTopic}' 주제가 선택되었습니다! ✨`);
+    // A. 부모 창(window.opener)이 존재할 때 (새 창/새 탭 연동 모드)
+    if (window.opener && !window.opener.closed) {
+      try {
+        window.opener.postMessage({ type: 'KODARI_SELECT_TOPIC', topic: selectedTopic }, '*');
+        window.close();
+        return;
+      } catch (err) {
+        console.error('부모 창 postMessage 전송 실패, fallback 작동:', err);
+      }
+    }
+
+    // B. 단독 모드로 기동 중일 때 (주소창 직접 접속)
+    // 1. 공용 금고(LocalStorage) 세션 우선 갱신
+    try {
+      const savedSessionRaw = localStorage.getItem('kodari_saved_session');
+      let session = {};
+      if (savedSessionRaw) {
+        session = JSON.parse(savedSessionRaw);
+      }
+      session.topic = selectedTopic;
+      session.inputMode = 'topic';
+      session.timestamp = Date.now();
+      localStorage.setItem('kodari_saved_session', JSON.stringify(session));
+    } catch (e) {
+      console.warn(e);
+    }
+
+    // 2. 클립보드 자동 복사
+    try {
+      navigator.clipboard.writeText(selectedTopic);
+    } catch (e) {
+      console.warn(e);
+    }
+
+    alert(`📋 '${selectedTopic}' 주제가 복사되었습니다!\n메인 블로그 AI 화면으로 이동하여 자동 주입합니다. ✨`);
+    
+    // 3. 메인 화면으로 이동하며 파라미터 주입
+    window.location.href = `/?topic=${encodeURIComponent(selectedTopic)}`;
   };
 
   const handleSubCopyChange = (idx, newCopy) => {
@@ -1039,6 +1110,166 @@ ${summaryData}`;
       ...prev,
       [`${categoryName}_${sectionName}`]: selected
     }));
+  };
+
+  // 🧭 [V3.7.9.8] 소재연구소 UI 단독 렌더러 함수 분리 정의 (코드 재활용 극대화)
+  const renderTopicLabContent = (standalone = false) => {
+    return (
+      <div className={standalone ? "bg-white rounded-3xl shadow-xl p-8 border border-slate-100 space-y-8" : "bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto"}>
+        <div className="flex justify-between items-center mb-8">
+          <div className="space-y-1">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+              💡 소재 연구소 <span className="text-sm font-bold bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest">Lab</span>
+            </h2>
+            <p className="text-sm text-slate-400 font-medium">조회수가 터지는 황금 키워드를 발굴하세요.</p>
+          </div>
+          {!standalone && (
+            <button onClick={() => setIsTopicLabOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
+          )}
+        </div>
+
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-3xl">
+            {topicDatabase.categories.map((cat, i) => (
+              <button
+                key={i}
+                onClick={() => { setSelectedCategory(cat.name); }}
+                className={`px-5 py-3 rounded-2xl font-black text-xs transition-all ${
+                  selectedCategory === cat.name 
+                  ? 'bg-white text-indigo-600 shadow-md scale-105' 
+                  : 'text-slate-500 hover:text-indigo-600 hover:bg-white/50'
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+
+          {/* 노란색 필터 버튼 그룹 */}
+          <div className="flex flex-wrap gap-2 px-1">
+            {[
+              { id: 'realtime', label: '실시간' },
+              { id: 'monthly', label: '이번달' },
+              { id: 'annual', label: '연간' },
+              { id: 'gold', label: '황금' },
+              { id: 'all', label: '전체' }
+            ].map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => setLabFilter(btn.id)}
+                className={`px-6 py-2 rounded-lg font-black text-sm border-2 border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${
+                  labFilter === btn.id ? 'bg-amber-400 text-black' : 'bg-white text-slate-400 border-slate-200 shadow-none'
+                }`}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 4대 전략 대시보드 리스트 (스크롤 가능) */}
+          <div className="space-y-6 max-h-[65vh] overflow-y-auto pr-2 custom-red-scrollbar">
+            
+            {/* 1. 실시간 트렌드 카드 */}
+            {(labFilter === 'all' || labFilter === 'realtime') && (
+              <div className="bg-slate-900 rounded-[30px] py-8 px-6 shadow-xl border border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-white font-black text-sm flex items-center gap-2">
+                    ⚡ 실시간 주제
+                    <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
+                    {dynamicTopicsTimestamps[selectedCategory] && (
+                      <span className="text-[10px] font-bold text-slate-400">
+                        ({dynamicTopicsTimestamps[selectedCategory]} 검색)
+                      </span>
+                    )}
+                  </h3>
+                  <button 
+                    onClick={refreshLiveTrends}
+                    disabled={isLiveLoading}
+                    className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
+                  >
+                    {isLiveLoading ? '분석 중...' : '새로고침 🔄'}
+                  </button>
+                </div>
+                <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
+                  {dynamicTopics[selectedCategory] ? (
+                    dynamicTopics[selectedCategory].map((t, i) => (
+                      <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 whitespace-normal break-keep line-clamp-2 leading-relaxed">
+                        {i+1}. {t}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-10 space-y-3">
+                      <p className="text-slate-500 text-xs font-bold">지금 가장 핫한 주제는?</p>
+                      <button onClick={refreshLiveTrends} className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black shadow-lg shadow-indigo-900/40 active:scale-95">실시간 분석 시작 🚀</button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* 2. 이번 달 주제 카드 */}
+            {(labFilter === 'all' || labFilter === 'monthly') && (
+              <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                    🗓️ 이번 달 주제
+                    <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Monthly</span>
+                  </h3>
+                  <button onClick={() => refreshStaticSection(selectedCategory, 'monthly')} className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors">새로고침 🔄</button>
+                </div>
+                <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
+                  {(displayedStaticTopics[`${selectedCategory}_monthly`] || []).map((t, i) => (
+                    <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 3. 연간 주제 카드 */}
+            {(labFilter === 'all' || labFilter === 'annual') && (
+              <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                    📅 연간 주제
+                    <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase">Annual</span>
+                  </h3>
+                  <button onClick={() => refreshStaticSection(selectedCategory, 'annual')} className="text-[10px] font-bold text-slate-400 hover:text-amber-600 transition-colors">새로고침 🔄</button>
+                </div>
+                <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
+                  {(displayedStaticTopics[`${selectedCategory}_annual`] || []).map((t, i) => (
+                    <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 4. 황금 키워드 카드 */}
+            {(labFilter === 'all' || labFilter === 'gold') && (
+              <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
+                    💎 황금 키워드
+                    <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Evergreen</span>
+                  </h3>
+                  <button onClick={() => refreshStaticSection(selectedCategory, 'gold')} className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">새로고침 🔄</button>
+                </div>
+                <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
+                  {(displayedStaticTopics[`${selectedCategory}_gold`] || []).map((t, i) => (
+                    <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // 초기 로딩 및 카테고리 변경 시 키워드 셔플 (안전한 버전)
@@ -1194,6 +1425,17 @@ ${summaryData}`;
       .join(' ');
   };
 
+  // 🧭 [V3.7.9.8] 독립형 기동(Standalone Lab Mode) 분기 렌더링
+  if (isStandaloneLab) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900">
+        <div className="max-w-4xl mx-auto">
+          {renderTopicLabContent(true)}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 py-6 md:py-12 px-4 font-sans text-slate-900">
       <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
@@ -1240,7 +1482,7 @@ ${summaryData}`;
                 </div>
               </div>
               <button 
-                onClick={() => setIsTopicLabOpen(true)}
+                onClick={handleOpenTopicLab}
                 className="md:hidden px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-[11px] border-2 border-indigo-100 shadow-sm flex items-center gap-1 active:scale-95"
               >
                 <span>💡 소재 연구소</span>
@@ -1287,7 +1529,7 @@ ${summaryData}`;
                 )}
               </div>
               <button 
-                onClick={() => setIsTopicLabOpen(true)}
+                onClick={handleOpenTopicLab}
                 className="hidden md:flex px-8 py-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-2xl font-black text-sm transition-all flex-col items-center justify-center gap-1 border-2 border-indigo-100 shadow-sm whitespace-nowrap active:scale-95"
               >
                 <span className="text-2xl">💡</span>
@@ -1896,158 +2138,7 @@ ${summaryData}`;
 
       {isTopicLabOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-start md:items-center justify-center z-[100] p-2 md:p-4 overflow-y-auto pt-4 md:pt-0">
-          <div className="bg-white rounded-[24px] md:rounded-[40px] p-4 md:p-8 max-w-2xl w-full shadow-2xl border border-white/20 animate-in fade-in zoom-in duration-300 my-auto">
-            <div className="flex justify-between items-center mb-8">
-              <div className="space-y-1">
-                <h2 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                  💡 소재 연구소 <span className="text-sm font-bold bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full uppercase tracking-widest">Lab</span>
-                </h2>
-                <p className="text-sm text-slate-400 font-medium">조회수가 터지는 황금 키워드를 발굴하세요.</p>
-              </div>
-              <button onClick={() => setIsTopicLabOpen(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all font-bold text-xl">✕</button>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-3xl">
-                {topicDatabase.categories.map((cat, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setSelectedCategory(cat.name); }}
-                    className={`px-5 py-3 rounded-2xl font-black text-xs transition-all ${
-                      selectedCategory === cat.name 
-                      ? 'bg-white text-indigo-600 shadow-md scale-105' 
-                      : 'text-slate-500 hover:text-indigo-600 hover:bg-white/50'
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-
-              {/* [V3.7.8.1] 노란색 필터 버튼 그룹 */}
-              <div className="flex flex-wrap gap-2 px-1">
-                {[
-                  { id: 'realtime', label: '실시간' },
-                  { id: 'monthly', label: '이번달' },
-                  { id: 'annual', label: '연간' },
-                  { id: 'gold', label: '황금' },
-                  { id: 'all', label: '전체' }
-                ].map((btn) => (
-                  <button
-                    key={btn.id}
-                    onClick={() => setLabFilter(btn.id)}
-                    className={`px-6 py-2 rounded-lg font-black text-sm border-2 border-black transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${
-                      labFilter === btn.id ? 'bg-amber-400 text-black' : 'bg-white text-slate-400 border-slate-200 shadow-none'
-                    }`}
-                  >
-                    {btn.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* 4대 전략 대시보드 리스트 (스크롤 가능) */}
-              <div className="space-y-6 max-h-[65vh] overflow-y-auto pr-2 custom-red-scrollbar">
-                
-                {/* 1. 실시간 트렌드 카드 */}
-                {(labFilter === 'all' || labFilter === 'realtime') && (
-                  <div className="bg-slate-900 rounded-[30px] py-8 px-6 shadow-xl border border-white/10 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-white font-black text-sm flex items-center gap-2">
-                        ⚡ 실시간 주제
-                        <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">LIVE</span>
-                        {dynamicTopicsTimestamps[selectedCategory] && (
-                          <span className="text-[10px] font-bold text-slate-400">
-                            ({dynamicTopicsTimestamps[selectedCategory]} 검색)
-                          </span>
-                        )}
-                      </h3>
-                      <button 
-                        onClick={refreshLiveTrends}
-                        disabled={isLiveLoading}
-                        className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1"
-                      >
-                        {isLiveLoading ? '분석 중...' : '새로고침 🔄'}
-                      </button>
-                    </div>
-                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
-                      {dynamicTopics[selectedCategory] ? (
-                        dynamicTopics[selectedCategory].map((t, i) => (
-                          <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-white/5 hover:bg-indigo-600/30 text-white text-xs font-bold transition-all border border-white/5 whitespace-normal break-keep line-clamp-2 leading-relaxed">
-                            {i+1}. {t}
-                          </button>
-                        ))
-                      ) : (
-                        <div className="text-center py-10 space-y-3">
-                          <p className="text-slate-500 text-xs font-bold">지금 가장 핫한 주제는?</p>
-                          <button onClick={refreshLiveTrends} className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-xs font-black shadow-lg shadow-indigo-900/40 active:scale-95">실시간 분석 시작 🚀</button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
- 
-                {/* 2. 이번 달 주제 카드 */}
-                {(labFilter === 'all' || labFilter === 'monthly') && (
-                  <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
-                        🗓️ 이번 달 주제
-                        <span className="text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase">Monthly</span>
-                      </h3>
-                      <button onClick={() => refreshStaticSection(selectedCategory, 'monthly')} className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 transition-colors">새로고침 🔄</button>
-                    </div>
-                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
-                      {(displayedStaticTopics[`${selectedCategory}_monthly`] || []).map((t, i) => (
-                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
- 
-                {/* 3. 연간 주제 카드 */}
-                {(labFilter === 'all' || labFilter === 'annual') && (
-                  <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
-                        📅 연간 주제
-                        <span className="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase">Annual</span>
-                      </h3>
-                      <button onClick={() => refreshStaticSection(selectedCategory, 'annual')} className="text-[10px] font-bold text-slate-400 hover:text-amber-600 transition-colors">새로고침 🔄</button>
-                    </div>
-                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
-                      {(displayedStaticTopics[`${selectedCategory}_annual`] || []).map((t, i) => (
-                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
- 
-                {/* 4. 황금 키워드 카드 */}
-                {(labFilter === 'all' || labFilter === 'gold') && (
-                  <div className="bg-white rounded-[30px] py-8 px-6 border-2 border-slate-50 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-slate-800 font-black text-sm flex items-center gap-2">
-                        💎 황금 키워드
-                        <span className="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full uppercase">Evergreen</span>
-                      </h3>
-                      <button onClick={() => refreshStaticSection(selectedCategory, 'gold')} className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 transition-colors">새로고침 🔄</button>
-                    </div>
-                    <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1 custom-red-scrollbar">
-                      {(displayedStaticTopics[`${selectedCategory}_gold`] || []).map((t, i) => (
-                        <button key={i} onClick={() => handleSelectTopic(t)} className="w-full text-left py-3.5 px-4 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 text-xs font-black transition-all border border-slate-100 whitespace-normal break-keep line-clamp-2 leading-relaxed">
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          {renderTopicLabContent(false)}
         </div>
       )}
 
